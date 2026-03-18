@@ -1,0 +1,23 @@
+<experimental-study name="pebbl-knap">
+  <tags>
+    <tag>nightly</tag>
+    <tag>smoke</tag>
+  </tags>
+
+  <experiment>
+    <factors>
+      <factor name="test" filename="knap_problems"/>
+    </factors>
+    <controls>
+       <executable type="runexp_driver">exp.pebbl.pl --knapsack</executable>
+    </controls>
+  </experiment>
+
+  <analyze>
+    <test name="FinalValue" type="validate">
+      <options>_measurement='Value' _tolerance=_opttol</options>
+    </test>
+  </analyze>
+
+</experimental-study>
+

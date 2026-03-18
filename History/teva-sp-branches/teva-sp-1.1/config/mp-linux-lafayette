@@ -1,0 +1,49 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for host=SOLARIS at site=SNL.STD		#
+#-----------------------------------------------------------------------#
+
+CPLEX_DIR=/usr/ilog/cplex90
+CPLEX_INCLUDES=-I$(CPLEX_DIR)/include/ilcplex
+CPLEX_LIBS=-lcplex -lpthread
+CPLEX_LDFLAGS=-L$(CPLEX_DIR)/lib/i86_linux2_glibc2.3_gcc3.2/static_pic
+
+#MPI_DIR=/Net/proj/opt/packages/LINUX/mpich
+##MPI_DIR=/usr/local/lib/mpich.current
+#MPI_INCLUDES=-I$(MPI_DIR)/include
+#MPI_LIBS=-lmpich
+#MPI_LDFLAGS= -L$(MPI_DIR)/lib
+
+MPI_DIR=/usr/src/redhat/SOURCES/lam-7.0
+MPI_INCLUDES=-I/usr/local/include
+MPI_LIBS=-llammpi++ -llammpio -llamf77mpi -lmpi -llam -lpthread
+MPI_LDFLAGS= -L$(MPI_DIR)/lib
+ 
+MPE_DIR=
+MPE_INCLUDES=
+MPE_LIBS=
+MPE_LDFLAGS=
+
+XPRESS_DIR=
+XPRESS_INCLUDES=
+XPRESS_LIBS=
+XPRESS_LDFLAGS=
+
+SOPLEX_DIR=SOPLEX_DIR=$(ROOT_DIR)/../soplex
+SOPLEX_INCLUDES=-I$(SOPLEX_DIR)/src
+SOPLEX_LIBS=-lsoplex
+SOPLEX_LDFLAGS=-L$(SOPLEX_DIR)/lib
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+
+PYTHON_DIR=
+PYTHON_LIBS=
+PYTHON_INCLUDES=
+PYTHON_LDFLAGS=
+
+SWIG_DIR=
+SWIG_LIBS=
+SWIG_INCLUDES=
+SWIG_LDFLAGS=

@@ -1,0 +1,94 @@
+
+
+
+C      SUBROUTINE FUN( N, M, X, F, C, IFERR )
+CC
+CC  THIS SUBROUTINE COMPUTES
+CC  THE OBJECTSIVE  FUNCTION VALUE AND THE VALUES OF  
+CC  THE CONSTRAINTSFOR A GIVEN POINT X BY CALLING THE 
+CC  CUTE INTERFACE SUBROUTINE CFN. 
+CC  IF CFN RETURNS A NAN OF INF VALUE
+CC  THE ROUTINE REPORTS AN ERROR BY SETTING IFERR=.TRUE.
+CC
+C
+C
+C   
+C       DOUBLE PRECISION X(N), F, C(M)
+C       LOGICAL          IFERR
+C       INTEGER          N, M
+C
+C       INTEGER           I
+C
+CC
+CC  COMPUTES THE VALUES OF FUNCTION AND CONSTRAINTS AND CHECKS IS 
+CC  THE VALUES ARE NOT INF OR NAN
+CC
+C       IFERR=.FALSE.
+C
+C       CALL CFN( N , M , X , F , M, C)
+C
+C       IF (.NOT.( F .LT. 10.0D20 .AND. F .GT. -10.0D20 ))
+C     +            IFERR = .TRUE.
+C
+C       DO 10 I=1, M
+C         IF (.NOT.( C(I) .LT. 10.0D20 .AND. C(I) .GT. -10.0D20 ))
+C     +              IFERR = .TRUE.
+C 10    CONTINUE
+C
+C       RETURN
+C       END
+
+
+
+
+      SUBROUTINE FMERIT(M, VAL, OBJVAL, C, CU, CL, PP, METHOD ) 
+   
+       DOUBLE PRECISION VAL, OBJVAL, C(*), CL(*), CU(*), PP
+       INTEGER          M, METHOD
+
+
+       INTEGER          I
+C
+C  COMMON VARIABLES
+C
+
+C
+C  PROBLEM CONTROL PARAMETERS
+C
+      INTEGER          IOUT  , IPRINT
+      DOUBLE PRECISION MCHEPS, CNSTOL 
+      COMMON / DFOCM / IOUT  , IPRINT, MCHEPS, CNSTOL
+      SAVE / DFOCM /
+C
+C  PP IS THE PENALTY PARAMETER
+C
+
+       VAL=OBJVAL
+       IF ( METHOD .NE. 4 ) THEN 
+         DO 10 I =1, M
+           IF (CL(I)-CNSTOL.GT.C(I)) THEN
+              VAL = VAL + PP*(CL(I)-C(I))
+           ELSEIF  (CU(I)+CNSTOL.LT.C(I)) THEN
+              VAL = VAL + PP*(C(I)-CU(I))
+           ENDIF
+ 10      CONTINUE
+       ELSE
+         DO 20 I =1, M
+           IF (CL(I)-CNSTOL.GT.C(I)) THEN
+              VAL = VAL + PP*(CL(I)-C(I))**2
+           ELSEIF  (CU(I)+CNSTOL.LT.C(I)) THEN
+              VAL = VAL + PP*(C(I)-CU(I))**2
+           ENDIF
+ 20      CONTINUE
+       ENDIF
+       RETURN
+       END
+
+
+
+
+
+
+
+
+

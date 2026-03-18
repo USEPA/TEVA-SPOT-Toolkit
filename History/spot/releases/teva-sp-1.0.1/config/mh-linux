@@ -1,0 +1,15 @@
+#-------------------------------------------------#
+# Host ARCHitecture dependent definitions - LINUX #
+#-------------------------------------------------#
+
+ECHO		= /bin/echo
+LN		= ln -s
+LND		= ln -s
+MYMAKE		= gmake
+MAKE		= $(MYMAKE) -f Makefile-$(TARGET_NAME)
+PWD		= pwd
+RM		= rm -rf
+SHELL		= /bin/sh
+SYMBTEST	= -L
+YACC		= yacc
+LEX		= flex -l

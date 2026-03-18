@@ -1,0 +1,59 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for host=SOLARIS at site=RUTGERS		#
+#-----------------------------------------------------------------------#
+
+# CPLEX 7.1 is installed in /local/cplex-old on Jobim as of December 2003
+# CPLEX 8.0 is now in /local/cplex, but probably won't work with PICO yet.
+CPLEX_DIR=/local/cplex-old
+CPLEX_INCLUDES=-I$(CPLEX_DIR)/include
+CPLEX_LIBS=-lcplex -lm -lnsl -lsocket
+CPLEX_LDFLAGS=-L$(CPLEX_DIR)/lib
+
+# This is for LAM; installed in /local
+MPI_DIR=/local/lam
+MPI_INCLUDES=-I$(MPI_DIR)/include
+MPI_LDFLAGS=-L$(MPI_DIR)/lib
+# MPE not presently supported with LAM
+MPE_DIR= 
+MPE_INCLUDES=
+MPE_LIBS= 
+MPE_LDFLAGS=
+MPI_LIBS=$(MPE_LIBS) -lpmpi -lmpi -llam -lsocket -lnsl -laio
+
+# This is for MPICH; now installed in /local
+# MPI_DIR=/local/mpich
+# MPI_INCLUDES=-I$(MPI_DIR)/include \
+#              -DUSE_STDARG -DHAVE_STDLIB_H=1 -DHAVE_STRING_H=1 \
+#              -DHAVE_UNISTD_H=1 -DHAVE_STDARG_H=1 -DUSE_STDARG=1 \
+#              -DMALLOC_RET_VOID=1
+# MPI_LDFLAGS=-L$(MPI_DIR)/lib
+# MPE_DIR= $(MPI_DIR)
+# MPE_INCLUDES=-DUSING_MPE
+# MPE_LIBS= -lmpe
+# MPE_LDFLAGS=
+# MPI_LIBS=$(MPE_LIBS) -lmpich -lnsl -lrt -lthread -lnsl -laio
+
+# SUN HPC MPI with CC 5.0/6.0 -- abandon due to bad behavior with
+# aborts and uselessness of new release of Prism
+# MPE_DIR= /local/custom/MPE
+# MPE_INCLUDES=-DMPE -I$(MPE_DIR)
+# MPE_LIBS=-lmpe
+# MPE_LDFLAGS=-L$(MPE_DIR)
+# MPI_DIR=/opt/SUNWhpc
+# MPI_INCLUDES=-I$(MPI_DIR)/include -mt
+# MPI_LIBS=$(MPE_LIBS) -lmpi -lmpi++ -lrte -ldl -lposix4
+# MPI_LIBDIR=$(MPI_DIR)/lib
+# MPI_LDFLAGS=-R$(MPI_LIBDIR)/SC5.0:$(MPI_LIBDIR) -L$(MPI_LIBDIR)/SC5.0 -L$(MPI_LIBDIR)
+
+ARCH_LIBS = 
+
+XPRESS_DIR=
+XPRESS_INCLUDES=
+XPRESS_LIBS=
+XPRESS_LDFLAGS=
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+

@@ -1,0 +1,65 @@
+/*  _________________________________________________________________________
+ *
+ *  UTILIB: A utility library for developing portable C++ codes.
+ *  Copyright (c) 2001, Sandia National Laboratories.
+ *  This software is distributed under the GNU Lesser General Public License.
+ *  For more information, see the README file in the top UTILIB directory.
+ *  _________________________________________________________________________
+ */
+
+/**
+ * \file comments.cpp
+ *
+ * \author William E. Hart
+ */
+
+#include <utilib/comments.h>
+
+namespace utilib {
+
+
+UTILIB_API istream& whitespace(istream& ins)
+{
+char c='\000';
+ins.get(c);
+
+while (ins) {
+  if (! ((c == ' ') || (c == '\t') || (c == '\n')) ) {
+     break;
+     }
+ 
+  ins.get(c);
+  }
+if (ins)
+   ins.putback(c);
+ 
+return ins;
+}
+
+
+UTILIB_API istream& comment_lines(istream& ins, int& line_counter)
+{
+char c='\000';
+bool flag=true;
+ 
+ins >> whitespace;
+ 
+while ((flag == true) && ins) {
+  ins.get(c);
+  if (ins && (c != '#')) {
+     ins.putback(c);
+     flag = false;
+     continue;
+     }
+ 
+  while (ins && (c != '\n'))
+    ins.get(c);
+ 
+  line_counter++;
+  ins >> whitespace;
+  }
+ 
+return ins;
+}
+
+} // namespace utilib

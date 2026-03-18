@@ -1,0 +1,8 @@
+#!/bin/sh
+##
+## Dummy script that calls ./bin/testdriver to manage configuration, builds
+## and testing
+##
+                                                                                
+./bin/testdriver $*
+

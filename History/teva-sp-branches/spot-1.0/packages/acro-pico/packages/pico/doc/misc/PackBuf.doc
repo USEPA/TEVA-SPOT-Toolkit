@@ -1,0 +1,79 @@
+
+The PackBuffer and UnPackBuffer classes provide a convenient mechanism
+for packing and unpacking buffers for communication.  They are
+currently implemented for use with MPI, with which they use MPI's Pack
+and UnPack routines.
+
+
+The PackBuffer class dynamically resizes its internal buffer to contain
+enough memory to pack the entire object.  When deleted, this internal buffer
+is deleted.
+
+const char* buf()
+
+  This method returns a pointer to the internal buffer.
+
+int len()
+
+  This method returns the amount of memory used to pack the data.
+
+void reset()
+
+  This method resets the pointer used for packing, which effectively resets
+  the PackBuffer class to pack new data.
+ 
+void pack(const <type>* data, const int num=1)
+void pack(const <type>& data)
+
+  The pack methods are defined for a variety of standard data types.
+  The first pack method can be used to pack a vector of <type>'s, and the
+  second pack method can be used to pack a single <type>.
+
+PackBuffer& operator<< (PackBuffer& buff, const <type>& data) 
+
+  The in-stream operator provides a convenient shorthand for the second
+  pack method.
+
+
+
+The UnPackBuffer class retrieves information from a given buffer.
+
+void setup(char* buf_, int size_)
+
+  This method sets the buffer and buffer size and resets the buffer to prepare
+  it for retrieval.
+ 
+UnPackBuffer(char* buf_=0, int size_=0)
+
+  The construct simply calls the setup method.
+
+~UnPackBuffer()
+
+  The destructor deletes the buffer supplied to the setup or to the constructor.
+ 
+const char* buf()
+
+  This method returns a pointer to the buffer.
+
+int len()
+
+  This method returns the current index used to retrieve information from the 
+  buffer;
+
+void reset()
+
+  This method resets the buffer, which enables this class to retrieve information
+  from the same buffer again.
+
+void unpack(const <type>* data, const int num=1)
+void unpack(const <type>& data)
+
+  The unpack methods are defined for a variety of standard data types.
+  The first unpack method can be used to unpack a vector of <type>'s, and the
+  second unpack method can be used to unpack a single <type>.
+ 
+
+UnPackBuffer& operator>> (UnPackBuffer& buff, const <type>& data)
+
+  The out-stream operator provides a convenient shorthand for the second
+  unpack method.

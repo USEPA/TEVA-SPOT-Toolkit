@@ -1,0 +1,33 @@
+/*!
+ * \page mip_extensions
+
+\section mip_extensions Customizing the PICO MIP Solver
+
+
+\subsection extensionsOverview MIP Customizations
+
+TODO - why we would customize a MIP solver
+<ol>
+
+<li>  Custom incumbent heuristic
+
+<li>  Custom incument generation
+
+<li>  Custom problem definition (loading data and printing results)
+
+</ol>
+
+
+
+\subsection extensionsGenerating Generating a Derived PICO MIP Solver
+
+TODO - how to use gen_milp_app
+
+
+
+\subsection extensionsExample Application Example
+
+
+TODO - what application?  what customization?
+
+*/

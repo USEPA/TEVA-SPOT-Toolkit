@@ -1,0 +1,32 @@
+#-----------------------------------------------------------------------#
+#       These SITE Macros for a STANDARD configuration are used 	#
+#	everywhere.				                        #
+#									#
+#	This is the configuration that I use for development, so I make	#
+#	assumptions that the make environment is less brain-dead.	#
+#	In particular, I use VPATH and the += option			#
+#-----------------------------------------------------------------------#
+
+BINDIR= $(ROOT_DIR)/bin
+LIBDIR= $(ROOT_DIR)/lib
+SRCDIR= $(ROOT_DIR)/src
+INCDIR= $(ROOT_DIR)
+DOCDIR= $(ROOT_DIR)/doc
+TEMPLATE_DIR=$(ROOT_DIR)
+
+PACKAGE_INCLUDES= $(MPI_INCLUDES)
+PACKAGE_LIBS= $(MPI_LIBS)
+PACKAGE_LDFLAGS= $(MPI_LDFLAGS)
+PACKAGE_DEFINES= $(MPI_DEFINE) $(MPE_DEFINE)
+
+##
+## Define global compiling flags
+##
+XTRAFLAGS = $(MALLOC) $(WARNINGS) $(DEBUGGING) $(ANSI_FLAG) $(ANSIHDR_FLAG) \
+	    $(MAPPEDIO_FLAG) -DDLL_API=
+INCLUDES = $(PACKAGE_DEFINES) -I. -I$(INCDIR) $(PACKAGE_INCLUDES)
+
+LDLIBS = -lutilib $(PACKAGE_LIBS) $(ARCH_LIBS) -lm
+ 
+LDFLAGS = -L$(LIBDIR) $(PACKAGE_LDFLAGS)
+

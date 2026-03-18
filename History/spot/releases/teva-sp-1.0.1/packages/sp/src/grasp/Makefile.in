@@ -1,0 +1,53 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+library:
+
+install_library:
+
+C++FLAGS +=  -DNDEBUG -DBOSSA_RUSAGE
+LDLIBS = -lm #-lthreatassess -ltevautil -lepanet
+EXECUTABLES= grasp.exe pmgen.exe impact2pmm.exe
+
+SRCS=\
+basics.cpp\
+bossa_random.cpp\
+bossa_timer.cpp\
+constructive.cpp\
+cover_instance.cpp\
+distance.cpp\
+elite.cpp\
+euclidean_instance.cpp\
+geo_instance.cpp\
+graph_instance.cpp\
+hybrid_instance.cpp\
+impact_instance.cpp\
+matrix_instance.cpp\
+path_relink.cpp\
+search.cpp\
+search_tables.cpp\
+solution.cpp
+
+OBJS=$(SRCS:.cpp=.o)
+
+
+all:	executables
+
+clean:
+	@$(RM) -Rf *.o *.ii *.ti SunWS_cache
+	@$(RM) -Rf $(EXECUTABLES)
+	@$(RM) -Rf $(EXECUTABLES:.exe=)
+
+executables:
+	$(MAKE) $(EXECUTABLES:.exe=)
+	cp $(EXECUTABLES:.exe=) $(ROOT_DIR)/bin
+
+grasp: grasp.cpp $(OBJS)
+	$(CCC) $(ARCH_FLAGS) -o grasp $(C++FLAGS) $(INCLUDES) grasp.cpp $(OBJS) $(LDLIBS)
+
+pmgen: pmgen.cpp $(OBJS)
+	$(CCC) $(ARCH_FLAGS) -o pmgen $(C++FLAGS) $(INCLUDES) pmgen.cpp $(OBJS) $(LDLIBS)
+
+impact2pmm: impact2pmm.cpp
+	$(CCC) $(ARCH_FLAGS) -o impact2pmm $(C++FLAGS) $(INCLUDES) impact2pmm.cpp $(LDLIBS)
+

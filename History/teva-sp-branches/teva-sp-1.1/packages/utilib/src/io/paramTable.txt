@@ -1,0 +1,114 @@
+The PARAMETER Class
+===================
+
+Jonathan Eckstein, June 1997
+Updated January 1999
+
+
+The class "parameter" allows for a simple and consistent method for
+entering numeric algorithmic parameters that have default values
+overridable from a file.  To use, #include "paramTable.H".
+
+To define a parameter as a class member, you code:
+
+CLASS_PARAMETER(name);	in the class definition 
+			(expands to "static parameter name")
+
+CLASS_PARAMETER_DEF(class,name,min,default,max);	in the top level of
+                                                 	some source module.
+
+Here, "class" is the name of the class, "min" is the minimum value of
+the parameter, "default" is the default value, and "max" is the
+maximum value.  The (double) value of the parameter is then available
+as member "name()" of "class".
+
+You can also define parameters with global scope:
+
+GLOBAL_PARAMETER(name);		in your header file.
+
+GLOBAL_PARAMETER_DEF(name,min,default,max);  	at the top level of some
+						source module.
+
+The parameter value is then available globally as "name()".
+
+Defining two parameters with the same name (even if they are in two
+different classes) will cause an error message at run time.
+
+
+Methods:
+-------
+
+static void readAll(int argc,char** argv,int minArgs,int maxArgs);
+
+Reads the values of all algorithm parameters from the command line
+given by argc, argv.  Parameter values are read from the command line,
+or from files specified on the command line (see "file format" below).
+If MPI is active, one processor will read set up the parameters and
+broadcast their values to all other processors.  
+
+The method counts the number of command line tokens that do not start
+with a hyphen ('-').  If this count is outside the range
+[minArgs,maxArgs], it issues an error message.  minArgs has a default
+value of 0 and maxArgs has a default value of 1.
+
+
+void changeValue(double newValue);
+
+[Example of use:  heuristic::maxIterations.changeValue(100)].  Sets
+the value of a parameter to "newValue".  
+
+
+static int howMany()
+
+Returns the number of parameters currently defined.
+
+
+
+Command Line Format:
+-------------------
+
+Parameters are set by command line arguments of the form -name=value,
+with no spaces either before or after the '='.
+
+The "value" part of the string is interpreted as under "File Format"
+below.  "Name" must be the name of a defined parameter, or 'param'.
+If the name is a define parameter, it is set to value, which is
+interpreted as under "File Format" below.  If the "=value" part is
+omitted, it is interpreted the same as "=1" or "=true".
+
+There are two special cases, "-param=file" and "-param".  In teh
+"-param=file" case, parameter values are read from the file specified
+by "file", using the format described below.  For "-param", parameters
+are read from standard intput using the same formatl.
+
+
+
+File Format:
+-----------
+
+Files (or standard input) read by parameter::readAll are in a free
+format consisting of pairs of the form
+
+	name	value
+
+separated by white space (new lines, spaces, tabs).  "name" must be a
+parameter name.  "value" is interpreted as a double, except that
+"true" means 1 and "false" means 0 (both of these keywords are case
+insensitive).  A "*" character at the beginning of a line, or after a
+space or tab, is interpreted as the start of a comment, and input is
+ignored until the beginning of the next line.  For parameters defined
+as class members, the class name is *not* part of the parameter name
+and should not be included in "name".
+
+
+Notes
+-----
+
+I anticipate that all parameters will be globals or static class
+members.  It is possible to bypass the definition/declaration macros
+given above to define automatic/ephemeral parameters, but I don't see
+an obvious use for this.
+
+At run time, static initialization of parameters causes them to
+assemble themselves into a hash table that is used by readAll(...).
+

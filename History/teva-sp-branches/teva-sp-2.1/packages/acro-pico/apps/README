@@ -1,0 +1,7 @@
+
+This directory can be used as a 'sandbox' for building Acro applications.
+
+This capabatility is still under development, but the goal is for the
+makefile in this directory be useful to build Acro-based executables in a
+transparent manner.
+

@@ -1,0 +1,279 @@
+Getting started with PICO:
+
+PICO is a general (parallel) branch-and-bound library which includes a
+general mixed-integer-programming (MIP) code.  This MIP code has
+branch and cut, but it is not currently working.  It also has no
+user-level documentation other than this.  Please ask questions as
+they arise as that will help us develop the FAQ and documentation.
+
+This document describes how to check out and maintain PICO and
+required libraries using cvs and how to run a simple example MIP
+problem.
+
+PICO requires utilib utility library.  This predates STL and has some
+things STL does not, (or does them better or more portably).  For more
+information on utilib, see http://www.cs.sandia.gov/UTILIB/
+(Note: the checkout directions on that page may not be current.  Use
+the ones below).
+
+To run the MIP code in PICO, you will also need a linear-programming
+solver.  Right now, PICO supports cplex version 7 and soplex.  We use
+the COIN OSI interface, but we require some functionality on top of
+that provided by OSI.  In principle, though, any LP solver with an OSI
+interface can be supported by PICO with a "little" extra effort.  We
+maintain a soplex repository and give directions below to use it.  However,
+before you check out the code, you must go to the soplex home page
+http://www.zib.de/Optimization/Software/Soplex/soplex.php
+and acquire your own license.  This is free for academic and research work.
+
+The default configurations assume that all three libraries are in
+"sibling" directories.  For example src/pico, src/utilib, and
+src/SOPLEX.  Make sure you have installed utilib and one of the lp
+libraries before installing PICO.
+
+There are 4 scripts appended to this file (I would have put them in a
+shar file, but can't find shar on this system): ssh.cvs, cvs.u, cvs.p,
+and cvs.so.  The scripts are delineated with lines like
+***** begin cvs.u ****** and
+***** end cvs.u ****
+Save the four scripts to files (without the **** lines) and make them executable
+(eg chmod 755 cvs.u).
+
+To get a copy of utilib, make sure you're in the directory where you'd like
+the utilib code tree placed.  Then type
+
+cvs.u -guest utilib checkout
+
+You will be prompted for a password, which is anonymous (that is, the
+word "anonymous").
+
+Similar commands (executed in the same directory) will check out pico
+(using cvs.p, same password) and soplex (using cvs.so, password: linear!).
+
+Now cd into utilib and run the following two commands:
+
+configure
+make install
+
+This should create a library for your system that will work for serial
+code.  It also creates symbolic links in the utilib/include directory
+to all the header files throughout the code tree.  This is a handy
+place to grep if you're looking for a particular method or class.
+Utilib has been ported to many platforms and this *should* go through
+without problems.
+
+If you want to run PICO in parallel, you will have to configure utilib
+(and PICO) to run with MPI.  You have to tell utilib where mpi is on
+your machine. To do this, go to the utilib/config directory.  This has
+a number of configuration fragments with names like mp-solaris-snl980.
+All the mp- files specify where packages (such as mpi or cplex) are.
+The second part of the name specifies an operating system and the
+third specifies a location.  Find an mp-<your os>-<foo> file and copy
+it into mp-<your os>-<name for your site> file.  Then edit the line that
+looks like:
+
+MPI_DIR=/Net/proj/opt/packages/SOLARIS/mpich
+
+to specify the location of mpi (mpich) on your machine.
+
+Then go back to the utilib main directory and execute
+
+configure --with-mpi
+make clean
+make install
+
+(the make clean may not be necessary, but it never hurts).
+
+Installing PICO is similar.  If you choose to use soplex, then
+in the main pico directory execute:
+
+configure --with-soplex
+make install
+
+As with utilib, you can create an mp-<os>-<your site> file to specify the
+location of mpi and/or cplex.  Then configure as
+configure --with-mpi --with-soplex
+
+or
+
+configure --with-mpi --with-cplex
+
+etc.
+
+Access through the guest account will not give you permission to modify
+utilib or pico through cvs commit commands.  However, you can receive updates via
+
+cvs.u -guest update
+
+run from the main utilib directory (or in a subdirectory if you like).
+This will give you bug fixes, new features, etc.  After the update,
+it's a good idea to reconfigure and do a clean install.  The text file
+config.status in the main utilib directory shows what was used in the
+last configuration.  If you just want to reconfigure with the same options, you
+can execute
+
+bin/reconfigure
+make clean
+make install
+
+Of course if you want to change the options, e.g. to change the lp
+solver in pico, then you will have to type the reconfigure command
+with the appropriate options.
+
+Running PICO:
+
+Installing PICO creates a number of executables in the directory
+pico/src/apps/milp
+
+In particular, serialMIP and parMIP run serial and parallel mixed-integer
+programming solvers respectively.  The command-line call for a serial run is
+
+serialMIP file.mps -<option>=val ...
+
+The MIP file can be in either mps format (a standard MIP/LP format) or
+in lp format.  I think our mps reader is currently more robust.  There
+are a number of examples from the standard miplib in
+
+pico/src/etc/mpsfiles/miplib/
+
+This directory includes a file miplib.cat which for most of these
+problems has statistics about size, value of the LP relaxation, value
+of the optimal integer solution, which variables are integer, binary
+vs. general integer, etc.
+
+The remainder of the arguments in the command line can adjust PICO
+parameters.  These set constants or strategies within the program such
+as tolerances.  All parameters have default values, so you can run
+without specifying anything after the mps file.  I'll try to produce
+comprehensive documentation for all the command-line parameters ASAP.
+In the meantime, you can ask if you think you should be able to tweak
+something or you can look for code lines that look like:
+
+CLASS_PARAMETER_DEF(picoBase,statusPrintFrequency,0,1000,MAXDOUBLE);
+
+This defines a parameter called statusPrintFrequency, which controls
+the number of subproblem solutions between printing of a status line
+(the status line, among other things, tells you the value of the best
+solution found so far and the gap between the lower and upper bounds).
+This parameter has a default of 1000, a minimum value of 0, and
+maximum value of MAXDOUBLE.  So, if you decide you'd rather get status
+information every 500 subproblems, you'd run:
+
+serialMIP myprob.mps -statusPrintFrequency=500
+
+You can also specify parameter adjustments in a file but I don't
+remember the precise syntax and don't want to hold this up while I
+look for it.  If you specify a parameter without a value, the default
+is 1 (e.g. for turning on binary options such as using a depth-first search)
+
+serialMIP myprob.mps -depthFirst
+
+To run a parallel instance, you'll have to make sure mpi is set up
+properly.  For instance we alias mpirun to
+
+mpirun -machinefile ~/.mpi_machines !*
+
+Then in ~/.mpi_machines you can list the machines to run on in order.
+So for, example, if you wish to run on 2 machines, the first two in
+the list are used.  Make sure you have configured ssh to allow
+password-free login between these machines.
+
+To run a parallel instance, execute
+
+mpirun -np <number-of-machines> parMIP file.mps -<option>=val ...
+
+The solution is put in a file pico-solution.dat in the directory where
+you run pico.
+
+
+***** begin ssh.cvs ******
+
+#!/bin/sh -f
+##
+## cvs.ssh [...]
+##
+## Specifies the encryption protcol that can be used to access a remote cvs
+## repository with ssh.
+##
+
+ssh -c 3des $*
+
+
+***** end ssh.cvs ****
+
+***** begin cvs.u ******
+
+#!/bin/sh -f
+##
+## cvs-u [-guest] [...]
+##
+## cvs-u sends a cvs command to the remote cvs repository that contains the
+## utilib software package.  If the '-guest' option is used, you can checkout
+## software but you cannot commit changes back into the repository.
+##
+
+CVSROOT=
+CVS_RSH=ssh.cvs
+export CVS_RSH
+
+if [ "$1" = "-guest" ]; then
+   shift
+   cvs -d :ext:GUEutili@gaston.cs.sandia.gov:/usr/local/cvs/cvsroot $*
+else
+   cvs -d :ext:DEVutili@gaston.cs.sandia.gov:/usr/local/cvs/cvsroot $*
+fi
+
+
+***** end cvs.u ****
+
+***** begin cvs.p ******
+
+#!/bin/sh -f
+##
+## cvs-p [-guest] [...]
+##
+## cvs-p sends a cvs command to the remote cvs repository that contains the
+## pico software package.  If the '-guest' option is used, you can checkout
+## software but you cannot commit changes back into the repository.
+##
+
+CVSROOT=
+CVS_RSH=ssh.cvs
+export CVS_RSH
+
+if [ "$1" = "-guest" ]; then
+   shift
+   cvs -d :ext:GUEpico@gaston.cs.sandia.gov:/usr/local/cvs/cvsroot $*
+else
+   cvs -d :ext:DEVpico@gaston.cs.sandia.gov:/usr/local/cvs/cvsroot $*
+fi
+
+***** end cvs.p ****
+
+***** begin cvs.so ******
+
+#!/bin/sh -f
+##
+## cvs-so [-guest] [...]
+##
+## cvs-so sends a cvs command to the remote cvs repository that contains the
+## soplex software package.  If the '-guest' option is used, you can checkout
+## software but you cannot commit changes back into the repository.
+##
+
+CVSROOT=
+CVS_RSH=ssh.cvs
+export CVS_RSH
+
+if [ "$1" = "-guest" ]; then
+   shift
+   cvs -d :ext:GUEspx@gaston.cs.sandia.gov:/usr/local/cvs/cvsroot $*
+else
+   cvs -d :ext:DEVspx@gaston.cs.sandia.gov:/usr/local/cvs/cvsroot $*
+fi
+
+***** end cvs.so ****
+
+
+
+

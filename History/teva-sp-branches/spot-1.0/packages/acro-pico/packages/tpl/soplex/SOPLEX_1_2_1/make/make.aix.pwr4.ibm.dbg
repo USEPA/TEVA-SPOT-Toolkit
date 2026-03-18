@@ -1,0 +1,8 @@
+#--- $Id: make.aix.pwr4.ibm.dbg,v 1.1 2002/06/25 21:07:09 DEVspx Exp $
+CXX	=	xlC_r
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-g -q32  \
+		-qsuppress=1540-1405:1540-5314 
+# -qheapdebug -qflttrap -qcheck=all -qinfo=all -qwarn64 -extchk
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

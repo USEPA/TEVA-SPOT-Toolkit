@@ -1,0 +1,1006 @@
+#!/usr/bin/python
+#
+# sp - sensor placement solver
+#
+# This generates a configuration file that can be read in by the SPProblem 
+# class and thereby initialize SP solvers.
+#
+# TODO - clean up temporary files created during the solve
+#
+# TODO - limit the solver runtime
+# 	 SEE http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/307871
+#
+
+import time
+import string
+import sys
+import re
+import os
+import os.path
+import commands
+import re
+import tempfile
+
+debug=False
+if sys.platform[0:3] == "win":
+   slash = "\\"
+else:
+   slash = "/"
+
+def run_command(command):
+  if sys.platform[0:3] == "win":
+     tmpfile = tempfile.gettempprefix() + ".sp"
+     system_call(command, tmpfile, True)
+     INPUT = open(tmpfile,"r")
+     ans = INPUT.read()
+     INPUT.close()
+     os.remove(tmpfile)
+     return ans
+  elif sys.platform[0:5] == "linux" or sys.platform == "cygwin":
+     return commands.getoutput(command)
+  else:
+     print "ERROR: unknown platform " + sys.platform
+     sys.exit(1)
+
+def system_call(command,outfile,flag):
+  if sys.platform[0:3] == "win":
+     cmdline = command
+     if outfile != "":
+        if flag:
+           cmdline = cmdline + " > " + outfile
+        else:
+           cmdline = cmdline + " >> " + outfile
+  elif sys.platform[0:5] == "linux" or sys.platform == "cygwin":
+     cmdline = "(" + command
+     if outfile != "":
+        if flag:
+           cmdline = cmdline + ") > " + outfile + " 2>&1"
+        else:
+           cmdline = cmdline + ") >> " + outfile + " 2>&1"
+     else:
+        cmdline = cmdline + ")"
+  else:
+     print "ERROR: unknown platform " + sys.platform
+     sys.exit(1)
+  if debug:
+     print "Running local command: " + cmdline
+  return os.system(cmdline)
+
+def executable_exists(output_file):
+  if sys.platform[0:3] == "win":
+     return os.path.isfile(output_file + ".exe")
+  elif sys.platform[0:5] == "linux" or sys.platform == "cygwin":
+     return os.path.isfile(output_file)
+  else:
+     print "ERROR: unknown platform " + sys.platform
+     sys.exit(1)
+
+#
+# Misc global data
+#
+valid_objectives = [ "cost", "ec", "td", "mc", "nfd", "ns", "pe", "pk", "vc" ]
+valid_statistics = [ "mean", "median", "var", "tce", "cvar", "total", "worst" ]
+junctionmap = {}
+#
+# Command-line default values
+#
+objectives = []
+network = "ERROR"
+delay = "0";
+threshold={}
+costs="none"
+costs_names="none"
+fixed="none"
+fixed_names="none"
+invalid="none"
+invalid_names="none"
+constraints = []
+solver="grasp"
+solver_options=""
+seconds=-1.0
+compute_bound=False
+tmpname=""
+output_file=""
+data_dir=""
+amplname="ampl"
+summary_file=""
+format_str="cout"
+eval_all=False
+modpath=""
+binpath=""
+impactdir=""
+amplcplexpath=""
+picopath=""
+gamma = 0.05
+
+#
+#
+#
+def read_costs(fname):
+  INPUT = open(fname,"r")
+  len = 0
+  result = {}
+  for line in INPUT.xreadlines():
+    piece = re.split('[ \t]+', line.strip())
+    #print piece[0],piece[1]
+    result[ piece[0].strip() ] = eval(piece[1])
+  return result
+
+#
+#
+#
+def read_array(fname):
+  INPUT = open(fname,"r")
+  len = 0
+  result = []
+  for line in INPUT.xreadlines():
+    pieces = re.split('[ \t]+', line.strip())
+    for piece in pieces:
+      if piece[0] == "#":
+         break;
+      if len == 0:
+         len = eval(piece)
+      else:
+         result = result + [ piece.strip() ]
+  return result
+
+#
+# Function to print help information
+#
+def print_help():
+   print ""
+   print "sp - a python script for running the teva-sp sensor placement solvers\n"
+   print "usage:"
+   print ""
+   print "   sp [options...] --network=<network> --objective=<objective-ids>"
+   print "                   --ub=<objective>,<ub-limit>"
+   print ""
+   print "options:"
+   print ""
+   print "   ------------------------------------------------------------------"
+   print "   The following options control the specification of the type of"
+   print "   sensor placement problem that will be solved."
+   print "   ------------------------------------------------------------------"
+   print ""
+   print "   --network=<network>"
+   print "	The name of the network that will be analyzed"
+   print ""
+   print "   --objective=<objective-ids>"
+   print "	This option can be used one or more times to specify sensor"
+   print "	placement objectives.  Alternatively, this option can be used"
+   print "	once with a comma-delimited list of objectives."
+   print ""
+   print "	Objective names have the form: <goal>_<statistic>"
+   print "	The objective goals are:"
+   print "	  cost   the cost of sensor placement"
+   print "	  ec	 extent of contamination"
+   print "	  td	 time to detection"
+   print "	  mc	 mass consumed"
+   print "	  nfd	 number of failed detections"
+   print "	  ns	 the number of sensors"
+   print "	  pe	 population exposed"
+   print "	  pk	 population killed"
+   print "	  vc	 volume consumed"
+   print "	The objective statistics are:"
+   print "	  mean   the mean impact"
+   print "	  median the median impact"
+   print "	  var    the value-at-risk of the impact distribution"
+   print "	  tce    the tail-conditioned expectation of the impact distribution"
+   print "	  cvar   an approximation to TCE used with IP formulations"
+   print "	  worst  the worst impact"
+   print "	For simplicity, an objective name of the form <type> is"
+   print "	assumed to refer to the objective <type>_mean"
+   print ""
+   print "   --delay=<time>"
+   print "	Specifies the response delay (in minutes)."
+   print ""
+   print "   --gamma=<value>"
+   print "	Specifies the fraction of the distribution of impacts that will"
+   print "	be used to compute the var, cvar and tce measures.  Gamma is"
+   print "	assumed to lie in the interval (0,1].  It can be interpreted as"
+   print "	specifying the 100*gamma percent of the worst attacks that are"
+   print "	used for these calculations."
+   print ""
+   print "   --impact-dir=<directory>"
+   print "	Specifies the directory the contains impact files.  By"
+   print "	default the current directory is used."
+   print ""
+   print "   --aggregation-threshold=<goal>,<value>"
+   print "   --threshold=<goal>,<value>"
+   print "	Specifies the value that is used to aggregate 'similar'"
+   print "	impacts.  This is used to reduce the total size of the"
+   print "	sensor placement formulation (for large problems)."
+   print "	The solution generated with non-zero thresholds is not guaranteed"
+   print "	to be globally optimal."
+   print ""
+   print "   --ub-constraint=<objective>,<ub-value>"
+   print "   --ub=<objective>,<ub-value>"
+   print "	This option specifies a constraint on the maximal value of"
+   print "	an objective type.  This option can be repeated multiple"
+   print "	times with different objectives."
+   print ""
+   print "   --costs=<filename>"
+   print "   --costs-ids=<filename>"
+   print "	This file contains costs for the installation of sensors"
+   print "	throughout the distribution network.  This file contains"
+   print "	id/cost pairs, and default costs can be specified with the"
+   print "	id: __default__"
+   print ""
+   print "   --costs-indices=<filename>"
+   print "	This file contains costs for the installation of sensors"
+   print "	throughout the distribution network.  This file contains"
+   print "	index/cost pairs, and default costs can be specified with the"
+   print "	index: -1"
+   print ""
+   print "   --fixed-ids=<filename>"
+   print "   --fixed=<filename>"
+   print "	This file contains location ids of predefined sensor placements."
+   print "	Additional sensor locations are	considered by the optimizer, up"
+   print "	to given constraints on cost or impact values"
+   print ""
+   print "   --fixed-indices=<filename>"
+   print "	This file contains location indices of predefined sensor placements."
+   print "	Additional sensor locations are	considered by the optimizer, up"
+   print "	to given constraints on cost or impact values"
+   print ""
+   print "   --invalid-ids=<filename>"
+   print "   --invalid=<filename>"
+   print "	This file contains location ids where sensors cannot"
+   print "	be placed.  These ids are mapped to location indices using"
+   print "	the <network>.nodemap file."
+   print ""
+   print "   --invalid-indices=<filename>"
+   print "	This file contains location indices where sensors cannot"
+   print "	be placed."
+   print ""
+   print "   ------------------------------------------------------------------"
+   print "   The following options control the solver that is used to find"
+   print "   optimal sensor placements."
+   print "   ------------------------------------------------------------------"
+   print ""
+   print "   --solver=<type>"
+   print "	This option specifies the type of solver that is used to find"
+   print "	sensor placement(s).  The following solver types are currently"
+   print "	supported:"
+   print "	  grasp		A multistart local search heuristic (default)"
+   print "	  pico		A mixed-integer programming solver"
+   print "	  picoamp	A mixed-integer programming solver using AMPL"
+   print "	  cplexamp	A commercial mixed-integer programming solver"
+   print ""
+   print "   --solver-options=<string>"
+   print "	This option contains solver-specific options for controling"
+   print "	the sensor placement solver."
+   print ""
+   print "   --runtime=<seconds>"
+   print "	Terminate the solver after the specified number of seconds"
+   print "	have elapsed.  By default, no limit is placed on the runtime."
+   print "	(Not currently supported.)"
+   print ""
+   print "   --compute-bound"
+   print "	Only compute a bound on the value of the optimal solution."
+   print ""
+   print "   ------------------------------------------------------------------"
+   print "   The following options control the general behavior of this solver"
+   print "   interface."
+   print "   ------------------------------------------------------------------"
+   print ""
+   print "   --tmp-file=<filename>"
+   print "	Name of temporary file prefix used in this computation."
+   print "	The default name is \"<network-name>\"."
+   print ""
+   print "   --output=<filename>"
+   print "   --o=<filename>"
+   print "	Name of the output file that contains the sensor placement."
+   print "	The default name is \"<network-name>.sensors\""
+   print ""
+   print "   --summary=<filename>"
+   print "	Name of the output file that contains summary information"
+   print "	about the sensor placement."
+   print ""
+   print "   --format=<string>"
+   print "	Format of the summary information."
+   print ""
+   print "   --help"
+   print "	Print this error message."
+   print ""
+   print "   --debug"
+   print "	Print debugging information."
+   print ""
+   print "   --path=<directory>"
+   print "	Add this path to the set of paths search for executables and IP models."
+   print ""
+   print "   --amplcplexpath=<directory>"
+   print "	Look for ampl and cplexamp executables in this directory."
+   print "	This defaults to a 'blank' path, which implies that the"
+   print "	user's system path is used."
+   print ""
+   print "   --picopath=<directory>"
+   print "	Look for the PICO executable in this directory."
+   print "	This defaults to the path used for executables specified by."
+   print "	the --path option."
+   print ""
+   print "   --ampl=<ampl-name>"
+   print "	The name of the ampl executable (this defaults to 'ampl')."
+   print ""
+   print "   --eval-all"
+   print "	This option specifies that all impact files found will be used to"
+   print "	evaluate the final solution(s)."
+   print ""
+
+
+###
+### MAIN ROUTINE
+###
+
+#
+# Print help information
+#
+if (len(sys.argv) < 2):
+   print_help()
+   sys.exit(1)
+#
+# Process command-line 
+#
+cmdline=""
+i=1
+while (i < len(sys.argv)):
+  #
+  # Save the original command line
+  #
+  cmdline = cmdline + " " + sys.argv[i]
+  #
+  # Get the option/value pair
+  #
+  if (sys.argv[i]).startswith("--") == False:
+     print "ERROR: argument \"%s\" does not start with --\n" % sys.argv[i]
+     sys.exit(1)
+  tmp = (sys.argv[i].replace("--","")).split("=")
+  #
+  # Process the option
+  #
+  if   tmp[0] == "network":
+	network = tmp[1]
+
+  elif tmp[0] == "objective":
+	objectives = objectives + tmp[1].split(",")
+        for obj in objectives:
+	   objective = obj.split("_")
+	   if len(objective) == 2 and ((objective[1] == "median") or (objective[1] == "var") or (objective[1] == "tce")):
+              print "ERROR: the objective statistic",
+              print objective[1], "is not currently allowed!"
+              sys.exit(1)
+
+  elif tmp[0] == "delay":
+	delay = tmp[1]
+
+  elif tmp[0] == "gamma":
+	gamma = eval(tmp[1])
+
+  elif tmp[0] == "impact-dir":
+	impactdir = tmp[1]
+
+  elif (tmp[0] == "aggregation-threshold") or (tmp[0] == "threshold"):
+	tmp = tmp[1].split(",")
+	threshold[tmp[0]] = tmp[1]
+
+  elif tmp[0] == "lock-sensors" or tmp[0] == "sensors":
+	sensors = tmp[1]
+
+  elif tmp[0] == "ub-constraint" or tmp[0] == "ub":
+	constraints = constraints + [tmp[1]]
+
+  elif tmp[0] == "baseline-constraint" or tmp[0] == "baseline":
+	print "ERROR: constraints not currently supported"
+	sys.exit(1)
+
+  elif tmp[0] == "reduction-constraint" or tmp[0] == "reduction":
+	print "ERROR: constraints not currently supported"
+	sys.exit(1)
+
+  elif tmp[0] == "costs" or tmp[0] == "costs-ids":
+	costs_names = tmp[1]
+
+  elif tmp[0] == "costs-indices":
+	costs = tmp[1]
+
+  elif tmp[0] == "fixed" or tmp[0] == "fixed-ids":
+	fixed_names = tmp[1]
+
+  elif tmp[0] == "invalid" or tmp[0] == "invalid-ids":
+	invalid_names = tmp[1]
+
+  elif tmp[0] == "fixed-indices":
+	fixed = tmp[1]
+
+  elif tmp[0] == "invalid-indices":
+	invalid = tmp[1]
+
+  elif tmp[0] == "solver_options":
+	solver_options= tmp[1] + " " + solver_options
+
+  elif tmp[0] == "solver":
+	solver= tmp[1]
+
+  elif tmp[0] == "runtime":
+	seconds = tmp[1]
+
+  elif tmp[0] == "debug":
+	debug=True
+
+  elif tmp[0] == "compute-bound":
+	compute_bound=True
+
+  elif tmp[0] == "tmp-file":
+	tmpname=tmp[1]
+
+  elif tmp[0] == "output" or tmp[0] == "o":
+	output_file=tmp[1]
+
+  elif tmp[0] == "summary":
+	summary_file=tmp[1]
+
+  elif tmp[0] == "format":
+	format_str=tmp[1]
+
+  elif tmp[0] == "eval-all":
+	eval_all=True
+
+  elif tmp[0] == "path":
+	if (modpath == "") and (os.path.isfile(tmp[1] + slash + "GeneralSP.mod")):
+	   modpath = tmp[1] + slash
+	if (binpath == "") and (os.path.isfile(tmp[1] + slash + "sp")):
+	   binpath = tmp[1]
+
+  elif tmp[0] == "amplcplexpath":
+	amplcplexpath = tmp[1] + slash
+
+  elif tmp[0] == "picopath":
+	picopath = tmp[1]
+
+  elif tmp[0] == "help":
+	print_help()
+	sys.exit(1)
+
+  else:
+	print "ERROR: unknown command line option \"%s\"" % tmp[0]
+	sys.exit(1)
+  i+=1
+
+if impactdir == "":
+   impactdir = os.getcwd();
+if modpath == "":
+   modpath = os.getcwd();
+if binpath == "":
+   binpath = os.getcwd();
+if data_dir == "":
+   data_dir = os.getcwd();
+if picopath == "":
+   picopath = binpath
+
+if (solver == "cplexamp" or solver == "picoamp") and sys.platform == "cygwin":
+   modpath = commands.getoutput("cygpath -d " + modpath)
+   data_dir = commands.getoutput("cygpath -d " + data_dir)
+   picopath = commands.getoutput("cygpath -d " + picopath)
+
+if (solver == "pico" or solver == "grasp") and sys.platform == "cygwin":
+   impactdir = commands.getoutput("cygpath -m " + impactdir)
+   data_dir = commands.getoutput("cygpath -m " + data_dir)
+   modpath = commands.getoutput("cygpath -m " + modpath)
+
+if tmpname == "":
+   tmpname = network
+if output_file == "":
+   output_file = network + ".sensors"
+nodemap_file = impactdir + slash + network + ".nodemap"
+
+#
+# Verify stuff
+#
+if (gamma <= 0.0) or (gamma > 1.0):
+   print "ERROR: gamma must be in the interval (0,1]."
+   sys.exit(1)
+if len(objectives) == 0:
+   print "ERROR: no objective specified."
+   sys.exit(1)
+if len(constraints) == 0:
+   print "ERROR: no constraints specified."
+   sys.exit(1)
+if network == "ERROR":
+   print "ERROR: network name is unspecified."
+   sys.exit(1)
+if (compute_bound==True) and (solver=="grasp"):
+   print "ERROR: can only compute the bound with an IP solver!"
+   sys.exit(1)
+#
+# Processing data
+#
+goals = []
+measures = {}
+bounds = {}
+objflag = {}
+allmeasures = []
+for obj in objectives:
+  tmp = obj.split("_")
+  if tmp[0] not in goals:
+     goals = goals + [ tmp[0] ]
+     measures[tmp[0]] = []
+     objflag[tmp[0]] = True
+  if tmp[0] == "ns":
+     measures[tmp[0]] = ["total"]
+     allmeasures = allmeasures + ["total"]
+  elif tmp[0] == "cost":
+     measures[tmp[0]] = ["total"]
+     allmeasures = allmeasures + ["total"]
+  elif len(tmp) == 1:
+     measures[tmp[0]] = measures[tmp[0]] + ["mean"]
+     allmeasures = allmeasures + ["mean"]
+  else:
+     measures[tmp[0]] = measures[tmp[0]] + [tmp[1]]
+     allmeasures = allmeasures + [tmp[1]]
+for obj in constraints:
+  tmp = (obj.split(",")[0]).split("_")
+  bound = obj.split(",")[1]
+  if tmp[0] not in goals:
+     goals = goals + [ tmp[0] ]
+     measures[tmp[0]] = []
+     bounds[tmp[0]] = []
+     objflag[tmp[0]] = False
+  if tmp[0] == "ns":
+     measures[tmp[0]] = ["total"]
+     allmeasures = allmeasures + ["total"]
+     bounds[tmp[0]] = [bound]
+  elif tmp[0] == "cost":
+     measures[tmp[0]] = ["total"]
+     allmeasures = allmeasures + ["total"]
+     bounds[tmp[0]] = [bound]
+  elif len(tmp) == 1:
+     measures[tmp[0]] = measures[tmp[0]] + ["mean"]
+     allmeasures = allmeasures + ["total"]
+     bounds[tmp[0]] = bounds[tmp[0]] + [bound]
+  else:
+     measures[tmp[0]] = measures[tmp[0]] + [tmp[1]]
+     allmeasures = allmeasures + [tmp[1]]
+     bounds[tmp[0]] = bounds[tmp[0]] + [bound]
+#
+# Get number of nodes
+#
+num_nodes = 0
+valid_delay=False
+for goal in goals:
+  if (goal != "ns") and (goal != "cost"):
+     INPUT = open(impactdir + slash + network + "_" + goal + ".impact","r")
+     line = INPUT.readline()
+     num_nodes = eval(line.strip())
+     line = INPUT.readline()
+     line = line.strip()
+     vals = line.split(" ")
+     for word in vals[1:]:
+       if eval(delay) == eval(word):
+          valid_delay=True
+          break
+     INPUT.close()
+     break
+if valid_delay==False:
+   print "ERROR: the delay value " + `delay` + " does not appear in one or more"
+   print "ERROR: impact files!"
+   sys.exit(1)
+
+#
+# Print debugging info
+#
+if debug:
+  print "Network:    ", network
+  print "Goals:      ", goals
+  print "Objectives: ", objectives
+  print "Delay:      ", delay
+  print "ImpactDir:  ", impactdir
+  print "Threshold:  ", threshold
+  print "Fixed:      ", fixed
+  print "Costs:      ", costs
+  print "Solver:     ", solver
+  print "Seconds:    ", seconds
+  print "BinPath:    ", binpath
+  print "ModPath:    ", modpath
+#
+# More error checking
+#
+if num_nodes == 0:
+   print "ERROR: could not identify the number of nodes"
+   print "ERROR: possible problem with the specification of the objectives"
+   sys.exit(1)
+for goal in goals:
+  if (goal != "ns") and (goal != "cost") and \
+     not os.path.isfile(impactdir + slash + network + "_" + goal + ".impact"):
+     print "ERROR: missing file", impactdir + slash + network + "_" + goal + ".impact"
+     sys.exit(1)
+if fixed_names != "none" and not os.path.isfile(fixed_names):
+   print "ERROR: missing file", fixed_names;
+   sys.exit(1)
+if (fixed_names != "none" or invalid_names != "none")\
+   and not os.path.isfile(nodemap_file):
+   print "ERROR: missing required file", nodemap_file
+   sys.exit(1)
+if invalid_names != "none" and not os.path.isfile(invalid_names):
+   print "ERROR: missing file", invalid_names;
+   sys.exit(1)
+if fixed != "none" and not os.path.isfile(fixed):
+   print "ERROR: missing file", fixed;
+   sys.exit(1)
+if invalid != "none" and not os.path.isfile(invalid):
+   print "ERROR: missing file", invalid;
+   sys.exit(1)
+if costs != "none" and not os.path.isfile(costs):
+   print "ERROR: missing file", costs;
+   sys.exit(1)
+if costs_names != "none" and not os.path.isfile(costs_names):
+   print "ERROR: missing file", costs_names;
+   sys.exit(1)
+for measure in allmeasures:
+  if (measure == "cvar") and (solver == "grasp"):
+     print "ERROR: cannot use the CVaR measure with heuristic solvers!" 
+     sys.exit(1)
+  if (measure == "tce") and (solver == "pico" or solver=="picoamp" or solver=="cplex" or solver == "cplexamp"):
+     print "ERROR: cannot use the TCE measure with IP solvers!" 
+     sys.exit(1)
+#
+# Read node map
+#
+if costs_names != "none" or fixed_names != "none" or invalid_names != "none":
+   INPUT = open(nodemap_file)
+   for line in INPUT.xreadlines():
+     vals = line.split(" ");
+     vals[1] = vals[1].strip()
+     #print ":" + vals[1] + ":" + vals[0] + ":"
+     junctionmap[vals[1]] = vals[0]
+#
+# Process fixed locations
+#
+if fixed != "none":
+   fixed_vals = read_array(fixed)
+elif fixed_names != "none":
+   tmp = read_array(fixed_names)
+   fixed_vals = []
+   for name in tmp:
+     fixed_vals = fixed_vals + [ junctionmap[name] ]
+else:
+   fixed_vals = []
+#
+# Process invalid locations
+#
+if invalid != "none":
+   invalid_vals = read_array(invalid)
+elif invalid_names != "none":
+   tmp = read_array(invalid_names)
+   invalid_vals = []
+   for name in tmp:
+     invalid_vals = invalid_vals + [ junctionmap[name] ]
+else:
+   invalid_vals = []
+#
+# Process location costs
+#
+if costs != "none":
+   cost_map = read_costs(costs)
+elif costs_names != "none":
+   tmp = read_costs(costs_names)
+   cost_map = {}
+   for val in tmp:
+     if val == "__default__":
+        cost_map[-1] = tmp[val]
+     else:
+        cost_map[junctionmap[val]] = tmp[val]
+else:
+   cost_map = {}
+
+#
+# Create the configuration file
+#
+OUTPUT = open(tmpname + ".config","w")
+print >>OUTPUT, num_nodes, delay
+print >>OUTPUT, len(goals)
+for goal in goals:
+  print >>OUTPUT, goal,
+  if goal == "ns" or goal == "cost":
+     print >>OUTPUT, "none", 
+  else:
+     print >>OUTPUT, impactdir + slash + network + "_" + goal + ".impact",
+  if threshold.has_key(goal):
+     print >>OUTPUT, threshold[goal],
+  else:
+     print >>OUTPUT, 0.0,
+  print >>OUTPUT, len(measures[goal]),
+  for measure in measures[goal]:
+    print >>OUTPUT, measure,
+  if objflag[goal] == True:
+     print >>OUTPUT, "o",
+  else:
+     print >>OUTPUT, "c",
+     for bound in bounds[goal]:
+       print >>OUTPUT, bound,
+  print >>OUTPUT, ""
+
+print >>OUTPUT, len(fixed_vals),
+for val in fixed_vals:
+  print >>OUTPUT, val,
+print >>OUTPUT, ""
+
+print >>OUTPUT, len(invalid_vals),
+for val in invalid_vals:
+  print >>OUTPUT, val,
+print >>OUTPUT, ""
+
+print >>OUTPUT, len(cost_map),
+for val in cost_map:
+  print >>OUTPUT, "%s %d " % (val,cost_map[val]),
+print >>OUTPUT, ""
+
+OUTPUT.close()
+
+#
+# Remove an existing output file
+#
+if os.path.isfile(output_file):
+   os.remove(output_file);
+if os.path.isfile("pico.solution.dat"):
+   os.remove("pico.solution.dat");
+if os.path.isfile("pico-temp-sol.dat"):
+   os.remove("pico-temp-sol.dat");
+
+# 
+# Delete the log file
+#
+
+if os.path.isfile(tmpname + ".log"):
+   os.remove(tmpname + ".log")
+
+#
+# Run solver
+#
+if solver == "pico":
+   #
+   # Test executables
+   #
+   if not executable_exists(binpath + slash + "setupIPData"):
+      print "Executable setupIPData is missing"
+      sys.exit(1)
+   if not executable_exists(picopath + slash + "PICO"):
+      print "Executable PICO is missing"
+      sys.exit(1)
+   if not os.path.isfile(modpath + slash + "GeneralSP.mod"):
+      print "AMPL model GeneralSP.mod is missing"
+      sys.exit(1)
+   #
+   # Run PICO's IP solver
+   #
+   print "Setting up IP data file..."
+   if system_call(binpath + slash + "setupIPData --gamma=" + `gamma` + " " + tmpname + ".config ", tmpname + ".dat",True):
+      print "ERROR: problem launching setupIPData"
+      sys.exit(1)
+   print "Running PICO..."
+   if compute_bound == True:
+      solver_options = solver_options + " --onlyRootLP=true "
+
+   if picopath == "":
+     if os.system("(PICO --lpType=soplex --usingCuts=false " + solver_options + modpath + slash + "GeneralSP.mod " + data_dir + slash + tmpname + ".dat) >> " + tmpname + ".log 2>&1"):
+        print "ERROR: problem launching the PICO solver"
+        sys.exit(1)
+   else:
+     if os.system("(" + picopath + slash + "PICO --lpType=soplex --usingCuts=false " + solver_options + modpath + slash + "GeneralSP.mod " + data_dir + slash + tmpname + ".dat) >> " + tmpname + ".log 2>&1"):
+        print "ERROR: problem launching the PICO solver"
+        sys.exit(1)
+   if compute_bound == False:
+      #
+      # Process the pico.solution.dat file to get the sensor placements
+      #
+      INPUT = open("pico.solution.dat","r")
+      sensors = []
+      for line in INPUT.xreadlines():
+        tokens = line.split(" ")
+        if (tokens[0] == "variable"):
+           #
+           # Process a line to see if its a sensor variable
+           #
+	   item = tokens[3].split("[")
+	   if (item[0] == "s"):
+              val = eval(item[1].split("]")[0])
+              sensors = sensors + [ val ]
+      INPUT.close()
+      OUTPUT = open(output_file,"w")
+      print >>OUTPUT, "#"
+      print >>OUTPUT, "# Generated by sp solver interface: " + time.asctime(time.gmtime(time.time()))
+      print >>OUTPUT, "# " + cmdline
+      print >>OUTPUT, "#"
+      print >>OUTPUT, os.getpid(), len(sensors),
+      for sensor in sensors:
+        print >>OUTPUT, sensor,
+      OUTPUT.close()
+   else:
+      # TODO - find the lower bound
+      print "Computing a lower bound"
+
+elif solver == "cplexamp" or solver == "picoamp":
+   #
+   # Test executables
+   #
+   if not executable_exists(binpath + slash + "setupIPData"):
+      print "ERROR: Executable " + binpath + slash + "setupIPData is missing"
+      sys.exit(1)
+   if amplcplexpath != "":
+     if not os.path.isfile(amplcplexpath + slash + "ampl"):
+        print "Executable ampl is missing"
+        sys.exit(1)   
+   if solver == "picoamp":
+     if picopath=="":
+       if not os.path.isfile(binpath + slash + "PICO"):
+          print "Executable PICO is missing"
+          sys.exit(1)
+     else:
+       if not os.path.isfile(picopath + slash + "PICO"):
+          print "Executable PICO is missing"
+          sys.exit(1)        
+   if amplcplexpath != "":
+     if solver == "cplexamp":
+       if not os.path.isfile(amplcplexpath + slash + "cplexamp"):
+          print "Executable cplexamp is missing"
+          sys.exit(1)        
+   if not os.path.isfile(modpath + slash + "GeneralSP.mod"):
+      print "AMPL model GeneralSP.mod is missing"
+      sys.exit(1)
+
+   #
+   # Run CPLEX IP solver
+   #
+   print "Setting up IP data file..."
+   if system_call(binpath + slash + "setupIPData --gamma=" + `gamma` + " " + tmpname + ".config ", tmpname + ".dat",True):
+      print "ERROR: problem launching setupIPData"
+      sys.exit(1)
+
+   print "Creating AMPL script..."
+   OUTPUT = open(tmpname + ".mod","w")
+   print >>OUTPUT, "#"
+   print >>OUTPUT, "# File generated by the 'sp' solver interface"
+   print >>OUTPUT, "#"
+   print >>OUTPUT, "model %sGeneralSP.mod;" % modpath
+   print >>OUTPUT, "data %s/%s.dat;" % (data_dir, tmpname)
+   print >>OUTPUT, "option show_stats 1;"
+   if compute_bound == True:
+      print >>OUTPUT, "option relax_integrality 1;"
+   if solver == "cplexamp":
+      print >>OUTPUT, "option solver cplexamp;"
+   else:
+      print >>OUTPUT, "option solver \"" + picopath + slash + "PICO\";"
+      print >>OUTPUT, "option pico_options \"lpType=soplex usingCuts=false\";"
+   print >>OUTPUT, "solve;"
+   print >>OUTPUT, "display s;"
+   if compute_bound == False:
+      print >>OUTPUT, "printf \"#\\n\"" + "> %s;" % output_file
+      print >>OUTPUT, "printf \"# Generated by sp solver interface: " + time.asctime(time.gmtime(time.time())) + "\\n\" > %s;" % output_file
+      print >>OUTPUT, "printf \"# " + cmdline + "\\n\" > %s;" % output_file
+      print >>OUTPUT, "printf \"#\\n\"" + "> %s;" % output_file
+      print >>OUTPUT, "printf \"%d " % os.getpid() + " %d \", card({i in FeasibleLocations : s[i] == 1}) " + "> %s;" % output_file
+      print >>OUTPUT, "printf {i in FeasibleLocations : s[i] == 1} \"%d \", i " + "> %s;" % output_file
+      print >>OUTPUT, ""
+   else:
+      # TODO - find lower bound
+      if solver == "cplexamp":
+         print >>OUTPUT, "printf \"\\tLP value= %f\\n\", Objective;"
+   OUTPUT.close()
+
+   print "Running AMPL script..."
+   if amplcplexpath == "":
+     if os.system("(" + amplname + " " + tmpname + ".mod) >> " + tmpname + ".log 2>&1"):
+        print "ERROR: problem launching the ampl solver interface"
+        sys.exit(1)
+   else:
+     if os.system("(" + amplcplexpath + slash + amplname + " " + tmpname + ".mod) >> " + tmpname + ".log 2>&1"):
+        print "ERROR: problem launching the ampl solver interface"
+        sys.exit(1)           
+
+elif solver == "grasp":
+   #
+   # Test for executables
+   #
+   if not executable_exists(binpath + slash + "grasp"):
+      print "ERROR: Executable grasp is missing"
+      sys.exit(1)
+   #
+   # Run the grasp heuristic
+   #
+   print "Validating input for GRASP heuristic"
+   if bounds.has_key("ns") == 0:
+     print "GRASP requires an upper bound on the number of sensors"
+     sys.exit(1)
+   if len(bounds)>1: 
+     print "WARNING: GRASP currently ignores all objective constraints other than the number of sensors"
+   if len(objectives)>1:
+     print "ERROR: GRASP only supports individual objectives"
+     sys.exit(1)
+
+   numsensors=eval(bounds["ns"][0])
+   print "Number of sensors="+`numsensors`
+
+   if len(string.split(objectives[0],"_")) == 1:
+      objectives[0] = objectives[0] + "_mean"
+   objective=string.strip(string.split(objectives[0],"_")[0])
+   statistic=string.strip(string.split(objectives[0],"_")[1])
+   print "Objective="+objective
+   print "Statistic="+statistic
+
+   if statistic != "mean":
+     print "GRASP only supports optimization of mean impact"
+     sys.exit(1)
+
+   impactfile=impactdir+slash+network+"_"+objective+".impact"
+   if os.path.exists(impactfile) == 0:
+     print "Could not open impact file="+impactfile
+     sys.exit(1)
+   print "Impact file="+impactfile
+
+   print "Delay="+delay
+   infile=open(impactfile)
+   numnodeline=infile.readline()
+   delayline=infile.readline()   
+   infile.close()
+   delays=string.split(delayline," ")
+   if len(delays) < 2:
+      print "ERROR - Improperly formatted delays in impact file="+impactFile
+      sys.exit(1)
+   # delay files are currently fixed to one delay per file - just check for consistency
+   fileDelay=string.strip(delays[1])
+   if delay != fileDelay:
+      print "ERROR - Delay specified in file="+fileDelay
+      sys.exit(1)
+
+   print "Running GRASP heuristic"
+   system_call(binpath + slash + "grasp " + impactfile + " -elite 0 " + " -p " + `numsensors` + " -outputFacilities " + output_file, tmpname + ".log", True)
+   print "GRASP completed - sensors written to file="+output_file
+
+else:
+   #
+   # Bad solver type
+   #
+   print "ERROR: unknown solver type:", solver
+   sys.exit(1)
+
+#
+# Print summary of output
+#
+impactfiles=""
+if eval_all == True:
+   goals = []
+   for goal in valid_objectives:
+     if (goal != "ns") and (goal != "cost") and os.path.isfile(impactdir + slash + network + "_" + goal + ".impact"):
+        goals = goals + [ goal ]
+for goal in goals:
+  if (goal != "ns") and (goal != "cost"):
+     impactfiles = impactfiles + " "  + impactdir + slash + network + "_" + goal + ".impact"
+if costs_names != "none":
+   cost_option = " --costs=" + costs_names
+else:
+   cost_option = ""
+if debug:
+   print binpath + slash + "evalsensor --delay=" + delay + " --gamma=" + `gamma` + " --format=" + format_str + " --nodemap=" + nodemap_file + cost_option + " " + output_file + " " + impactfiles
+if compute_bound == False:
+   if not os.path.isfile(tmpname + ".sensors"):
+      print "ERROR: File " + tmpname + ".sensors is missing"
+      sys.exit(1)
+   if not executable_exists(binpath + slash + "evalsensor"):
+      print "ERROR: Executable evalsensor is missing"
+      sys.exit(1)
+   cmd_output = run_command(binpath + slash + "evalsensor --delay=" + delay + " --gamma=" + `gamma` + " --format=" + format_str + " --nodemap=" + nodemap_file + cost_option + " " + output_file + " " + impactfiles)
+else:
+   INPUT = open(tmpname + ".log","r")
+   for line in INPUT.xreadlines():
+     words = re.split("[\t ]*",line)
+     if len(words) >= 3  and  words[2] == "value=":
+        bound = words[3]
+        break
+   INPUT.close()
+   cmd_output = "Objective lower bound: " + bound
+
+if summary_file == "":
+   print cmd_output
+else:
+   OUTPUT = open(summary_file,"w")
+   print >>OUTPUT, cmd_output
+   OUTPUT.close()

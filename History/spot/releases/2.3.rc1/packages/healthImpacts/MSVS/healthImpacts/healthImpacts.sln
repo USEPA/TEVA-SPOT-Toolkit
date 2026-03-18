@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libthreatassess", "libthreatassess\libthreatassess.vcproj", "{A1ADD65D-BD32-4BC5-ADB7-23A0624406F5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4F5E5969-82B3-4E2E-89A3-D8E6AE95891A} = {4F5E5969-82B3-4E2E-89A3-D8E6AE95891A}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtsoutil", "..\..\..\tevaUtils\MSVS\tevaUtils\libtsoutil\libtsoutil.vcproj", "{4F5E5969-82B3-4E2E-89A3-D8E6AE95891A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libHIAModule", "libHIAModule\libHIAModule.vcproj", "{E264123B-50B7-4E87-AD02-88B2427C16B6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{926EBF34-2203-4ACB-A36C-719BCCCCB086} = {926EBF34-2203-4ACB-A36C-719BCCCCB086}
+		{A1ADD65D-BD32-4BC5-ADB7-23A0624406F5} = {A1ADD65D-BD32-4BC5-ADB7-23A0624406F5}
+		{F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C} = {F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libAnalysisModule", "libAnalysisModule\libAnalysisModule.vcproj", "{926EBF34-2203-4ACB-A36C-719BCCCCB086}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C} = {F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ANLUtils", "..\..\..\..\..\ANLUtils_Library\VisualStudio\ANLUtils.vcproj", "{F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1ADD65D-BD32-4BC5-ADB7-23A0624406F5}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A1ADD65D-BD32-4BC5-ADB7-23A0624406F5}.Debug|Win32.Build.0 = Debug|Win32
+		{A1ADD65D-BD32-4BC5-ADB7-23A0624406F5}.Release|Win32.ActiveCfg = Release|Win32
+		{A1ADD65D-BD32-4BC5-ADB7-23A0624406F5}.Release|Win32.Build.0 = Release|Win32
+		{4F5E5969-82B3-4E2E-89A3-D8E6AE95891A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4F5E5969-82B3-4E2E-89A3-D8E6AE95891A}.Debug|Win32.Build.0 = Debug|Win32
+		{4F5E5969-82B3-4E2E-89A3-D8E6AE95891A}.Release|Win32.ActiveCfg = Release|Win32
+		{4F5E5969-82B3-4E2E-89A3-D8E6AE95891A}.Release|Win32.Build.0 = Release|Win32
+		{E264123B-50B7-4E87-AD02-88B2427C16B6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E264123B-50B7-4E87-AD02-88B2427C16B6}.Debug|Win32.Build.0 = Debug|Win32
+		{E264123B-50B7-4E87-AD02-88B2427C16B6}.Release|Win32.ActiveCfg = Release|Win32
+		{E264123B-50B7-4E87-AD02-88B2427C16B6}.Release|Win32.Build.0 = Release|Win32
+		{926EBF34-2203-4ACB-A36C-719BCCCCB086}.Debug|Win32.ActiveCfg = Debug|Win32
+		{926EBF34-2203-4ACB-A36C-719BCCCCB086}.Debug|Win32.Build.0 = Debug|Win32
+		{926EBF34-2203-4ACB-A36C-719BCCCCB086}.Release|Win32.ActiveCfg = Release|Win32
+		{926EBF34-2203-4ACB-A36C-719BCCCCB086}.Release|Win32.Build.0 = Release|Win32
+		{F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C}.Debug|Win32.Build.0 = Debug|Win32
+		{F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C}.Release|Win32.ActiveCfg = Release|Win32
+		{F5ABC5BD-0366-44AD-96DF-5706ECDC7F2C}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

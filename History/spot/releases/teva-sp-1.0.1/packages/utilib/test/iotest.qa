@@ -1,0 +1,78 @@
+ucout_flag=1
+----------------------------------------------------------
+FOO -- default settings
+Beginning CommonIO block.
+TEST 1
+
+TEST 2
+
+TEST 3
+
+TEST 4
+
+TEST 5
+
+TEST FINAL
+Ending CommonIO block.
+
+----------------------------------------------------------
+----------------------------------------------------------
+FOO -- output to a file iotest.temp.*
+Beginning CommonIO block.
+Ending CommonIO block.
+
+----------------------------------------------------------
+----------------------------------------------------------
+FOO -- tagged output with numDigits=5
+Beginning CommonIO block.
+[0]-00001 TEST 1
+[0]-00002 TEST 2
+[0]-00003 TEST 3
+[0]-00004 TEST 4
+[0]-00005 TEST 5
+[0]-00006 TEST FINAL
+Ending CommonIO block.
+
+----------------------------------------------------------
+----------------------------------------------------------
+FOO -- default settings
+Beginning CommonIO block.
+[0] TEST 1
+[0] TEST 2
+[0] TEST 3
+[0] TEST 4
+[0] TEST 5
+[0] TEST FINAL
+Ending CommonIO block.
+
+----------------------------------------------------------
+----------------------------------------------------------
+FOO -- buffered output
+[0] Beginning CommonIO block.
+[0] TEST 1
+[0] TEST 2
+[0] TEST 3
+[0] TEST 4
+[0] TEST 5
+[0] TEST FINAL
+[0] Ending CommonIO block.
+
+----------------------------------------------------------
+----------------------------------------------------------
+FOO -- default settings
+Beginning CommonIO block.
+[0] TEST 1
+[0] TEST 2
+[0] TEST 3
+[0] TEST 4
+[0] TEST 5
+[0] TEST FINAL
+Ending CommonIO block.
+
+----------------------------------------------------------
+----------------------------------------------------------
+FOO -- buffered output to a file with tagging
+
+----------------------------------------------------------
+Closing MPI
+Ending IO

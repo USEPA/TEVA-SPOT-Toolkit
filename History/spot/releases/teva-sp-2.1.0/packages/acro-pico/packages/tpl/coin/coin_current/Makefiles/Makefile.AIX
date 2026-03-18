@@ -1,0 +1,71 @@
+CP := /bin/cp -p
+LN := ln -s
+
+USE_XLC = false
+# USE_XLC = true
+
+###############################################################################
+
+# Using vacpp for DEPCXX does not seem to work because the dependancies
+# are created in a different format from the way g++ creates them.
+# Parts of this make process depends on the g++ format.  It seems to work
+# fine to use vacpp for CXX and g++ for DEPCXX
+ifeq ($(USE_XLC),true)
+    CXX = /usr/vacpp/bin/xlC -qrtti=all
+    FF  = xlf
+    DEPCXX = g++ -MM
+else
+    CXX = g++
+    FF = g77
+    DEPCXX = g++ -MM
+endif
+
+###############################################################################
+
+ifeq ($(findstring g++, $(CXX)),g++)
+    SYSLD += -Wl,-bmaxdata:0x80000000,-bbigtoc,-brtl
+    STATICSYSLD += -static -Wl,-bmaxdata:0x80000000,-bbigtoc
+endif
+
+ifeq ($(findstring xlC, $(CXX)),xlC)
+    SYSLD += -bmaxdata:0x80000000 -bbigtoc -brtl
+    STATICSYSLD += -bstatic -bmaxdata:0x80000000 -bbigtoc
+endif
+
+###############################################################################
+
+ifeq ($(OptLevel),-O)
+    ifeq ($(findstring g++, $(CXX)),g++)
+	OPTFLAG := -O6
+    else
+	OPTFLAG := -O2 -qmaxmem=-1 -qarch=auto -qtune=auto
+    endif
+else
+    OPTFLAG := $(OptLevel)
+endif
+
+###############################################################################
+
+SHARED_LIBEXT := .so
+STATIC_LIBEXT := .a
+
+ifeq (${LibType},SHARED)
+  ifeq ($(findstring xlC, $(CXX)),xlC)
+    SHLINKPREFIX := 
+    LD  := $(CXX) -o
+    LIBLDFLAGS := -G
+    LIBEXT := $(SHARED_LIBEXT)
+    SHFLAG :=
+  else
+    $(warning "Shared libs are supported on AIX only with xlC.")
+    LibType := STATIC
+  endif
+endif
+
+ifeq (${LibType},STATIC)
+  SHLINKPREFIX :=
+  LD  := ar -q
+  LIBLDFLAGS :=
+  LIBEXT := $(STATIC_LIBEXT)
+  SHFLAG :=
+endif

@@ -1,0 +1,44 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for host=SOLARIS at site=SNL.STD		#
+#-----------------------------------------------------------------------#
+
+#CPLEX_DIR=/Net/proj/opt/packages/SOLARIS/CPLEX.6.5/cplex65
+#CPLEX_INCLUDES=-I$(CPLEX_DIR)
+#CPLEX_LDFLAGS=-L$(CPLEX_DIR)
+
+CPLEX_DIR=/Net/proj/opt/packages/SOLARIS/CPLEX.current/
+#CPLEX_DIR=/Net/proj/opt/packages/SOLARIS/CPLEX.7.1/
+CPLEX_INCLUDES=-I$(CPLEX_DIR)/include/ilcplex
+CPLEX_LIBS=-lcplex -lsocket -lnsl
+CPLEX_LDFLAGS=-L$(CPLEX_DIR)/lib/ultrasparc_5_5.0/static_pic_mt
+
+MPI_DIR=/Net/proj/opt/packages/SOLARIS/mpich
+MPI_INCLUDES=-I$(MPI_DIR)/include
+MPI_LIBS= -lmpich -lrt -lsocket -lnsl
+MPI_LDFLAGS= -L$(MPI_DIR)/lib
+
+#MPI_DIR=/Net/proj/opt/packages/SOLARIS/lam
+#MPI_INCLUDES=-I/Net/proj/opt/packages/SOLARIS/usr/local/include
+#MPI_LIBS=-llammpi++ -llammpio -lpmpi -llamf77mpi -lmpi -llam -lsocket -lnsl
+#MPI_LDFLAGS=-L/Net/proj/opt/packages/SOLARIS/usr/local/lib
+ 
+MPE_DIR=/home/jeckst/MPEX
+MPE_INCLUDES= -DUSING_MPE -I$(MPE_DIR)
+MPE_LIBS= -lmpe
+MPE_LDFLAGS= -L$(MPE_DIR)
+
+XPRESS_DIR=/Net/proj/opt/packages/SOLARIS/express
+XPRESS_INCLUDES=-I$(XPRESS_DIR)/include
+XPRESS_LIBS=-lxmsl -lxosl -lmp-opt
+XPRESS_LDFLAGS=-L$(XPRESS_DIR)/lib
+
+SOPLEX_DIR=/Net/proj/opt/packages/SOLARIS/SOPLEX
+SOPLEX_INCLUDES=-I$(SOPLEX_DIR)/src
+SOPLEX_LIBS=-lsoplex
+SOPLEX_LDFLAGS=-L$(SOPLEX_DIR)/lib
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+

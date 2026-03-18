@@ -1,0 +1,15 @@
+
+9/2006  this entire directory is deprecated - JWB
+
+Right now the impact2Dynamic code has its own copies
+ot tso.c, etc.  This has to change once all of the
+code is organized.  - JWB 7/2005
+
+make genevent
+make impact2Dynamic
+make install
+
+
+
+genevent 9705 > event.9705
+

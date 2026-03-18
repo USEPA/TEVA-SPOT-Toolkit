@@ -1,0 +1,54 @@
+CP := /bin/cp -p
+LN := ln -s
+
+###############################################################################
+CC := gcc
+DEPCC := gcc -MM
+
+CXX := g++
+DEPCXX := g++ -MM
+
+FF := f77
+DEPFF := f77 -MM
+
+###############################################################################
+
+ifeq ($(OptLevel),-O)
+    OPTFLAG = -O6
+else
+    OPTFLAG = $(OptLevel)
+endif
+
+compilerOptFlags := -O -O1 -O2 -O3 -O4 -O5 -O6
+ifeq ($(OptLevel),-O1)
+     CXXFLAGS += -DNDEBUG
+     CXXFLAGS += -ffast-math -fomit-frame-pointer
+     CXXFLAGS += -march=i686
+endif
+
+###############################################################################
+
+SYSLD += 
+STATICSYSLD += -static -lpthread
+
+###############################################################################
+
+# It's OK to specify this even if static executable is created.
+SHLINKPREFIX := -Wl,-rpath,
+
+SHARED_LIBEXT := .so
+STATIC_LIBEXT := .a
+
+ifeq (${LibType},SHARED)
+  LD  := g++ -o
+  LIBLDFLAGS := -shared
+  LIBEXT := $(SHARED_LIBEXT)
+  CXXFLAGS += -fPIC
+else
+  LD  := ar -q
+  LIBLDFLAGS :=
+  LIBEXT := $(STATIC_LIBEXT)
+  CXXFLAGS +=
+endif
+
+EFENCE := -lefence

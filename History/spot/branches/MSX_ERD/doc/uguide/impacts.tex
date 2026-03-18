@@ -1,0 +1,176 @@
+This section describes how to simulate contamination incidents and compute contamination impacts, which are the first steps needed to setup and solve a sensor placement problem with SPOT. These two steps can be viewed as preprocessing or data preparation for sensor placement optimization. Thus, these steps can be performed prior to optimization, which is generally a more interactive, iterative process.
+
+The following sections illustrate the capabilities of SPOT with the example in the C:$\backslash$spot$\backslash$examples$\backslash$simple directory.
+
+\section{Simulating Contamination Incidents}\label{impacts_impact1}
+
+To simulate contamination incidents, the \doxyref{tevasim}{p.}{tevasimExecutable} command is utilized, which uses EPANET to perform an ensemble of contaminant transport simulations defined by a \doxyref{TSG File}{p.}{formats_tsgFile}. An ensemble of contamination scenarios for EPANET Example Net3 is defined in the file C:$\backslash$spot$\backslash$examples$\backslash$simple$\backslash$Net3.tsg. Contamination incidents are simulated for all network junctions, one for each hour of the day, and each contamination incident models an injection that continues for 24 hours. The {\ttfamily tevasim} command is run with the following command line:
+\lstinputlisting[firstline=9,lastline=9]{examples/simple2.sh}% anchor=tevasim
+This command generates three files: (a) Net3.tso, a binary TSO file that contains the contamination transport data, (b) Net3.sdx, a binary SDX file that provides an index into the TSO file, and (c) Net3.out, which provides a textual summary of the EPANET simulations and is the same as the report file ($\ast$.rpt) from EPANET.
+
+\section{Using tso2Impact}\label{impacts_impact2}
+
+After running \doxyref{tevasim}{p.}{tevasimExecutable} command, the output files, {\ttfamily Net3.tso} and {\ttfamily Net3.sdx}, can be used to compute one or more {\ttfamily IMPACT} files. An {\ttfamily IMPACT} file summarizes the consequence of each contamination incident in a manner that facilitates optimization. The \doxyref{tso2Impact}{p.}{tso2ImpactExecutable} command generates these files with the following command line: 
+\lstinputlisting[firstline=16,lastline=16]{examples/simple2.sh}% anchor=tso2Impact
+This command generates IMPACT files for each of the five objectives specified: mass consumed (mc), volume consumed (vc), time to detection (td), number of failed detections (nfd) and extent of contamination (ec). For each IMPACT file (e.g. {\ttfamily Net3\_\-mc.impact} ), a corresponding {\ttfamily ID} file is generated to map the sensor placement ids back to the network junction labels (e.g. {\ttfamily Net3\_\-mc.impact.id} ).
+
+The impact measures computed by {\ttfamily tso2Impact} represent the
+amount of impact that would occur up until the point where a contamination
+incident is detected. This computation assumes that sensors work perfectly
+(i.e., there are no false positive or false negative errors). However,
+we can generalize the sensor behavior in two ways. First, we can specify
+a detection threshold; contaminants are only detected above a specified
+concentration limit (the default limit is zero). Second, we can specify
+a response time, which accounts for the time needed to verify that
+a contamination has occurred and then inform the public (the default
+response time is zero). The contamination impact is computed at the
+time where the response has completed (the detection time plus response
+time), which is called the {\itshape effective response time\/}. For
+undetected incidents, the effective response time is simply the end of
+the contaminant transport simulation. The following illustrates how to
+specify these options:
+\lstinputlisting[firstline=16,lastline=16]{examples/simple3.sh}% anchor=tso2Impact
+This computes impacts for a 60 minute response time, with a 0.1 detection
+threshold. Note that the units for {\ttfamily -\/-\/detectionLimit}
+are the same as for the MASS values that are specified in the TSG file.
+
+Impacts from multiple TSO files can be combined to generate a single
+IMPACT file using the following syntax:
+\lstinputlisting[firstline=21,lastline=21]{examples/simple4.sh}% anchor=tso2Impact
+Note that the value of 30000000 corresponds to the detection threshold
+for the contaminant described in {\ttfamily Net3\_\-1a.tso} and
+0.0001 is the detection threshold for the contaminant described in
+{\ttfamily Net3\_\-1b.tso}. For example, this can be used to combine
+simulation results from different types of contaminants, in which the
+TSO files would have been generated from different TSG files. Murray et
+al.~\cite{MurBerHar06} use this technique to combine data from different
+tyes of contamination incidents into a single impact metric.
+
+\section{Impact Measures}\label{impacts_impact2a}
+
+After running \doxyref{tevasim}{p.}{tevasimExecutable} command, the
+output files, {\ttfamily Net3.tso} and {\ttfamily Net3.sdx}, can be used
+to compute one or more {\ttfamily IMPACT} files. An {\ttfamily IMPACT}
+file summarizes the consequence of each contamination incident in a
+manner that facilitates optimization. A variety of objective measures
+are supported by {\ttfamily tso2Impact} to reflect the different criteria
+that decision makers could use in CWS design. For most of these criteria,
+there is a {\itshape detected\/} and {\itshape undetected\/} version
+of the objective. This difference concerns how undetected contamination
+incidents are modeled.
+
+For example, the default time-\/to-\/detection objective, {\bfseries td},
+uses the time at which the EPANET simulations are terminated to define
+the time for incidents that are not detected. By contrast, the {\itshape
+detected\/} time-\/to-\/detection, {\bfseries dtd}, simply ignores these
+incidents (they have impact zero). Sensor placement with the {\itshape
+detected\/} objective is somewhat more precise, but this objective needs
+to be optimized with a revised formulation that explicitly limits the
+fraction of incidents that are not detected by the sensors.
+
+The following objectives are currently supported by {\ttfamily tso2Impact:} 
+\begin{itemize}
+
+\item {\bfseries ec} and {\bfseries dec} -\/ The extent of contaminated
+in the network. This is the total feet of pipes contaminated by the
+effective response time. An entire pipe is considered contaminated if
+contaminant enters the pipe at a given time step. For {\bfseries ec},
+the extent of contamination of an undetected incident is the extent
+of contamination at the point when the simulation terminates, while
+undetected contamination incidents are ignored for {\bfseries dec}.
+
+\item {\bfseries mc} and {\bfseries dmc} -\/ The mass of contaminant
+consumed by junctions in the network with nonzero demand. For {\bfseries
+mc}, the mass of contaminant of an undetected incident is the mass of
+contaminant that has left the network via demand at the point when
+the simulation terminates, while undetected contamination incidents
+are ignored for {\bfseries dmc}. This objective is typically measured
+in milligrams (the units used in the TSG file are mg/L). However,
+concentrations may also be interpreted; for example, we can treat this
+measure as a count of cells for a biological contaminant, where the TSG
+measurement is cells/L.
+
+\item {\bfseries nfd} -\/ The number of contamination incidents that are
+not detected by any sensor before the contaminant transport simulations
+terminate. NOTE: this measure is not affected by the response time option.
+
+\item {\bfseries pe} and {\bfseries dpe} -\/ The number of individuals
+exposed to a contaminant. For {\bfseries pe}, the population exposed
+for an undetected incident is the population exposed at the point when
+the simulation terminates, while undetected contamination incidents are
+ignored fo {\bfseries dpe}.
+
+\item {\bfseries pd} and {\bfseries dpd} -\/ The number of individuals
+that receive a dose of contaminant above a specified threshold. For
+{\bfseries pd}, the population dosed by an undetected incident is the
+population dosed at the point when the simulation terminates, while for
+{\bfseries dpd} the undetected contamination incidents are ignored.
+
+\item {\bfseries pk} and {\bfseries dpk} -\/ The number of individuals
+killed by a contaminant. For {\bfseries pk}, the population killed
+by an undetected incident is the population killed at the point when
+the simulation terminates, while for {\bfseries dpk} the undetected
+contamination incidents are ignored.
+
+\item {\bfseries td} and {\bfseries dtd} -\/ The time, in minutes, from
+the beginning of a contamination incident until the first sensor detects
+it. For {\bfseries td}, the time-\/to-\/detection of an undetected
+incident is the time from the start of the incident until the end of
+the simulation, while undetected contamination incidents are ignored
+for {\bfseries dtd}. NOTE: this measure is not affected by the response
+time option.
+
+\item {\bfseries vc} and {\bfseries dvc} -\/ The volume of contaminated
+water consumed by junctions in the network with nonzero demand. For
+{\bfseries vc}, the volume of contaminated water of an undetected
+incident is the volume of contaminated water consumed at the point when
+the simulation terminates, while undetected contamination incidents are
+ignored for {\bfseries dvc}.
+
+\end{itemize}
+
+These health impact measures are computed with an auxiliary input file, {\bfseries TAI}, that specifies parameters for a health impact model that predicts how a population is affected by exposure to a contaminant. The \doxyref{TAI File}{p.}{formats_taiFile} bio.tai specifies the nature of the contaminant and how it impacts human health. Further, this file specifies the fraction of the volume of water consumed at junctions that is consumed by humans. For example, consider the command line: 
+\lstinputlisting[firstline=16,lastline=16]{examples/simple5.sh}% anchor=tso2Impact
+
+
+\section{Advanced Tools for Large Sensor Placements Problems}\label{impacts_impact3}
+
+In some applications, the size of the IMPACT files is very
+large, which can lead to optimization models that cannot
+be solved on standard 32-\/bit workstations. SPOT includes
+several utilities that are not commonly used to address this
+challenge: the \doxyref{scenarioAggr}{p.}{scenarioAggrExecutable}
+executable aggregates similar contamination incidents, and the
+\doxyref{filter\_\-impacts}{p.}{filter_impactsExecutable} script filters
+out contamination incidents that have low impacts.
+
+The \doxyref{scenarioAggr}{p.}{scenarioAggrExecutable} executable reads
+an IMPACT file, finds similar incidents, combines them, and writes out
+another IMPACT file. This aggregation technique combines two incidents
+that impact the same locations in the same order, allowing for the
+possibility that one incident continues to impact other locations. For
+example, two contamination incidents should travel in the same pattern
+if they differ only in the nature of the contaminant, though one may
+decay more quickly than the other. Aggregated incidents can be combined
+by simply averaging the impacts that they observe and updating the
+corresponding incident weight.
+
+For example, consider the command:
+\lstinputlisting[firstline=20,lastline=20]{examples/simple6.sh}% anchor=aggr
+This creates the files {\ttfamily aggrNet3\_\-mc.impact} and {\ttfamily aggrNet3\_\-mc.impact.prob}; where the {\ttfamily Net3\_\-mc.impact} file has 236 events. The file {\ttfamily aggrNet3\_\-mc.impact} is the new IMPACT file, and the file {\ttfamily aggrNet3\_\-mc.impact.prob} contains the probabilities of the aggregated incidents.
+
+The \doxyref{filter\_\-impacts}{p.}{filter_impactsExecutable} script
+reads an impact file, filters out the low-\/impact incidents, rescales
+the impact values, and writes out another IMPACT file. The command:
+\lstinputlisting[firstline=24,lastline=24]{examples/simple6.sh}% anchor=filter
+generates an IMPACT file that contains the incidents whose impacts
+(without sensors) are the largest 5\% of the incidents in {\ttfamily
+Net3\_\-mc.impact}. Similarly, the {\ttfamily -\/-\/num=k} option selects
+the $k$ incidents with the largest impacts, and the option {\ttfamily
+-\/-\/threshold=h} selects the incidents with the impacts greater than
+or equal to $h$.
+
+The {\ttfamily filter\_\-impacts} command also includes options to rescale
+the impact values. The {\ttfamily -\/-\/rescale} option rescales impact
+values with a log-\/scale and the {\ttfamily -\/-\/round} option rescales
+impact values to rounded log-\/scale values.

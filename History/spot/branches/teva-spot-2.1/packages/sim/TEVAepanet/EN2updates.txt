@@ -1,0 +1,291 @@
+EPANET 2 UPDATE HISTORY
+=======================
+
+------------------------
+Builds 2.00.01 - 2.00.04
+------------------------
+Beta releases A through D.
+
+----------------------
+Build 2.00.05 (6/1/00)
+----------------------
+The first official release of EPANET 2.0.
+
+-----------------------
+Build 2.00.06 (9/11/00)
+-----------------------
+User Interface Bug Fixes (epanet2w.exe):
+
+1. Using the Property Editor to edit the Base Demand
+   for a junction with multiple demand categories now
+   correctly updates its value in the internal database.
+
+2. The distances between nodes displayed on a Profile
+   Plot have been corrected.
+
+3. The demands in an imported demand scenario file
+   are now assigned correctly to the nodes in the
+   network.
+
+4. Curved pipes are no longer represented as straight
+   lines in map files exported in DXF format.
+
+5. In a Group Edit operation, conditions placed on string
+   properties, such as Tags or Demand Patterns, are now
+   processed correctly.
+
+Computational Engine Bug Fixes (epanet2.dll and
+epanet2d.exe):
+
+1. The conversion factor used for IMGD flow units has been
+   corrected. (All flow conversion factors have been 
+   updated to maintain 4-5 significant digits. This
+   might cause some minor differences in computed results
+   from earlier versions.)
+
+2. Any bulk reaction coefficient assigned to a tank
+   is now correctly inactivated when a source trace
+   analysis is made.
+
+3. The check to see if pipes to full/empty tanks should be
+   closed has been modified to account for conditions where
+   the headloss across the pipe is negligible (a leftover
+   bug from Version 1.1).
+
+4. An FCV closed by a rule can now be restored to either
+   an open or active status at a later time via another
+   rule.
+
+5. Several tuning parameters and steps of the hydraulic 
+   analyis algorithm were modified to enhance its 
+   robustness. Appendix D of the EPANET Users Manual has
+   been revised to reflect these changes.
+
+------------------------
+Build 2.00.07 (12/11/00)
+------------------------
+User Interface Bug Fixes (epanet2w.exe)
+
+6. Using the Property Editor to edit the Base Demand for a
+   junction with multiple demand categories now correctly
+   updates its value in the internal database (see Bug 1
+   above) and also passes this value to the network solver
+   when an analysis is made.
+
+7. The program now runs correctly when there are no
+   printers installed for Windows.
+
+8. A custom zoom window can now be drawn in any direction.
+   Before if the window was not drawn from top-left to
+   bottom-right then a default zoom (2x) would occur.
+
+9. If the Map Window is in Vertex Editing mode and an
+   object is selected from either the Browser or the Map
+   Finder then vertex editing will now be disabled and
+   the map will be placed into Object Selection mode.
+
+10. The '&' character in an ID label will now display
+    correctly in the Flyover map labels.
+
+11. The simulation Time Legend will now display correctly
+    when the Clock Start Time option is expressed in decimal
+    hours instead of hours:minutes notation.
+
+12. Map printing has been modified so that line widths and
+    font sizes remain close to how they appear on the screen.
+
+13. For safety's sake, the Auto-Length feature is automatically
+    disabled whenever a new project is opened.
+
+
+Computational Engine Bug Fixes (epanet2.dll and
+epanet2d.exe):
+
+6. The units of SYSTEM DEMAND in rule-based controls have
+   been fixed to match those set by the user (rather than
+   always be cfs).
+
+7. The 2-compartment tank mixing model has been modified to
+   prevent water quality concentrations from "blowing up"
+   when tank inflow is almost equal to its outflow.
+
+8. Error message 222 has been added to test if both ends
+   of a link are the same node.
+
+9. File names with spaces in them will now be recognized in
+   the Toolkit functions ENsavehydfile and ENusehydfile.
+
+10. The Toolkit function ENgetlinkvalue will now correctly
+    return the flow in a pump whose status was changed from
+    what its initial value was.
+
+11. An error in the way that multi-point pump curves were
+    adjusted for a variable speed setting has been fixed.
+
+------------------------
+Build 2.00.07a (1/2/01)
+------------------------
+This build corrects problems that cropped up when fixes
+were made to GUI bugs 6 and 12 in Build 2.00.07.
+
+
+------------------------
+Build 2.00.07b (1/5/01)
+------------------------
+Corrects an oversight in Build 2.00.07a that prevents .NET files
+created with Build 2.00.07 from being read by later builds.
+
+
+-----------------------
+Build 2.00.08 (3/2/01)
+-----------------------
+User Interface Bug Fixes (epanet2w.exe)
+
+14. The Sepoint Booster and Flow Paced Booster options for water
+    quality sources were being switched when a network was
+    exported to file in ASCE text format.
+
+15. Clicking the Options button on the Standard Toolbar had no
+    effect when one wanted to edit options for Graphs,
+    Contour Plots, Tables or Calibration Reports.
+
+16. The view variable Headloss is now labelled as Unit Headloss
+    to reinforce the fact that it represents the headloss per
+    1000 ft (or 1000 m) of pipe.
+
+Computational Engine Bug Fixes (epanet2.dll and
+epanet2d.exe):
+
+12. The Toolkit function ENsaveinpfile was not correctly writing
+    to file the name of an efficiency curve specified for a pump.
+
+13. The Toolkit function ENgetcontrol was not returning a setting
+    value of 0 when the control in question closed a pipe (as
+    opposed to a pump).
+
+14. The Toolkit function ENsetqualtype was not re-setting the
+    unit conversion factor for concentration when the water
+    quality analysis was being changed between chemical, age,
+    and trace analyses.
+
+15. In the Toolkit function ENinitH(flag), the flag argument can
+    now be a 2-digit number. A 0 or 1 in the right-most digit
+    determines if hydraulic results are saved to file or not.
+    A 0 or 1 in the left digit determines whether all flows will
+    be re-initialized to 1 cfs or not.
+    
+16. When a numerical setting (as opposed to an OPEN/CLOSED status)
+    was assigned to a pipe as the action in a control or rule, the
+    action was ignored. Now a numerical setting of 0 means that
+    the pipe will close, while a setting greater than 0 will open
+    the pipe.
+
+17. It is now illegal to have a Flow Control Valve connected
+    directly to the upstream node of a Pressure Sustaining Valve
+    or to the downstream node of a Pressure Reducing Valve.
+
+NOTE: The computational engine (epanet2.dll and epanet2d.exe) was
+      re-compiled using version 5.5.1 of Borland C++ and version
+      5.00 of the Borland linker. Toolkit users who program in
+      C/C++ must use the .lib files in the latest version of the
+      Toolkit (Build 2.00.08 or higher) to link EPANET2.DLL
+      sucessfully with their projects.
+
+------------------------
+Build 2.00.09 (11/19/01)
+------------------------
+User Interface Bug Fixes (epanet2w.exe)
+
+17. The problem with the Setpoint Booster and Flow Paced Booster
+    source types being switched when exported (see Item 14 above)
+    has finally been fixed.
+
+18. The Background map was not being panned with the network when
+    the Find dialog caused a zoomed-in map to pan to the found item.
+
+19. ID labels with double quotes in them, such as 123"abc"456, were
+    being imported from .INP files as separate tokens (123, abc,
+    and 456) instead of as a single string.
+
+20. X and Y coordinates with many significant digits (i.e., > 8)
+    were not being read with full precision from imported .INP files.
+
+Computational Engine Bug Fixes (epanet2.dll and
+epanet2d.exe):
+
+18. The flow tolerance used to test the status of PRVs and other
+    valves was too large, causing the program to miss some status
+    changes under very small flows.
+
+19. The check used to prevent outflow from an empty tank could fail
+    when the headloss through the outflow pipe was negligible.
+
+20. The logic used to determine if pumps connected directly to
+    full or empty tanks should be closed has been corrected.
+
+21. In the toolkit function ENgetlinkvalue, the check for a closed
+    pipe was using the initial pipe status instead of the current
+    status.
+
+22. The toolkit function ENsaveinpfile was not writing to file
+    correctly the nodal demands and the emitter exponent value.
+
+------------------------
+Build 2.00.09a (12/8/01)
+------------------------
+User Interface Bug Fixes (epanet2w.exe)
+
+21. When drawing objects on the map, the user would be switched back to 
+    object selection mode after each object was drawn, rather than
+    remaining in drawing mode until the switch was made manually.
+
+------------------------
+Build 2.00.10 (6/24/02)
+------------------------
+User Interface Bug Fixes (epanet2w.exe)
+
+22. The SPEED keyword in the [PUMP] lines of an imported .INP file
+    was not being recognized.
+
+23. There was no way to change the reaction order parameter for tanks.
+    Now it is always set equal to the value specified for bulk order.
+
+24. More space was added to the columns of a Calibration Report for
+    displaying the mean observed and mean predicted values at each
+    sampling location.
+
+Computational Engine Bug Fixes (epanet2.dll and
+epanet2d.exe):
+
+23. At intermediate times when tanks would normally become full they
+    could actually be just below full because EPANET measures time 
+    in integer seconds. In some cases this would cause water age in
+    the tank to continually increase with time and never reach an
+    equilbrium value.
+
+24. The report generated by the command-line or toolkit versions of
+    EPANET was printing an incorrect demand charge in its Energy
+    section when no demand charge was specified in the input file.
+
+25. The report was also not always able to display very small or very 
+    large values in its tables.
+
+26. The Status Report could not distinguish the time of events that
+    occurred within seconds of one another (status time is now shown
+    as hours:minutes:seconds).
+
+27. No check was being made to ensure that the time pattern assigned
+    to a non-primary demand category at a node actually existed.
+
+28. The following toolkit problems were corrected:
+    a. map coordinate data was being lost when the ENsaveinpfile
+       function was called to overwrite the original input file
+    b. not enough decimal places were being used to write out D-W
+       roughness heights with the ENsaveinpfile function
+    c. when demands are specified in the [DEMANDS] section of the 
+       input file instead of the [JUNCTIONS] section, using
+       ENgetnodevalue to check on a base demand would return zero
+       and trying to change the demand using ENsetnodevalue would
+       instead create a new demand category.
+    d. ENgetlinkvalue could return an invalid energy value for a
+       closed link.

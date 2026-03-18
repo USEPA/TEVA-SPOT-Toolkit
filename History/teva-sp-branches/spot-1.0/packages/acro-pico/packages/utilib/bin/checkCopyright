@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# Verify that all source files contain a valid copyright.
+# Could be expanded to include files like README, scripts, etc.
+#
+# usage:  checkCopyright {path}
+#
+# Will check all files that normally contain code at and below path.  
+# Will skip soft links.  Default path is CWD.
+#
+
+validString1="Copyright (c) [0-9][0-9][0-9][0-9], Sandia National Laboratories"
+validString2="GNU Lesser General Public License"
+validString3="This is third-party software that is distributed with Acro."
+appspackString="Copyright (2[0-9][0-9][0-9]) Sandia Corporation"
+
+if [ $# == 1 ] ; then
+  topdir=$1
+else
+  topdir=.
+fi
+
+export codeFiles=`find $topdir -regex ".*\.[hcHC][xpXP]*"`
+
+declare -i numBad=0
+
+echo "The following files need copyright messages:"
+echo "============================================"
+
+for fname in $codeFiles ; do
+  if [ -f $fname ] ; then
+    needsCopyRight=1
+
+    appspackFname=${fname#*appspack/}
+
+    if [ $appspackFname != $fname ] ; then
+      #
+      # This is an appspack source file
+      #
+      grep --regexp="$appspackString" $fname > /dev/null
+      fail=$?
+      if [ $fail == 0 ] ; then
+        needsCopyRight=0
+      fi
+
+    else
+      #
+      # Check if both validString1 and validString2 are in the file
+      #
+      grep --regexp="$validString1" $fname > /dev/null
+      fail=$?
+      if [ $fail == 0 ] ; then
+        grep "$validString2" $fname > /dev/null
+        fail=$?
+        if [ $fail == 0 ] ; then
+          needsCopyRight=0
+        fi
+      fi
+    
+      #
+      # If both validString1 and validString2 are not in the file,
+      # then check if validString3 is in the file.
+      #
+      if [ $needsCopyRight == 1 ] ; then
+         grep --regexp="$validString3" $fname > /dev/null
+         fail=$?
+         if [ $fail == 0 ] ; then
+            needsCopyRight=0
+         fi
+      fi
+    fi
+       
+    if [ $needsCopyRight == 1 ] ; then
+      echo $fname
+      numBad=$numBad+1
+    fi
+  fi
+done
+
+echo ""
+echo "Total number of files missing copyright: $numBad"
+
+
+
+
+
+
+

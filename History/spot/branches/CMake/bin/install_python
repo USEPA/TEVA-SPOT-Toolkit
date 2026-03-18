@@ -1,0 +1,89 @@
+#! /usr/bin/env python
+
+import os
+import os.path
+from optparse import OptionParser
+import sys
+import re
+import glob
+#import shutil
+
+packages = ['%s/tpl/acro/tpl/cxxtest/python', '%s/packages/*/python', '%s/packages/tevaspot']
+
+cwd = os.getcwd()
+
+def call(str):
+    str = str.replace('\\',os.sep)
+    str = str.replace('/',os.sep)
+    if str[0] == '.':
+        str = cwd + os.sep + str
+    currdir = os.getcwd()
+    print >>OUTPUT, "Running command '%s' in directory '%s' " % (str,currdir)
+    OUTPUT.flush()
+    tmp = re.split('[ \t]+',str)
+    try:
+        import subprocess
+        try:
+            return subprocess.Popen(tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0]
+        except OSError:
+            tmp[0] += ".exe"
+            return subprocess.Popen(tmp, stdout=subprocess.PIPE, stderr=subprocess.STDOUT).communicate()[0]
+    except ImportError:
+        if os.path.exists(tmp[0]+".exe"):
+            tmp[0] += ".exe"
+        cmd = " ".join(tmp)
+        ans = os.system(cmd)
+        return ans
+
+parser=OptionParser()
+parser.add_option("--trunk",
+    help="Specify a trunk installation",
+    action="store_true",
+    dest="trunk",
+    default=False)
+parser.add_option("--src",
+    help="Specify the root source directory ",
+    action="store",
+    dest="srcdir",
+    default='.')
+parser.add_option("--build",
+    help="Specify the root build directory ",
+    action="store",
+    dest="builddir",
+    default='.')
+parser.add_option("--logfile",
+    help="Specify the logfile",
+    action="store",
+    dest="logfile",
+    default='python.log')
+(options,args) = parser.parse_args()
+
+OUTPUT=open(options.logfile,'w')
+
+if os.path.exists(options.builddir + '/python'):
+    print 'Python has already been installed at '+options.builddir + '/python'
+    sys.exit(0)
+else:
+    print 'Installing Python at '+options.builddir + '/python ...',
+    sys.stdout.flush()
+
+if options.trunk:
+    log = call('%s/tpl/acro/tpl/pyutilib.virtualenv/scripts/vpy_install --trunk --config %s/admin/vpy/dev.ini %s/python' % (options.srcdir, options.srcdir, options.builddir))
+else:
+    log = call('%s/tpl/acro/tpl/pyutilib.virtualenv/scripts/vpy_install --offline --zip %s/admin/vpy/python.zip --config %s/admin/vpy/dev.ini %s/python' % (options.srcdir, options.srcdir, options.srcdir, options.builddir))
+print >>OUTPUT, log
+    
+for package in packages:
+    dirname = package % options.srcdir
+    for dir in glob.glob(dirname):
+        cwd = os.getcwd()
+        os.chdir(dir)
+        print >>OUTPUT, '\nInstalling package at '+dir
+        log = call(options.builddir+'/python/bin/python setup.py develop')
+        print >>OUTPUT, log
+        call('rm -Rf build')
+        os.chdir(cwd)
+
+OUTPUT.close()
+print 'done.'
+print 'See logfile: %s' % options.logfile

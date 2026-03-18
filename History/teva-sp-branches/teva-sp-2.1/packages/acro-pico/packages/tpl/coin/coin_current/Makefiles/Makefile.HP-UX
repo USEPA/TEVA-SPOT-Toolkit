@@ -1,0 +1,121 @@
+
+# The first order of business is to attempt to figure out what programming
+# environment we're using, and what the appropriate command names are.
+
+pathsearch = $(firstword $(wildcard $(addsuffix /$(1), \
+	       $(subst :, ,$(PATH)))))
+
+# If the user hasn't specified the programming environment up front, try to
+# figure it out. First up, check for HP compiler. If it's present, use
+# it (after all, someone paid real money to acquire it). For the HP compiler
+# 'aCC -Ae' is correct for C compilation, aCC for C++ compilation.
+
+# If HP's compiler isn't present, assume the GCC is available (after all, we're
+# running Gnu make).  Do we want cc or gcc as the C compilation command? If gcc
+# exists, use it.
+
+# Yes, FF is correct --- see Makefile.rules.
+
+HP-UX_PROGENV = HPaCC 64BIT
+# HP-UX_PROGENV = HPaCC 32BIT
+# HP-UX_PROGENV = GCC
+
+ifeq ($(origin HP-UX_PROGENV),undefined)
+  testcmd := $(call pathsearch,aCC)
+  ifneq ($(testcmd),)
+    HP-UX_PROGENV = HPaCC 64BIT
+  endif
+endif
+
+HP-UX_PROGENV ?= GCC
+
+####
+
+ifeq (HPaCC,$(findstring HPaCC,$(HP-UX_PROGENV)))
+  ifeq (32BIT,$(findstring 32BIT,$(HP-UX_PROGENV)))
+    CC := aCC -Ae +DA2.0W
+    CXX := aCC -AA +DA2.0W
+  else
+    CC := aCC -Ae +DAportable
+    CXX := aCC -AA +DAportable
+  endif
+  FF := nonexistent
+  DEPCXX := $(CXX) +make -E
+  DEPCC := $(CC) +make -E
+endif
+
+ifeq ($(HP-UX_PROGENV),GCC)
+  CC := gcc
+  CXX := g++
+  FF := g77
+  DEPCXX := $(CXX) -MM
+  DEPCC := $(CC) -MM
+  #STDCPP_DIR = $(subst /bin/$(CXX),/lib,$(call pathsearch,$(CXX)))
+  #SYSLD += -L$(STDCPP_DIR) -Wl,-R,$(STDCPP_DIR) -lstdc++
+  #SYSLD += -Wl,-R,$(STDCPP_DIR) -lstdc++ -lnsl -lsocket
+endif
+
+CP := /usr/bin/cp -p
+LN := ln -s
+
+###############################################################################
+
+ifeq (HPaCC,$(findstring HPaCC,$(HP-UX_PROGENV)))
+  OPTFLAG_O := $(filter -O%,$(OptLevel))
+  OPTFLAG := $(filter-out -O%,$(OptLevel))
+  ifneq ($(OPTFLAG_O),)
+      OPTFLAG += +O3
+  endif
+  compilerOptFlags := -O -O2 +O +O1 +O2 +O3 +O4
+else
+  ifeq ($(OptLevel),-O)
+      OPTFLAG := -O6
+  else
+      OPTFLAG := $(OptLevel)
+  endif
+  compilerOptFlags := -O -O1 -O2 -O3 -O4 -O5 -O6
+endif
+
+###############################################################################
+# It's OK to specify this even if static executable is created.
+# Used in Osi/Test/Makefile.Test to link unitTest; perhaps elsewhere.
+
+SHARED_LIBEXT := .sl
+STATIC_LIBEXT := .a
+
+ifeq (HPaCC,$(findstring HPaCC,$(HP-UX_PROGENV)))
+    SHLINKPREFIX :=
+    SYSLD += 
+    STATICSYSLD += -Bstatic
+    ifeq (${LibType},SHARED)
+        LD  := $(CXX) -o
+        LIBEXT := $(SHARED_LIBEXT)
+        LIBLDFLAGS := -b -Wl,+s,+n,-B,immediate,-B,nonfatal -D_REENTRANT -DRWSTD_MULTI_THREADED -D_THREAD_SAFE
+        CXXFLAGS += +Z +DA2.0W -D_REENTRANT -DRWSTD_MULTI_THREADED -D_THREAD_SAFE
+    else
+        LD  := ar -q
+        LIBLDFLAGS :=
+        LIBEXT := $(STATIC_LIBEXT)
+        CXXFLAGS +=
+    endif
+
+else
+
+    SHLINKPREFIX := 
+    SYSLD += 
+    STATICSYSLD += -static
+    ifeq (${LibType},SHARED)
+        LD  := g++ -o
+        LIBLDFLAGS := -shared
+        LIBEXT := $(SHARED_LIBEXT)
+        CXXFLAGS += -fPIC
+    else
+        LD  := ar -q
+        LIBLDFLAGS :=
+        LIBEXT := $(STATIC_LIBEXT)
+        CXXFLAGS +=
+    endif
+
+endif
+
+EFENCE := -lefence

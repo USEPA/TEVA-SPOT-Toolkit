@@ -1,0 +1,47 @@
+/*!
+ * \page packages
+
+\section packages Software Overview
+
+Acro integrates a variety of optimization software packages, including
+libraries developed at Sandia National Laboratories as well as publicly
+available third-party libraries.  The goal of this integration is to 
+provide a single framework that includes a wide range of optimization methods.
+\htmlonly
+The following figure 
+\endhtmlonly
+\latexonly
+Figure~\ref{fig:acro} 
+\endlatexonly
+illustrates the dependencies between the Acro
+packages that are used with PICO.
+The dashed lines indicate packages and dependencies that are
+currently being developed.
+\htmlonly
+<center>
+<img src="../acro-pico.jpg" alt="[Acro-PICO Package Dependencies]">
+</center>
+\endhtmlonly
+\latexonly
+\begin{figure}
+\begin{center}
+\includegraphics[scale=0.8]{../acro-pico.jpg}
+\end{center}
+\caption{\label{fig:acro} An illustration of inter-package dependencies
+within Acro that are used with PICO.}
+\end{figure}
+\endlatexonly
+
+PICO
+depends on UTILIB for many basic data structures and system utilities.
+Additionally, PICO uses the COIN interface library to encapsulate
+linear programming solvers.  Two publicly available linear programming
+solvers are integrated into Acro: SOPLEX and CLP (which is included
+in COIN).  The mpPCx parallel linear programming solver is also
+being developed at Sandia (this is currently not part of Acro).
+PICO has been integrated with the GLPK package to support a public
+domain interface to AMPL integer programming problems.  PICO has also
+been integrated with the AMPL package, which includes the AMPL 
+routines for setting up an AMPL solver.
+
+*/

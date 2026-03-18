@@ -1,0 +1,4 @@
+Best integer solution value: 0.000000
+Lower bound: 0.000000
+Sensor locations
+     0      1      3 

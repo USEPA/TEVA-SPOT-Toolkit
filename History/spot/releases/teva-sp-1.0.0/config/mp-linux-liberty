@@ -1,0 +1,13 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for site=LIBERTY
+#-----------------------------------------------------------------------#
+
+MPI_DIR=/apps/mpich
+MPI_INCLUDES=-I$(MPI_DIR)/include
+MPI_LIBS= -lpmpich++ -lmpich -lgm -lVT -lpthread -lpvfs
+MPI_LDFLAGS=-L$(MPI_DIR)/lib -L/opt/gm/binary/lib/ -L/opt/gm/lib/ -L/usr/local/lib
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=

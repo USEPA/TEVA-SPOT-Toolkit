@@ -1,0 +1,22 @@
+{\small
+\begin{verbatim}
+template <class FunctionT>
+class parallelLipshitzian : public parallelBranching, public serialLipshitzian< FunctionT>
+{
+public:
+
+  /// Return a new subproblem
+  pico::parallelBranchSub* blankParallelSub();
+
+  /// Pack the branching information into a buffer
+  void pack(utilib::PackBuffer& outBuffer);
+
+  /// Unpack the branching information from a buffer
+  void unpack(utilib::UnPackBuffer& inBuffer);
+
+  /// Compute the size of the buffer needed for a subproblem
+  int spPackSize();
+
+};
+\end{verbatim}
+}

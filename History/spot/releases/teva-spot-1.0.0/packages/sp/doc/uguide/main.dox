@@ -1,0 +1,41 @@
+/*! 
+
+\mainpage SPOT User Guide
+
+<center>
+Jonathan Berry<br>
+Lee Ann Fisk<br>
+William E. Hart<br>
+Cynthia A. Phillips<br>
+Jean-Paul Watson
+</center>
+
+<center>
+<table borderwidth=0><tr><td width=500 align=left nowrap>
+This document describes the Sensor Placement Optimization Tool (SPOT).
+SPOT used to be called TEVA-SP, and it 
+includes a number of executables that can be used to 
+analyze the impact of contamination events, and to identify optimal
+sensor placements.
+</td></tr></table>
+</center>
+
+<h2> Table of Contents</h2>
+
+<ul>
+<li> \ref intro
+<li> \ref history
+<li> \ref evalsensorExecutable
+<li> \ref randomsampleExecutable
+<li> \ref sideconstraintsExecutable
+<li> \ref picoExecutable
+<li> \ref setupIPDataExecutable
+<li> \ref spExecutable
+<li> \ref tso2ImpactExecutable
+<li> \ref formats
+<li> \ref formulations
+<li> \ref install
+<li> <a class="el" href="../html-ref/index.html">Software Reference Guide</a>
+</ul>
+
+*/

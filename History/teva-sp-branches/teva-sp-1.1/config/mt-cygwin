@@ -1,0 +1,39 @@
+#----------------------------------------------------#
+# Target ARCHitecture dependent definitions - CYGWIN #
+#----------------------------------------------------#
+
+AR		= ar
+ARFLAGS		= ruv
+RANLIB		= ls
+ARCLEAN		= $(RM)
+
+CC              = gcc
+CWARNINGS       = $(C++WARNINGS) -Wstrict-prototypes -Wmissing-prototypes
+CC_SHARED	= -shared
+ 
+CCC             = g++
+C++             = $(CCC)
+C++WARNINGS     = -Wall
+C++_SHARED	= -shared
+ 
+F77		= f77
+FFLAGS		= -O -libmil #-u
+F_SHARED	=
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= 
+LDFLAGS		=
+OPTIMIZATION	= -O3
+
+ARCH_LIB_PATH	=
+ARCH_LIBS	= -lg2c #-lfl
+ARCH_INCLUDES	= -I. -I/usr/include/X11R5
+ARCH_FLAGS	= -DUNIX -DCYGWIN -DMULTITASK -DANSI_HDRS -DANSI_NAMESPACES
+XTRAFLAGS	= 
+PROFILE_FLAG	= -pg
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard

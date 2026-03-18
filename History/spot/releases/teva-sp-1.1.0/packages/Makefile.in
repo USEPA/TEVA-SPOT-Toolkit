@@ -1,0 +1,99 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+#-------------------------------------------------------------------------------
+#
+# SRC Makefile 
+#
+#-------------------------------------------------------------------------------
+
+##
+## Makefile Macros
+##
+install: update_includes
+	@(for DIR in ${SUBDIRS}"" ; do				\
+	    if [ -d "$${DIR}" ] ; then				\
+		echo "=== Running ${MYMAKE} in $${DIR}";	\
+		case "$${DIR}" in				\
+		  "") ;;					\
+		  *)						\
+		    (cd "$${DIR}" ; ${MYMAKE} );;		\
+		esac						\
+	    fi;							\
+	done;)
+	$(MAKE) update_libraries
+
+library: install
+ 
+shared_library:
+	@(for DIR in ${SUBDIRS}"" ; do				\
+	    if [ -d "$${DIR}" ] ; then				\
+		(cd "$${DIR}" ; ${MYMAKE} shared_library);	\
+	    fi;							\
+	done;)
+	$(MAKE) update_libraries
+ 
+executables:
+	@(for DIR in ${SUBDIRS}"" ; do				\
+	    if [ -d "$${DIR}" ] ; then				\
+		case "$${DIR}" in				\
+		  "") ;;					\
+		  "utilib") ;;					\
+		  *)						\
+		    (cd "$${DIR}" ; ${MYMAKE} executables);;	\
+		esac						\
+	    fi;							\
+	done;)
+ 
+test:
+	@(for DIR in ${SUBDIRS}"" ; do				\
+	    if [ -d "$${DIR}" ] ; then				\
+		(cd "$${DIR}" ; ${MYMAKE} test);		\
+	    fi;							\
+	done;)
+ 
+check:
+	@(for DIR in ${SUBDIRS}"" ; do				\
+	    if [ -d "$${DIR}" ] ; then				\
+		(cd "$${DIR}" ; ${MYMAKE} check);		\
+	    fi;							\
+	done;)
+ 
+clean:
+	@(for DIR in ${SUBDIRS}"" ; do				\
+	    if [ -d "$${DIR}" ] ; then				\
+		(cd "$${DIR}" ; ${MYMAKE} clean);		\
+	    fi;							\
+	done;)
+	@(find . -name 'SunWS_cache' | xargs /bin/rm -Rf)
+
+distclean:
+	@(for DIR in ${SUBDIRS}"" ; do				\
+	    if [ -d "$${DIR}" ] ; then				\
+		(cd "$${DIR}" ; ${MYMAKE} distclean);		\
+	    fi;							\
+	done;)
+	$(RM) Makefile config.status config Makefile-*
+
+update_includes:
+	@(if [ ! -d $(INCDIR) ]; then \
+	   mkdir -p $(INCDIR); \
+	fi)
+	@(for DIRS in $(SUBDIRS) appspack mtl; do \
+	  if [ -d $${DIRS} ]; then \
+	     $(RM) $(INCDIR)/$${DIRS};\
+	     $(LND) $(ROOT_DIR)/packages/$${DIRS}/$${DIRS} $(INCDIR)/$${DIRS}; \
+	  fi;\
+	done)
+
+update_libraries:
+	@(for FILE in `find . -name "*.a"` ; do\
+	   fname=`$(ECHO) "$${FILE}" | sed 's#\(.*\)\/\([a-zA-Z0-9]*\)$ #\2#'`;\
+	   $(RM) $(ROOT_DIR)/lib/$${fname};\
+	   $(LN) $(ROOT_DIR)/packages/$${FILE} $(ROOT_DIR)/lib/$${fname}; \
+	done)
+	@(for FILE in `find . -name "*.lib"` ; do\
+	   fname=`$(ECHO) "$${FILE}" | sed 's#\(.*\)\/\([a-zA-Z0-9]*\)$ #\2#'`;\
+	   $(RM) $(ROOT_DIR)/lib/$${fname};\
+	   $(LN) $(ROOT_DIR)/packages/$${FILE} $(ROOT_DIR)/lib/$${fname}; \
+	done)

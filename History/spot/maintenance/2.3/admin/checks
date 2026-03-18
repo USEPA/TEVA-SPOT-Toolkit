@@ -1,0 +1,108 @@
+#!/bin/sh
+#
+# checks <type>
+#
+# An administrative utility to run various administrative checks
+#
+
+if [ "$1" == "" ]; then
+   echo "checks <type>"
+   echo ""
+   echo "   copyright     - check copyright information in source files"
+   echo "   svn           - check subversion externals (public Acro)"
+   echo "   svn-limited   - check subversion externals (private Acro)"
+   echo "   svn-summary   - summary of Acro-related repositories"
+   echo "   release <rev> - update externals in a release branch"
+   echo "   gcovr         - apply gcovr report"
+   echo ""
+   exit 1;
+fi
+
+if [ "$1" == "copyright" ]; then
+   if [ -d packages/cat ]; then
+      echo "cat"
+      bin/checkCopyright packages/cat
+      echo ""
+   fi
+   if [ -d packages/detect ]; then
+      echo "detect"
+      bin/checkCopyright packages/detect
+      echo ""
+   fi
+   if [ -d packages/healthImpacts ]; then
+      echo "healthImpacts"
+      bin/checkCopyright packages/healthImpacts
+      echo ""
+   fi
+   if [ -d packages/sim ]; then
+      echo "sim"
+      bin/checkCopyright packages/sim
+      echo ""
+   fi
+   if [ -d packages/spot ]; then
+      echo "spot"
+      bin/checkCopyright packages/spot
+      echo ""
+   fi
+   if [ -d packages/teva_spot ]; then
+      echo "teva_spot"
+      bin/checkCopyright packages/teva_spot
+      echo ""
+   fi
+   if [ -d packages/tevaUtils ]; then
+      echo "tevaUtils"
+      bin/checkCopyright packages/tevaUtils
+      echo ""
+   fi
+   exit 0;
+fi
+
+if [ "$1" == "svn" ]; then
+   echo "Printing svn check in svn_check.xml ..."
+   bin/svn_check --validate --aux https://software.sandia.gov/svn/public/sacache --aux https://software.sandia.gov/svn/public/pyutilib --aux https://software.sandia.gov/svn/public/optpp/optpp --aux https://software.sandia.gov/svn/public/fast --aux https://software.sandia.gov/svn/public/exact --aux https://software.sandia.gov/svn/public/utilib --aux https://software.sandia.gov/svn/public/tpl --aux https://software.sandia.gov/svn/public/cxxtest/ --aux https://software.sandia.gov/svn/public/coopr --aux https://software.sandia.gov/svn/public/appspack https://software.sandia.gov/svn/public/acro > svn_check.xml 2>&1
+   echo "Done."
+fi
+if [ "$1" == "svn-limited" ]; then
+   echo "Printing svn check in svn_check.xml ..."
+   bin/svn_check --validate --aux https://software.sandia.gov/svn/public/sacache --aux https://software.sandia.gov/svn/public/pyutilib --aux https://software.sandia.gov/svn/public/optpp/optpp --aux https://software.sandia.gov/svn/public/fast --aux https://software.sandia.gov/svn/public/exact --aux https://software.sandia.gov/svn/public/utilib --aux https://software.sandia.gov/svn/public/tpl --aux https://software.sandia.gov/svn/public/cxxtest/ --aux https://software.sandia.gov/svn/public/coopr --aux https://software.sandia.gov/svn/public/appspack --aux https://software.sandia.gov/svn/public/acro https://software.sandia.gov/svn/private/acro > svn_check.xml 2>&1
+   echo "Done."
+fi
+if [ "$1" == "svn-summary" ]; then
+   echo "Printing svn summary in svn_summary.xml ..."
+   echo "acro public"
+    bin/svn_check https://software.sandia.gov/svn/public/acro > svn_summary.xml 2>&1
+   echo "acro private"
+    bin/svn_check https://software.sandia.gov/svn/private/acro >> svn_summary.xml 2>&1
+   echo "acro utilib"
+    bin/svn_check https://software.sandia.gov/svn/public/utilib >> svn_summary.xml 2>&1
+   echo "acro pyutilib"
+    bin/svn_check https://software.sandia.gov/svn/public/pyutilib >> svn_summary.xml 2>&1
+   echo "acro fast"
+    bin/svn_check https://software.sandia.gov/svn/public/fast >> svn_summary.xml 2>&1
+fi
+if [ "$1" == "release" ]; then
+   if [ "$2" == "" ]; then
+      rev=""
+   else
+      rev=" --rev $2 "
+   fi
+   echo "Creating release directories in svn_release ..."
+   bin/update_externals $rev --remove --dir svn_release --aux https://software.sandia.gov/svn/public/sacache --aux https://software.sandia.gov/svn/public/pyutilib --aux https://software.sandia.gov/svn/public/optpp/optpp --aux https://software.sandia.gov/svn/public/fast --aux https://software.sandia.gov/svn/public/exact --aux https://software.sandia.gov/svn/public/utilib --aux https://software.sandia.gov/svn/public/tpl --aux https://software.sandia.gov/svn/public/cxxtest/ --aux https://software.sandia.gov/svn/public/coopr --aux https://software.sandia.gov/svn/public/appspack https://software.sandia.gov/svn/public/acro > check.log 2>&1
+   echo "Done."
+   echo "Review check.log for details of the updates."
+   echo ""
+   echo "Subversion status summary"
+   cd svn_release
+   for i in $( ls ); do 
+     echo " FILE: $i"
+     svn status -q $i
+   done
+   echo ""
+   echo "You must manually commit the edits in the svn_release subdirectories!"
+fi
+
+if [ "$1" == "gcovr" ]; then
+    PWD=`pwd`
+    python/bin/gcovr -r $PWD -e '.*/test/' -e $PWD/include/tinyxml -e $PWD/packages/tevaUtils -e $PWD/packages/healthImpacts/ -e $PWD/tpl -e $PWD/packages/spot/grasp -e $PWD/packages/sim
+    python/bin/gcovr -r $PWD -d -e '.*/test/' -e $PWD/include/tinyxml -e $PWD/packages/tevaUtils -e $PWD/packages/healthImpacts/ -e $PWD/tpl -e $PWD/packages/spot/grasp -e $PWD/packages/sim -x > coverage.xml
+fi

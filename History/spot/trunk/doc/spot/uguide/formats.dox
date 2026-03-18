@@ -1,0 +1,328 @@
+/*! 
+ * \page formats File Formats
+
+
+\section tsoFile TSO File
+
+<ul>
+<li> <b>Desription:</b> provides a compact representation of simulation results.
+<li> <b>Format:</b> binary
+<li> <b>Created By:</b> \c tevasim
+<li> <b>Used By:</b> \c tso2Impact
+<li> <b>Details:</b> The format of TSO files is described in 
+C:\\spot\\doc\\TEVAUtil.doc.
+</ul>
+
+
+
+\section sdxFile SDX File
+
+<ul>
+<li> <b>Desription:</b> provides an index into a TSO file.
+<li> <b>Format:</b> binary
+<li> <b>Created By:</b> \c tevasim
+<li> <b>Used By:</b> \c tso2Impact
+<li> <b>Details:</b> SDX files provide an index file that contains information about at what 
+byte offset in which TSO file a particular 
+injection scenario's results are located.   The format of SDX files is described in 
+C:\\spot\\doc\\Threat\ Simulator.doc.
+</ul>
+
+
+\section tsgFile TSG File
+
+<ul>
+<li> <b>Desription:</b> specifies how an ensemble of EPANET simulations will be performed.
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> SPOT user
+<li> <b>Used By:</b> \c tevasim
+<li> <b>Details:</b> Each line of a TSG file specifies injection locations, the injection mass, and the injection time-frame:
+\verbatim
+NZD MASS <injection-mass> <start-time> <end-time>
+\endverbatim
+This format is described in detail in C:\\spot\\doc\\Threat\ Simulator.doc.
+</ul>
+
+
+\section taiFile TAI File
+
+<ul>
+<li> <b>Desription:</b> describes the information needed for assessing health impacts
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> SPOT user
+<li> <b>Used By:</b> \c tevasim
+<li> <b>Details:</b> A TAI provides information needed for assessing health impacts.  This file is only required for impact values like \c pe that involve health impacts.
+The format of TAI files will be described in C:\\spot\\doc\\threatAssess_readme.txt when health impacts are integrated into the TEVA-SPOT Toolkit release.
+</ul>
+
+
+
+\section sensorPlacementFile Sensor Placement File 
+
+<ul>
+<li> <b>Desription:</b> describes one or more sensor placements
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> \c sp
+<li> <b>Used By:</b> \c evalsensor
+<li> <b>Details:</b> 
+
+Lines in a sensor placement file that begin with the '#' character are assumed to be comments.
+Otherwise, lines of this file have the format
+\verbatim
+   <sp-id> <number-of-sensors> <node-index-1> ...
+\endverbatim
+The sensor placement ID is used to identify sensor placements in the file.  
+Sensor placements may have differing numbers of sensors, so each line
+contains this information.  The node indices map to values in the \ref nodeFile.
+</ul>
+
+
+
+\section impactFile Impact File 
+
+<ul>
+<li> <b>Desription:</b> describes the impact of a contamination event at the
+point that it is witnessed through a water distribution network.
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> \c tso2Impact
+<li> <b>Used By:</b> \c sp and \c evalsensor
+<li> <b>Details:</b> 
+An IMPACT file describes the impact of a contamination event at the point that it is witnessed throughout a water distribution network.  Specifically, the
+witness events are assumed to occur at junctions in the network.
+
+The first line of an IMPACT file contains the number of events.
+The next line specifies the types of delayed impacts
+provided in this file, with the format:
+\verbatim
+   <number-of-delays> <delay-time1> ... <delay-timeN>
+\endverbatim
+The delay times are in minutes.  (Currently, the SPOT utilities only
+support a single delay time.)
+
+Subsequent lines have the format
+\verbatim
+   <scenario-index> <node-index> <time-of-detection> <impact-value>
+\endverbatim
+The node index is the index of a witness location for the attack.
+A scenario ID maps to a line in the network \ref scenarioFile.  A node
+index maps to a line in the network \ref nodeFile.  The time of detection
+is in minutes.  The value of impacts are in the corresponding units for
+each impact measure.  The different impact measures in each line correspond
+to the different delays that have been computed.
+</ul>
+
+
+\section lagFile LAG File 
+
+<ul>
+<li> <b>Desription:</b> A sparse matrix file used by the UFL Lagrangian solver
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> \c setupIPData
+<li> <b>Used By:</b> \c lagrangian
+<li> <b>Details:</b> This is a variant of the IMPACT format.  Conceptually, it
+can be viewed as a transpose of the matrix specified in an IMPACT file.  The
+first line specifies the number of locations, the number of events, and the impact values:
+\verbatim
+   <num-locations> <num-events> <impact>
+\endverbatim
+These impact values differ from the values in the IMPACT file, in that they
+are normalized by the probability of the event.
+Subsequent lines describe the impact of each event:
+\verbatim
+   <location> <event> <impact>
+\endverbatim
+Note that the location and event indices are indexed starting at 1.
+</ul>
+
+
+
+
+\section scenarioFile Scenario File
+
+<ul>
+<li> <b>Desription:</b> The scenario file provides auxillary information about
+each contamination incident.
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> \c tso2Impact
+<li> <b>Used By:</b> \c evalsensor
+<li> <b>Details:</b> The scenario file provides auxillary information about each contamination
+scenario.  Each line of this file has the format:
+\verbatim
+   <node-index> <EPANET-ID> <source-type> <source-start-time> <source-stop-time> <source-strength>
+\endverbatim
+The node index maps to the network \ref nodeFile, and the EPANET ID provides this information (redundantly).  The scenario start and stop are in minutes, and these values are relative to the start of the EPANET simulation. The source type is the injection mode for an attack, e.g., flow-paced or fixed-concentration. The source strength is the concentration of contaminant at the attack source.
+</ul>
+
+
+\section nodeFile Node File
+
+<ul>
+<li> <b>Desription:</b> provides a mapping from the indices used
+for sensor placement to the junction IDs used within EPANET
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> \c tso2Impact
+<li> <b>Used By:</b> \c evalsensor and sensor placement solvers
+<li> <b>Details:</b> The node file provides a mapping from the indices used for sensor placement to the IDs used within EPANET.  Each line of this file has the format:
+\verbatim
+   <node-index> <EPANET-ID>
+\endverbatim
+This mapping is generated by \ref tso2ImpactExecutable "tso2Impact", and all
+sensor placement solvers subsequently use the node indices internally.
+</ul>
+
+
+\section spConfigFile Sensor Placement Configuration File
+
+<ul>
+<li> <b>Desription:</b> a configuration file used to define a sensor placement
+problem
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> \c sp
+<li> <b>Used By:</b> \c setupIPData
+<li> <b>Details:</b> 
+The sensor placement configuration file is generated by the \ref spExecutable "sp" solver 
+interface, and it contains all of the information that is needed to define
+a sensor placement problem. The file has the following format:
+
+\verbatim
+<number-of-junctions> <response-delay>
+<number-of-goals>
+<goal-name> <goal-filename> <compression-threshold> <compression-percentage> <attack-collapse-flag>\
+        <number-of-measures>\
+	<measure-name> ... <measure-name> <objective-flag>\
+	<bound-value> ... <bound-value>
+<fixed-sensor-placements>
+<invalid-sensor-placements>
+<cost-values>
+\endverbatim
+
+The values in this file correspond to the command-line arguments of
+the \ref spExecutable "sp" solver.  Compression threshold or
+percentage refers to node aggregation values.  The
+attack-collapse-flag is a 0 or 1 value in the configuration file, indicating
+whether compression/aggregation can make an attack trivial (single supernode
+equivalent to no detection).  The
+\<fixed-sensor-placements\>, \<invalid-sensor-placements\> and
+\<cost-values\> data sets are simply an import of the data from the
+corresponding files that are specified within the \ref spExecutable
+"sp" solver interface.
+</ul>
+
+
+
+\section costsFile Sensor Placement Costs File
+
+<ul>
+<li> <b>Desription:</b> specifies the costs for installing sensors at different
+junctions throughout a network
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> SPOT user
+<li> <b>Used By:</b> \c sp
+<li> <b>Details:</b> Each line of this file has the format:
+\verbatim
+   <EPANET-ID> <cost>
+\endverbatim
+Junctions not explicitly enumerated in this file are assumed to have zero
+cost unless the ID '__default__' is specified.  For example:
+\verbatim
+   __default 1.0
+\endverbatim
+This example would specify that all un-enumerated junctions have a cost of 1.0.
+</ul>
+
+
+\section locationsFile Placement Locations File
+
+<ul>
+<li> <b>Desription:</b> specifies whether sensor placements are fixed
+and whether locations are feasible sensor placement
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> SPOT user
+<li> <b>Used By:</b> \c sp
+<li> <b>Details:</b> 
+Each line of this
+file has the format:
+\verbatim
+   <keyword> <EPANET-ID> ... <EPANET-ID>
+\endverbatim
+The valid keywords are \b feasible, \b infeasible, \b fixed and \b unfixed.  These keywords correspond to two semantic states for each location: (1) the feasibility of sensor placement and (2) whether a sensor placement is forced.  The
+semantics of these keywords are as follows:
+<ul>
+<li> \b feasible - the specified locations are \b feasible and \b unfixed
+<li> \b infeasible - the specified locations are \b infeasible and \b unfixed
+<li> \b fixed - the specified locations are constrained to contain a sensor (\b fixed and \b feasible)
+<li> \b unfixed - the specified locations are not constrained to contain a sensor (\b unfixed and \b feasible)
+</ul>
+The locations are EPANET-IDs from the network model.  Additionally, the keyword \b ALL or \b * can be used to specify that all network locations are to be processed.
+
+A location file is processed sequentially.  The initial state is that all 
+locations are feasible and unfixed.  Subsequently, each line updates the state
+of the locations, given the state defined by the previous lines of this file.
+For example, the file:
+\verbatim
+infeasible ALL
+feasible A B C
+\endverbatim
+makes all locations infeasible except for locations A, B and C.  Similarly
+\verbatim
+fixed ALL
+feasible A B C
+\endverbatim
+makes all locations fixed except for locations A, B and C; the \b feasible keyword has the same semantics as the \b unfixed keyword.
+</ul>
+
+
+\section sensorClass Sensor Class File
+
+<ul>
+<li> <b>Desription:</b> contains false-negative probabilities for different types of sensors
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> SPOT user
+<li> <b>Used By:</b> \c sp
+<li> <b>Details:</b> The file has format:
+\verbatim
+   <class id> <false negative probability>
+   <class id> <false negative probability>
+   ....
+\endverbatim
+</ul>
+
+For example, the following file defines a failure class 1, with a false negative
+rate of 25 percent, and a failure class 2 with a false negative rate of 50 
+percent:
+\verbatim
+   1 0.25
+   2 0.5
+   ....
+\endverbatim
+
+
+
+\section junctionClass Junctions Class File
+
+<ul>
+<li> <b>Desription:</b> provides the mapping from EPANET junction IDs to
+failure classes
+<li> <b>Format:</b> ascii
+<li> <b>Created By:</b> EPANET user
+<li> <b>Used By:</b> \c sp
+<li> <b>Details:</b> When a sensor class file is being used, the "junction class" file provides
+the mapping from junction (node) id's to failure classes.  The format of
+this file is:
+\verbatim
+   <node id> <failure class>
+   <node id> <failure class>
+   ....
+\endverbatim
+</ul>
+
+For example, supposing that junction 1 is of class 2, junction 2 is
+of class 1, and junction 3 is of class 1:
+\verbatim
+   1 1
+   2 2
+   3 1
+   ....
+\endverbatim
+
+*/

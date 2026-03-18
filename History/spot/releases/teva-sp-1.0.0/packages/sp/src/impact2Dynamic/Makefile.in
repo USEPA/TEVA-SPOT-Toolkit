@@ -1,0 +1,30 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+#include ../MakeMacros
+
+library:
+
+install_library:
+
+LDLIBS = #-lthreatassess -ltevautil -lepanet -lm
+EXECUTABLES= genattack.exe impact2Dynamic.exe
+
+
+all:    executables
+
+clean:
+	@$(RM) -Rf *.o *.ii *.ti SunWS_cache
+	@$(RM) -Rf $(EXECUTABLES)
+	@$(RM) -Rf $(EXECUTABLES:.exe=)
+
+executables:
+	$(MAKE) $(EXECUTABLES:.exe=)
+	cp $(EXECUTABLES:.exe=) $(ROOT_DIR)/bin
+
+genattack: genattack.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+impact2Dynamic: impact2Dynamic.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+

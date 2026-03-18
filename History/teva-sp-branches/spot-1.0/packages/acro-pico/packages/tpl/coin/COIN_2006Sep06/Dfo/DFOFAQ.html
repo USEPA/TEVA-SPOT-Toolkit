@@ -1,0 +1,86 @@
+<HTML>
+<HEAD>
+<META Name="Generator" Content="Lotus Word Pro"></META>
+<TITLE>COIN FAQs</TITLE>
+
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF" TOPMARGIN="0" LEFTMARGIN="0" marginwidth="0" marginheight="0">
+
+
+<FONT FACE="Arial">
+<FONT SIZE="4" FACE="Arial">
+<B>D</B><A NAME="DFO1"></A><B>FO FAQs</B></FONT> 
+<P>
+<B>Q: What is DFO?</B> 
+<P>
+A: DFO is a Fortran package for solving general nonlinear optimization problems that have the following characteristics: 
+<P>
+<UL>
+<LI>they are relatively small scale (less than 100 variables),
+<LI>their objective function  is relatively expensive to 
+compute and derivatives of such functions are not available and
+<LI>cannot be estimated efficiently.
+</UL>
+<P>
+There also may be some noise in the function evaluation procedures. 
+Such optimization problems arise ,for example, in engineering design, where 
+the objective function evaluation is a simulation package treated as a black box.
+<P><B>Q: What if I have a constraint function that is expensive to evaluate and whose derivatives are not available?</B> 
+<P>A: A new version of DFO which handles such problems will be available soon. Meanwhile the user can try to put the &quot;difficult&quot; constraint into the objective function with a penalty term and handle the penalty function
+management themselves externally.
+<P><B>Q: What if the objective function evaluation fails for certain values of the variables? </B> 
+<P>A: We refer to such situation as &quot;virtual&quot; constraint; i.e. constraint
+whose value cannot be computed at all. All the information that is available about
+such a constraint is whether it is violated or not. The user has an option to return a
+ &quot;fail=true&quot; flag if the objective function cannot be  computed
+at a given point. The user should not assign artificially high values to
+the objective function at such points because this can seriously affect
+the efficiency of the algorithm.
+<P><B>Q: Is it useful to use DFO if the functions are inexpensive to evaluate?</B> 
+<P>A: Yes, but the runs will not be very efficient if the problem size is close to 100 rather than close to 20.
+<P>A version of DFO for problems with inexpensive function evaluations is under development.
+<P><B>Q: Does it matter if the underlying problem is essentially smooth or not?</B>
+<P>A: Maybe. The theory behind the algorithm assumes that derivatives exist but are not available. 
+In practise the algorithm can be applied when derivatives do not exist.
+<P><B>Q: Will DFO find me a global minimum?</B>
+<P>A: Maybe, but the algorithm is designed only to find local minima. In any case the user should run it from a variety of starting points. 
+Because of the general approach the method has a tendency not to converge to &quot;poor&quot; local optima.
+<P><B>Q: Are there any publications on DFO?</B>
+<P>A: Yes.
+<OL>
+<LI><FONT FACE="Arial">A. R. Conn, K. Scheinberg and Ph.L. Toint,
+Recent progress in unconstrained nonlinear optimization without derivatives. 
+Mathematical Programming, Vol. 79 (1997), pp. 397 - 414.
+<LI>A. R. Conn, K. Scheinberg and Ph.L. Toint, 
+On the convergence of derivative-free methods for unconstrained optimization. 
+Approximation Theory and Optimization: Tributes to M. J. D. Powell , Eds. A. Iserles and M. Buhmann, (1997), pp. 83-108, Cambridge University Press.  
+<LI>A. R. Conn, K. Scheinberg and Ph.L. Toint,
+A derivative free optimization algorithm in practice
+in Proceedings of 7th AIAA/USAF/NASA/ISSMO Symposium on Multidisciplinary Analysis and Optimization,
+St. Louis, MO, 1998.
+</OL>
+<P>
+<B>Q: What platforms does DFO run on?</B>
+<P>A: DFO has been tested on:
+<UL>
+<LI>AIX V4
+<LI>Linux 
+</UL>
+<P><B>Q: What do I need to install DFO?</B>
+<P>A: To run DFO the user needs to have 
+the <A HREF="http://www.netlib.org/blas/">BLAS</A> routines and the <A HREF="http://www.netlib.org/lapack"> LAPACK</A> routines which are not distributed with the open source. In addition
+DFO uses a derivative based optimization package to solve a trust region
+minimization subproblem on every iteration. In theory any general purpose gradient based
+nonlinear optimization package can be used, if an appropriate interface is provided.
+Currently there is are interfaces for the FORTRAN 77 package <A HREF="http://www.sbsi-sol-optimize.com/NPSOL.htm">NPSOL</A> and for the C package
+<A HREF="http://gachinese.com/aemdesign/FSQPframe.htm">CFSQP</A>. The user can  independently obtain either of these packages or
+develop their own interface with a different package.
+<P><B>Q: How do I test if I installed DFO correctly?</B>
+<P>A: There are 7 test problems from the Hock and Schittkowski test set that are provided with
+DFO. See the README file for instructions on running the tests.
+</BODY>
+
+</HTML>
+
+

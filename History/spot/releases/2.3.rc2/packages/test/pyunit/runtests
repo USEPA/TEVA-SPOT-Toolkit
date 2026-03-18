@@ -1,0 +1,27 @@
+#! /usr/bin/env python
+
+import sys
+import os
+from os.path import abspath, dirname
+pythondir=dirname(dirname(dirname(dirname(dirname(abspath(__file__))))))+os.sep+"python"
+import site
+site.addsitedir(pythondir)
+sys.path.insert(0, dirname(dirname(abspath(__file__))))
+sys.path.append(".")
+
+from pyutilib_th.runtests import main
+
+package="tevaspot"
+subpackages = ['evalsensor', 'sp', 'pico', 'tevasim', 'tso2Impact']
+filter = []
+
+currdir = os.path.dirname(os.path.abspath(__file__))
+
+if currdir.endswith('pyunit'):
+    testdir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    main(sys.argv, package, subpackages, filter, testdir, dirname="test"+os.sep+"pyunit")
+else:
+    testdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    bindir = os.path.join(testdir,'bin')
+    os.environ['PATH']=bindir+os.pathsep+os.environ['PATH']
+    main(sys.argv, package, subpackages, filter, testdir, dirname="test")

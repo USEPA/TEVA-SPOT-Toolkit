@@ -1,0 +1,29 @@
+<experimental-study name="pico-milp">
+  <tags>
+    <tag>nightly</tag>
+  </tags>
+
+  <experiment>
+    <factors>
+      <factor name="test" filename="milp_problems"/>
+      <factor name="lptype">
+        <level>lpType=clp</level>
+        <!-- <level>lpType=soplex</level>
+        <level>lpType=glpk</level> -->
+      </factor>
+      <factor name="misc">
+        <level>maxCPUMinutes=1.0 usingCuts=false</level>
+        <level>maxCPUMinutes=1.0</level>
+      </factor>
+    </factors>
+    <controls>
+       <executable type="runexp_driver">./exp.pico.pl</executable>
+    </controls>
+  </experiment>
+
+  <analyze>
+    <test name="FinalValue" type="validate">
+      <options>_measurement='Value' _tolerance=_opttol</options>
+    </test>
+  </analyze>
+</experimental-study>

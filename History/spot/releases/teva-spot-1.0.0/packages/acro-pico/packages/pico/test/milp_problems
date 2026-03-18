@@ -1,0 +1,48 @@
+#_optimum=924 _data=../etc/mpsfiles/miplib/10teams
+#_optimum=7580813.0459 _data=../etc/mpsfiles/miplib/arki001
+#_optimum=8.7843031600e+05 _opttol=1e-7 _data=../etc/mpsfiles/miplib/bell3a
+_optimum=8.9664064915e+06 _opttol=1e-4 _data=../etc/mpsfiles/miplib/bell5
+_optimum=34 _data=../etc/mpsfiles/miplib/bm23
+#_optimum=65.67 _data=../etc/mpsfiles/miplib/danoint
+_optimum=188182 _data=../etc/mpsfiles/miplib/dcmulti
+_optimum=-1.0 _opttol=1e-6 _data=../etc/lpfiles/demo_lag.lp
+#_optimum=Infeasible _data=../etc/mpsfiles/miplib/diamond
+_optimum=-305.19817501 _opttol=1e-7 _data=../etc/mpsfiles/miplib/dsbmip
+_optimum=568.1007 _data=../etc/mpsfiles/miplib/egout
+#_optimum=0.0 _data=../etc/mpsfiles/miplib/enigma
+_optimum=2.0 _opttol=1.0 _data=../etc/lpfiles/ex1.lp
+_optimum=2.0 _opttol=1.0 _data=../etc/lpfiles/ex1a.lp allowInfiniteIntegerVarBounds=true
+_optimum=2.1716783984e+03 _opttol=1e-6 _data=../etc/lpfiles/ex4.lp
+_optimum=2.1716783984e+03 _opttol=1e-6 _data=../etc/lpfiles/ex4a.lp allowInfiniteIntegerVarBounds=true
+_optimum=1.4090000000e+03 _data=../etc/lpfiles/ex6.lp
+#_optimum=405935.18000 _data=../etc/mpsfiles/miplib/fiber
+#_optimum=3983 _data=../etc/mpsfiles/miplib/fixnet6
+_optimum=1201500 _data=../etc/mpsfiles/miplib/flugpl _opttol=1e-8
+_optimum=112313 _opttol=1.0 _data=../etc/mpsfiles/miplib/gen
+#_optimum=25779856.372 _data=../etc/mpsfiles/miplib/gesa2
+#_optimum=25779856.372 _data=../etc/mpsfiles/miplib/gesa2_o
+#_optimum=27991042.648 _data=../etc/mpsfiles/miplib/gesa3
+#_optimum=27991042.648 _data=../etc/mpsfiles/miplib/gesa3_o
+_optimum=21166.000 _data=../etc/mpsfiles/miplib/gt2
+#_optimum=-73899798.00 _data=../etc/mpsfiles/miplib/harp2
+_optimum=106940226 _data=../etc/mpsfiles/miplib/khb05250
+#_optimum=4722 _data=../etc/mpsfiles/miplib/l152lav
+#_optimum=1120 _data=../etc/mpsfiles/miplib/lseu
+_optimum=3360 _data=../etc/mpsfiles/miplib/misc03
+_optimum=12850.8607 _opttol=1e-4 _data=../etc/mpsfiles/miplib/misc06
+#_optimum=2810 _data=../etc/mpsfiles/miplib/misc07
+#_optimum=307 _data=../etc/mpsfiles/miplib/mod008
+_optimum=6548 _data=../etc/mpsfiles/miplib/mod010
+#_optimum=20740508 _data=../etc/mpsfiles/miplib/modglob
+#_optimum=-43.0 _data=../etc/mpsfiles/miplib/noswot
+_optimum=3089 _opttol=1e-4 _data=../etc/mpsfiles/miplib/p0033
+_optimum=7615.0 _opttol=1e-8 _data=../etc/mpsfiles/miplib/p0201
+_optimum=258411 _data=../etc/mpsfiles/miplib/p0282
+_optimum=7.8826300000e+02 _data=../etc/mpsfiles/miplib/pipex _opttol=1e-8
+#_optimum=16029.7 _data=../etc/mpsfiles/miplib/qnet1_o
+_optimum=8.0 _data=../etc/lpfiles/queen.lp
+_optimum=82.2 _opttol=0.1 _data=../etc/mpsfiles/miplib/rgn
+_optimum=2 _data=../etc/mpsfiles/other/SC.mps
+_optimum=18 _data=../etc/mpsfiles/miplib/stein27
+#_optimum=30 _data=../etc/mpsfiles/miplib/stein45
+_optimum=9 _data=../etc/mpsfiles/other/tinymatchingint.mps

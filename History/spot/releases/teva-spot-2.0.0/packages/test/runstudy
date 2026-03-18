@@ -1,0 +1,3 @@
+#!/bin/csh
+
+../acro-pico/packages/exact/src/exact/exact $*

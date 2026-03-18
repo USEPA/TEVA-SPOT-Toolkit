@@ -1,0 +1,78 @@
+export CXXFLAGS :=
+export SYSLD := 
+export STATICSYSLD :=
+export SHLINKPREFIX :=
+
+export CP :=
+export LN :=
+
+export LD  :=
+export LIBLDFLAGS :=
+export LIBEXT :=
+
+export CC :=
+export CXX :=
+export FF :=
+export DEPCC :=
+export DEPCXX :=
+export DEPFF :=
+
+export OPTFLAG :=
+export compilerOptFlags :=
+
+export UNAME := $(shell uname)
+
+#########################################################################
+
+ifeq ($(findstring CYGWIN,${UNAME}),CYGWIN)
+    UNAME := CYGWIN
+else
+    CXXFLAGS += -DCOIN_NOT_CYGWIN
+endif
+
+# If we have a definition for optimisation level, we know enough to set
+# the target directory.
+
+ifneq ($(origin OptLevel),undefined)
+  space := $(empty) $(empty)
+  export OptVersion := $(subst $(space),_,$(OptLevel))
+  export TARGETDIR := $(UNAME)$(OptVersion)
+endif
+
+################# Tested for AIX, Linux, SunOS, CYGWIN ##################
+
+include ${MakefileDir}/Makefile.${UNAME}
+include ${MakefileDir}/Makefile.location
+
+#########################################################################
+
+export ifprefix = $(if ${1},$(addprefix ${1},${2}),)
+
+#########################################################################
+
+ifeq ($(findstring g++, $(CXX)),g++)
+#	CXXFLAGS += -frepo
+#	CXXFLAGS += -fconserve-space
+#	CXXFLAGS += -ansi
+#	CXXFLAGS += -pedantic 
+#	CXXFLAGS += -Weffc++
+	CXXFLAGS += -Wall
+#	CXXFLAGS += -Wid-clash-81
+	CXXFLAGS += -Wpointer-arith
+	CXXFLAGS += -Wcast-qual
+	CXXFLAGS += -Wwrite-strings
+	CXXFLAGS += -Wconversion
+#	CXXFLAGS += -Wstrict-prototypes
+#	CXXFLAGS += -Wmissing-prototypes
+#	CXXFLAGS += -fnonnull-objects
+	CXXFLAGS += -pipe
+# *May* be a problem: realignment was necessary for correct compilation.
+# turned off because of lots of warnings on Solaris
+#	CXXFLAGS += -Wcast-align
+# Performance related warning: warn if a function specified inline can't be
+# inlined. Turned off because with optimization g++ gives lots of warnings on 
+# rb_trees. 
+#	CXXFLAGS += -Winline
+endif
+
+#########################################################################

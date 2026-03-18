@@ -1,0 +1,32 @@
+/*! 
+ * \page multiplecontaminants Multiple Contaminants
+
+\section multiple_contaminantsUsage Usage
+
+The following is an example showing how to do a single sensor placement
+optimization that considers an ensemble of events involving multiple
+contaminants.  Assume that there are two TSG files: one describing a set
+of events associated with a chemical contaminant, and one describing a 
+set of events associated with a biological contaminant.  Assume also that
+there are corresponding TAI files describing the dose-response properties
+of these contaminants.  
+
+First generate two TSO files: one for each TSG file.  We'll assume that
+we are working on the test1 example in sp/test. Call these TSO
+files <b>test1b.tso</b> and <b>test1c.tso</b>.  Now, we will process these
+using <b>tso2Impact</b>
+ 
+\verbatim
+   tso2Impact --detectionLimit 300 --detectionLimit 0.00001 --pe test1 test1b.tso test1c.tso test1b.tai test1c.tai
+\endverbatim
+
+The result is a single impact file <b>test1_pe.impact</b> that can be
+treated like any other impact file.  For example, we can run any of
+the scripts in packages/sp/test that expect a problem named <b>test1</b>.
+For example:
+\verbatim
+   ../../../bin/sp --path=../../../bin --network=test1 --objective=mc_mean --ub=ns,5 --solver=snl_grasp
+\endverbatim
+
+
+*/

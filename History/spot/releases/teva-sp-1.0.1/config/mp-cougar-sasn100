@@ -1,0 +1,34 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for host=SOLARIS at site=SNL.STD		#
+#-----------------------------------------------------------------------#
+
+CPLEX_DIR=/usr/home/wehart/packages/CPLEX
+CPLEX_INCLUDES=-I$(CPLEX_DIR)
+CPLEX_LIBS=-lcplex
+CPLEX_LDFLAGS=-L$(CPLEX_DIR)
+
+MPI_DIR=/opt/intel/tflop/current/tflops/lib
+MPI_INCLUDES=-I$(MPI_DIR)/include  -I$(MPI_DIR)build/solaris/ch_p4/include
+MPI_LIBS=-lmpi 
+MPI_LDFLAGS= -L$(MPI_DIR)/lib/
+ 
+MPE_DIR=/usr/home/jeckst/MPEX
+MPE_INCLUDES= -DUSING_MPE -I$(MPE_DIR)
+MPE_LIBS= -lmpe
+MPE_LDFLAGS= -L$(MPE_DIR)
+
+XPRESS_DIR=/Net/proj/opt/packages/express
+XPRESS_INCLUDES=-I$(XPRESS_DIR)/include
+XPRESS_LIBS=-lxmsl -lxosl -lmp-opt
+XPRESS_LDFLAGS=-L$(XPRESS_DIR)/lib
+
+SOPLEX_DIR=/Net/proj/opt/packages/SOPLEX
+SOPLEX_INCLUDES=-I$(SOPLEX_DIR)/include
+SOPLEX_LIBS=-lsoplex
+SOPLEX_LDFLAGS=-L$(SOPLEX_DIR)/lib
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+

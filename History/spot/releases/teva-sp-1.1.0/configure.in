@@ -1,0 +1,325 @@
+# This file is a shell script fragment that supplies the information
+# necessary to tailor a template configure script into the configure
+# script appropriate for this directory.  For more information, check
+# any existing configure script.
+ 
+cd config
+\rm -f ms-* > /dev/null 2>&1
+for FILE in `ls ../pkg-config/ms*` ; do\
+  ln -f -s ${FILE} .;\
+done
+cd ..
+
+srctrigger="Makefile.in"
+srcname="teva-ac Root"
+configdirs="packages"
+
+##
+## CONFIG
+##
+## Define default values for packages
+##
+srcroot=`pwd`
+if [ "${with_acro}" = "no" ]; then
+   with_acro="";
+elif [ -e packages/acro ]; then
+   with_acro="${srcroot}/packages/acro";
+elif [ -e ../acro ]; then
+   with_acro="${srcroot}/../acro";
+fi
+export with_acro;
+
+if [ "${with_debugging}" = "" ]; then
+   with_debugging=no;
+fi
+if [ "${with_warnings}" = "" ]; then
+   if [ "${without_warnings}" = "" ]; then
+      case "${site}" in
+        snl980)		with_warnings=yes ;;
+        *)		with_warnings=no ;;
+      esac
+   else
+      with_warnings=no;
+   fi
+fi
+if [ "${with_mpi}" = "" ]; then
+   case "${site}" in
+     sasn100)	with_mpi=yes ;;
+     alaska)	with_mpi=yes ;;
+     *)		with_mpi=no ;;
+   esac
+fi
+if [ "${with_mpe}" = "" ]; then
+   case "${site}" in
+     snl980)		with_mpe=no ;;
+     sasn100)		with_mpe=no ;;
+     *)			with_mpe=no ;;
+   esac
+fi
+
+##
+## Setup Site
+##
+## Note: this assumes that ms-default always exists!
+##
+if [ x"${site}" = x ]; then
+   site=default
+   site_option="--site=$site"
+fi
+if [ "${site}" != "default" ]; then
+   if [ ! -r config/ms-${site} ]; then
+      cd config
+      ln -f -s ms-default ms-${site}
+      cd ..
+   fi
+fi
+
+# per-host:
+
+case "${host}" in
+  *-*-aix*)		host_name=aix;;
+  *-*-cougar*)		host_name=cougar;;
+  *-*-cplant*)		host_name=cplant;;
+  *-*-hpux*)     	host_name=hpux;;
+  *-*-irix*)     	host_name=irix;;
+  *-*-linux*)		host_name=linux;;
+  *-*-osf*)		host_name=osf;;
+  *-*-solaris*)  	host_name=solaris;;
+  *-*-sunos*)    	host_name=sunos;;
+  rs6000-ibm-aix*)	host_name=rs6000;;
+  *-*-uwinNT)		host_name=uwin;;
+  *-*-nutcNT)		host_name=nutc;;
+  *-*-linux*)		host_name=linux;;
+  *-*-cygwin*)		host_name=cygwin;;
+  *-*-darwin*)		host_name=darwin;;
+  *)			host_name=unknown;;
+esac
+export host_name
+
+# per-target:
+
+echo ${target}
+case "${target}" in
+  *-*-aix*)	target_name=aix;;
+  *-*-cougar*)	target_name=cougar;;
+  *-*-cplant*)	target_name=cplant;;
+  *-*-hpux*)	target_name=hpux;;
+  *-*-irix*)	target_name=irix;;
+  *-*-osf*)	target_name=osf;;
+  *-*-solaris*)	target_name=solaris;;
+  *-*-sunos*)	target_name=sunos;;
+  *-*-tflop*)   target_name=tflop ;;
+  *-*-vxworks*)	target_name=vxworks;;
+  *-*-uwin*)	target_name=uwin;;
+  *-*-nutc*)	target_name=nutc;;
+  *-*-linux*)	target_name=linux;;
+  *-*-cygwin*)	target_name=cygwin;;
+  *-*-darwin*)  target_name=darwin;;
+  *)		target_name=unknown;;
+esac
+export target_name
+
+##
+## Setup compiler options
+##
+if [ "${with_compiler}" != "" ]; then
+   compiler_name="${with_compiler}"
+else
+   compiler_name=""
+fi
+export compiler_name
+if [ "${target_name}" = "tflop" ] || [ "${compiler_name}" = "msvc" ]; then
+   with_apps=no;
+   export with_apps;
+fi
+
+if [ "${with_shared}" = "" ]; then
+   case "${site}" in
+     snl980)	with_shared=no ;;
+     *)		with_shared=no ;;
+   esac
+fi
+if [ "${without_static}" = "" ] || [ "${with_shared}" = "no" ]; then
+   with_static=yes
+else
+   if [ "${without_static}" = "yes" ]; then
+      with_static=no
+   else
+      with_static=yes
+   fi
+fi
+
+
+##
+## Create a host makefile fragment that contains all of the makefile
+## fragments.  This makes it easier to recursively configure.  All you 
+## need to do is include this single makefile fragment file!
+##
+## Note:  these fragments are used to specify additional configuration
+##        options
+##
+host_makefile_frag=config/mf-${host_name}-${target_name}${compiler_name}-${site}
+echo "" > ${host_makefile_frag}
+
+
+##
+## Output Host/Target/Site configuration
+##
+echo "Host/Target/Site Configuration:" > config.summary
+echo "  HOST		${host_name}" >> config.summary
+echo "  TARGET	${target_name}" >> config.summary
+echo "  SITE		${site}" >> config.summary
+if [ "${compiler_name}" = "" ]; then
+   echo "  COMPILER	<default>" >> config.summary
+else
+   echo "  COMPILER	${compiler_name}" >> config.summary
+fi
+if [ "${with_static}" = "yes" ]; then
+   echo "  STATIC BUILD	yes" >> config.summary
+   echo "INSTALL_LIBRARIES=install_libraries" >> ${host_makefile_frag}
+else
+   echo "  STATIC BUILD	no" >> config.summary
+fi
+if [ "${with_shared}" = "yes" ]; then
+   echo "  SHARED BUILD	yes" >> config.summary
+   echo "INSTALL_SHARED_LIBRARIES=install_shared_libraries" >> ${host_makefile_frag}
+else
+   echo "  SHARED BUILD	no" >> config.summary
+fi
+
+ 
+####
+#### Copy Target-Site Package Macros
+####
+if [ -f config/mp-${target_name}-${site} ]; then
+   cat config/mp-${target_name}-${site} >> ${host_makefile_frag}
+else
+   echo "config/mp-${target_name}-${site} does not exist! Using a default configuration!";
+fi
+####
+#### Target fragments (mt-*)
+####
+if [ "${compiler_name}" = "" ]; then
+   cat config/mt-${target_name} >> ${host_makefile_frag}
+else
+   cat config/mt-${target_name}-${compiler_name} >> ${host_makefile_frag}
+fi
+####
+#### Target name (used to facilitate recursive makes)
+####
+echo "TARGET_NAME=${target_name}" >> ${host_makefile_frag}
+####
+#### Host fragments (mh-*)
+####
+cat config/mh-${host_name} >> ${host_makefile_frag}
+####
+#### MakeMacros
+####
+cat config/MakeMacros >> ${host_makefile_frag}
+####
+#### Identify ROOT
+####
+srcroot=`pwd`
+export srcroot
+tpwd=`pwd`
+head=`echo "${tpwd}" | sed 's%^/\([^/]*\)/\(.*\)%\1%'`
+if [ "${head}" = "tmp_mnt" ]; then
+   tpwd=`echo "${tpwd}" | sed 's%^/\([^/]*\)/\(.*\)%/\2%'`
+fi
+echo "ROOT_DIR=${tpwd}" >> ${host_makefile_frag}
+####
+#### CONFIG
+####
+#### Package-specific configuration options
+####
+echo "Package Configuration: " >> config.summary
+######
+###### Setup Package Defines
+######
+if [ "${with_mpi}" = "yes" ]; then
+   echo "  MPI		yes" >> config.summary
+   echo "MPI_DEFINE=-DUSING_MPI" >> ${host_makefile_frag}
+  if [ ! -f config/mp-${target_name}-${site} ]; then
+     echo "MPI_LIBS=-lmpi" >> ${host_makefile_frag}
+   fi
+else
+   echo "  MPI		no" >> config.summary
+   echo "MPI_DIR=" >> ${host_makefile_frag}
+   echo "MPI_INCLUDES=" >> ${host_makefile_frag}
+   echo "MPI_LIBS=" >> ${host_makefile_frag}
+   echo "MPI_LDFLAGS=" >> ${host_makefile_frag}
+fi
+if [ "${with_mpe}" = "yes" ]; then
+   echo "  MPE		yes" >> config.summary
+   echo "MPE_DEFINE=-DUSING_MPE" >> ${host_makefile_frag}
+else
+   echo "  MPE		no" >> config.summary
+   echo "MPE_DIR=" >> ${host_makefile_frag}
+   echo "MPE_INCLUDES=" >> ${host_makefile_frag}
+   echo "MPE_LIBS=" >> ${host_makefile_frag}
+   echo "MPE_LDFLAGS=" >> ${host_makefile_frag}
+fi
+if [ "${with_acro}" = "" ]; then
+   echo "  ACRO		no" >> config.summary
+else
+   echo "  ACRO		${with_acro}" >> config.summary
+fi
+if [ "${with_gprof}" = "yes" ]; then
+   echo "  GPROF		yes" >> config.summary
+else
+   echo "  GPROF		no" >> config.summary
+   echo "PROFILE_FLAG=" >> ${host_makefile_frag}
+fi
+if [ "${with_debugging}" != "no" ]; then
+   echo "DEBUGGING=-DDEBUGGING" >> ${host_makefile_frag}
+   echo "  DEBUGGING	yes" >> config.summary
+   if [ "${with_debugging}" = "yes" ]; then
+      with_optimization="-g"
+   else
+      with_optimization=${with_debugging}
+   fi
+else
+   echo "  DEBUGGING	no" >> config.summary
+fi
+######
+###### Optimization Defines
+######
+if [ "${with_optimization}" != "" ] && [ "${with_optimization}" != "yes" ]; then
+  echo "OPTIMIZATION=${with_optimization}" >> ${host_makefile_frag}
+  echo "  OPTIMIZATION	${with_optimization}" >> config.summary
+else
+  echo "  OPTIMIZATION	<default>" >> config.summary
+fi
+######
+###### Echo Configuration Summary
+######
+echo ""
+cat config.summary
+echo ""
+
+if [ "${target_name}" = "cougar" ]; then
+   with_ampl=no
+   export with_ampl 
+fi
+
+##
+## Create a 'Makefile' file that is symbolicaly linked to the current
+## Makefile-* file.
+##
+Makefile=Makefile-${target_name}
+touch $Makefile
+files="${Makefile}"
+links="Makefile"
+
+
+##
+## Setup flags for recursive configure
+##
+if [ "${with_target}" = "" ]; then
+   arguments="${arguments} --with-target=${target_name} --with-host=${host_name}"
+   withoptions="${withoptions} --with-target=${target_name} --with-host=${host_name}"
+   with_target=${target_name}
+   export with_target
+   with_host=${host_name}
+   export with_host
+fi

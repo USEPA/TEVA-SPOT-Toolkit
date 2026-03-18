@@ -1,0 +1,1288 @@
+Number of sensors:          1
+Total cost:                 0
+Sensor node IDs:            1 
+Sensor junctions:           10 
+Number of events:           236
+Min impact:                 20714.4000
+Mean impact:                133343.5669
+Lower quartile impact:      132828.0000
+Median impact:              141092.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            2 
+Sensor junctions:           15 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                102233.0271
+Lower quartile impact:      21868.2000
+Median impact:              136910.0000
+Upper quartile impact:      143094.0000
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144283.8333
+Max impact:                 144375.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            3 
+Sensor junctions:           20 
+Number of events:           236
+Min impact:                 8.9945
+Mean impact:                129999.7139
+Lower quartile impact:      133537.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            4 
+Sensor junctions:           35 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                82471.6354
+Lower quartile impact:      1355.1400
+Median impact:              128466.0000
+Upper quartile impact:      143987.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            5 
+Sensor junctions:           40 
+Number of events:           236
+Min impact:                 80.7732
+Mean impact:                89682.9609
+Lower quartile impact:      8862.2000
+Median impact:              130243.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.7500
+Max impact:                 144735.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            6 
+Sensor junctions:           50 
+Number of events:           236
+Min impact:                 153.9550
+Mean impact:                62506.9270
+Lower quartile impact:      4350.7100
+Median impact:              39021.4000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144330.0000
+TCE                 (  5%): 144555.5833
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            7 
+Sensor junctions:           60 
+Number of events:           236
+Min impact:                 72098.8000
+Mean impact:                137028.5263
+Lower quartile impact:      134642.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            8 
+Sensor junctions:           601 
+Number of events:           236
+Min impact:                 72098.8000
+Mean impact:                137028.5263
+Lower quartile impact:      134642.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            9 
+Sensor junctions:           61 
+Number of events:           236
+Min impact:                 72098.8000
+Mean impact:                137028.5263
+Lower quartile impact:      134642.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            10 
+Sensor junctions:           101 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                119894.0452
+Lower quartile impact:      128566.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.3333
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            11 
+Sensor junctions:           103 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                104720.2100
+Lower quartile impact:      65172.8000
+Median impact:              132476.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144557.0833
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            12 
+Sensor junctions:           105 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                120209.1316
+Lower quartile impact:      128804.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.3333
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            13 
+Sensor junctions:           107 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                116662.3935
+Lower quartile impact:      127301.0000
+Median impact:              138449.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.3333
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            14 
+Sensor junctions:           109 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                98715.4243
+Lower quartile impact:      47183.7000
+Median impact:              128895.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            15 
+Sensor junctions:           111 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                98075.3596
+Lower quartile impact:      45544.5000
+Median impact:              130092.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            16 
+Sensor junctions:           113 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                97061.2083
+Lower quartile impact:      42816.3000
+Median impact:              130092.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            17 
+Sensor junctions:           115 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                115785.6997
+Lower quartile impact:      127301.0000
+Median impact:              138449.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.2500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            18 
+Sensor junctions:           117 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                120505.2750
+Lower quartile impact:      128885.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.2500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            19 
+Sensor junctions:           119 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                120032.6235
+Lower quartile impact:      128895.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.1667
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            20 
+Sensor junctions:           120 
+Number of events:           236
+Min impact:                 6.8112
+Mean impact:                120257.3604
+Lower quartile impact:      128895.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.2500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            21 
+Sensor junctions:           121 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                129288.6942
+Lower quartile impact:      133537.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            22 
+Sensor junctions:           123 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                134730.6449
+Lower quartile impact:      134167.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            23 
+Sensor junctions:           125 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                129306.9386
+Lower quartile impact:      133537.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            24 
+Sensor junctions:           127 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                129850.3926
+Lower quartile impact:      133537.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            25 
+Sensor junctions:           129 
+Number of events:           236
+Min impact:                 26.9139
+Mean impact:                129930.8113
+Lower quartile impact:      133537.0000
+Median impact:              141716.0000
+Upper quartile impact:      144119.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            26 
+Sensor junctions:           131 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                128442.7204
+Lower quartile impact:      132936.0000
+Median impact:              141500.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            27 
+Sensor junctions:           139 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                127528.9944
+Lower quartile impact:      132936.0000
+Median impact:              141612.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144325.0000
+TCE                 (  5%): 144484.4167
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            28 
+Sensor junctions:           141 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                105857.4470
+Lower quartile impact:      83150.7000
+Median impact:              137303.0000
+Upper quartile impact:      143481.0000
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144336.3333
+Max impact:                 144477.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            29 
+Sensor junctions:           143 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                103474.1764
+Lower quartile impact:      26859.5000
+Median impact:              136910.0000
+Upper quartile impact:      143094.0000
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144283.8333
+Max impact:                 144375.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            30 
+Sensor junctions:           145 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                107102.1237
+Lower quartile impact:      83150.7000
+Median impact:              137303.0000
+Upper quartile impact:      143481.0000
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144336.3333
+Max impact:                 144477.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            31 
+Sensor junctions:           147 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                108473.2197
+Lower quartile impact:      97669.1000
+Median impact:              137303.0000
+Upper quartile impact:      143481.0000
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144336.3333
+Max impact:                 144477.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            32 
+Sensor junctions:           149 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                110626.4660
+Lower quartile impact:      125152.0000
+Median impact:              137863.0000
+Upper quartile impact:      143812.0000
+Value at Risk (VaR) (  5%): 144283.0000
+TCE                 (  5%): 144550.7500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            33 
+Sensor junctions:           151 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                111338.1027
+Lower quartile impact:      125152.0000
+Median impact:              137863.0000
+Upper quartile impact:      143812.0000
+Value at Risk (VaR) (  5%): 144283.0000
+TCE                 (  5%): 144550.7500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            34 
+Sensor junctions:           153 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                126942.0974
+Lower quartile impact:      132936.0000
+Median impact:              141500.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144359.0000
+TCE                 (  5%): 144568.7500
+Max impact:                 144738.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            35 
+Sensor junctions:           157 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                117652.1788
+Lower quartile impact:      128466.0000
+Median impact:              138707.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.2500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            36 
+Sensor junctions:           159 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                115271.3405
+Lower quartile impact:      127699.0000
+Median impact:              138035.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.2500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            37 
+Sensor junctions:           161 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                96766.9919
+Lower quartile impact:      6818.7000
+Median impact:              133123.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.4167
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            38 
+Sensor junctions:           163 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                94928.0414
+Lower quartile impact:      4656.1500
+Median impact:              132673.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            39 
+Sensor junctions:           164 
+Number of events:           236
+Min impact:                 1.0147
+Mean impact:                94967.4103
+Lower quartile impact:      4864.1100
+Median impact:              132673.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            40 
+Sensor junctions:           166 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                92563.2431
+Lower quartile impact:      3018.6900
+Median impact:              132299.0000
+Upper quartile impact:      143987.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            41 
+Sensor junctions:           167 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                92473.6339
+Lower quartile impact:      2781.6300
+Median impact:              132299.0000
+Upper quartile impact:      143987.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            42 
+Sensor junctions:           169 
+Number of events:           236
+Min impact:                 1.5221
+Mean impact:                94879.6929
+Lower quartile impact:      3829.0000
+Median impact:              132673.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            43 
+Sensor junctions:           171 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                92502.7314
+Lower quartile impact:      2781.6300
+Median impact:              132299.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            44 
+Sensor junctions:           173 
+Number of events:           236
+Min impact:                 4.6085
+Mean impact:                92545.1688
+Lower quartile impact:      3004.0800
+Median impact:              132299.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            45 
+Sensor junctions:           177 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                85850.2961
+Lower quartile impact:      3236.5900
+Median impact:              129674.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            46 
+Sensor junctions:           179 
+Number of events:           236
+Min impact:                 9.7140
+Mean impact:                86344.2107
+Lower quartile impact:      3097.2300
+Median impact:              129674.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            47 
+Sensor junctions:           181 
+Number of events:           236
+Min impact:                 8.5664
+Mean impact:                84847.0931
+Lower quartile impact:      1382.6000
+Median impact:              129674.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            48 
+Sensor junctions:           183 
+Number of events:           236
+Min impact:                 5.6243
+Mean impact:                89053.5793
+Lower quartile impact:      5366.2100
+Median impact:              129674.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            49 
+Sensor junctions:           184 
+Number of events:           236
+Min impact:                 24.8822
+Mean impact:                85823.3912
+Lower quartile impact:      3264.0800
+Median impact:              128059.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            50 
+Sensor junctions:           185 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                85727.9253
+Lower quartile impact:      3163.8900
+Median impact:              128015.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            51 
+Sensor junctions:           187 
+Number of events:           236
+Min impact:                 5.6243
+Mean impact:                88860.7467
+Lower quartile impact:      7918.2800
+Median impact:              128996.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            52 
+Sensor junctions:           189 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                89276.4555
+Lower quartile impact:      5138.3000
+Median impact:              130210.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            53 
+Sensor junctions:           191 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                90294.5329
+Lower quartile impact:      9886.4400
+Median impact:              128996.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            54 
+Sensor junctions:           193 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                90993.2152
+Lower quartile impact:      9464.2500
+Median impact:              130210.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            55 
+Sensor junctions:           195 
+Number of events:           236
+Min impact:                 2.1479
+Mean impact:                98539.9805
+Lower quartile impact:      13106.3000
+Median impact:              133123.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            56 
+Sensor junctions:           197 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                96327.5563
+Lower quartile impact:      34226.9000
+Median impact:              128996.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            57 
+Sensor junctions:           199 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                90158.7607
+Lower quartile impact:      1667.1000
+Median impact:              130831.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            58 
+Sensor junctions:           201 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                75233.9080
+Lower quartile impact:      1544.8900
+Median impact:              93057.4000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            59 
+Sensor junctions:           203 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                72903.0198
+Lower quartile impact:      1600.7400
+Median impact:              83150.7000
+Upper quartile impact:      143987.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            60 
+Sensor junctions:           204 
+Number of events:           236
+Min impact:                 9.7140
+Mean impact:                88967.5674
+Lower quartile impact:      8128.2700
+Median impact:              128996.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            61 
+Sensor junctions:           205 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                81527.6069
+Lower quartile impact:      2218.7800
+Median impact:              125152.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            62 
+Sensor junctions:           206 
+Number of events:           236
+Min impact:                 76.4406
+Mean impact:                73639.4964
+Lower quartile impact:      1360.8700
+Median impact:              92817.6000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            63 
+Sensor junctions:           207 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                73534.3027
+Lower quartile impact:      997.6830
+Median impact:              92563.9000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            64 
+Sensor junctions:           208 
+Number of events:           236
+Min impact:                 114.7960
+Mean impact:                73748.4314
+Lower quartile impact:      1518.1900
+Median impact:              93057.4000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            65 
+Sensor junctions:           209 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                71611.9658
+Lower quartile impact:      1609.3200
+Median impact:              83150.7000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            66 
+Sensor junctions:           211 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                69485.0679
+Lower quartile impact:      1770.4200
+Median impact:              67266.2000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            67 
+Sensor junctions:           213 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                67277.4741
+Lower quartile impact:      1957.0400
+Median impact:              20178.3000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            68 
+Sensor junctions:           215 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                65315.5933
+Lower quartile impact:      2499.3300
+Median impact:              10553.7000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            69 
+Sensor junctions:           217 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                63560.9131
+Lower quartile impact:      2721.6000
+Median impact:              15776.6000
+Upper quartile impact:      142478.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            70 
+Sensor junctions:           219 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                62449.4173
+Lower quartile impact:      3055.0300
+Median impact:              18400.5000
+Upper quartile impact:      140018.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            71 
+Sensor junctions:           225 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                62479.1033
+Lower quartile impact:      3055.0300
+Median impact:              18400.5000
+Upper quartile impact:      140018.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            72 
+Sensor junctions:           229 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                61178.6255
+Lower quartile impact:      2056.1000
+Median impact:              9892.2600
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            73 
+Sensor junctions:           231 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                62053.3566
+Lower quartile impact:      2704.3400
+Median impact:              32287.1000
+Upper quartile impact:      143987.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            74 
+Sensor junctions:           237 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                61741.5090
+Lower quartile impact:      1920.2400
+Median impact:              10308.3000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            75 
+Sensor junctions:           239 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                59420.2069
+Lower quartile impact:      2057.7400
+Median impact:              9248.0800
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            76 
+Sensor junctions:           241 
+Number of events:           236
+Min impact:                 82.1430
+Mean impact:                59825.5165
+Lower quartile impact:      2405.3000
+Median impact:              10373.8000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            77 
+Sensor junctions:           243 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                65288.3402
+Lower quartile impact:      2959.5500
+Median impact:              26351.4000
+Upper quartile impact:      143987.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            78 
+Sensor junctions:           247 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                58137.1639
+Lower quartile impact:      2567.6100
+Median impact:              9308.5400
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            79 
+Sensor junctions:           249 
+Number of events:           236
+Min impact:                 82.1430
+Mean impact:                59456.3162
+Lower quartile impact:      2464.0300
+Median impact:              10503.2000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            80 
+Sensor junctions:           251 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                58231.6824
+Lower quartile impact:      2914.3100
+Median impact:              10755.2000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            81 
+Sensor junctions:           253 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                55217.6532
+Lower quartile impact:      3435.9000
+Median impact:              9869.3100
+Upper quartile impact:      143987.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            82 
+Sensor junctions:           255 
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                57287.9601
+Lower quartile impact:      3208.5400
+Median impact:              10201.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            83 
+Sensor junctions:           257 
+Number of events:           236
+Min impact:                 15.2103
+Mean impact:                121303.4564
+Lower quartile impact:      128895.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.2500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            84 
+Sensor junctions:           259 
+Number of events:           236
+Min impact:                 25.4234
+Mean impact:                121330.4752
+Lower quartile impact:      128895.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.2500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            85 
+Sensor junctions:           261 
+Number of events:           236
+Min impact:                 25.4234
+Mean impact:                120750.8312
+Lower quartile impact:      128885.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.2500
+Max impact:                 144732.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            86 
+Sensor junctions:           263 
+Number of events:           236
+Min impact:                 37.7079
+Mean impact:                120780.4442
+Lower quartile impact:      128885.0000
+Median impact:              139389.0000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144347.0000
+TCE                 (  5%): 144559.3333
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            87 
+Sensor junctions:           265 
+Number of events:           236
+Min impact:                 1.0147
+Mean impact:                94840.8683
+Lower quartile impact:      3506.3900
+Median impact:              132673.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            88 
+Sensor junctions:           267 
+Number of events:           236
+Min impact:                 1.5221
+Mean impact:                90629.4833
+Lower quartile impact:      7925.7700
+Median impact:              130210.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            89 
+Sensor junctions:           269 
+Number of events:           236
+Min impact:                 3.0421
+Mean impact:                93219.4856
+Lower quartile impact:      3344.2400
+Median impact:              132476.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            90 
+Sensor junctions:           271 
+Number of events:           236
+Min impact:                 4.6085
+Mean impact:                90847.0279
+Lower quartile impact:      1517.8600
+Median impact:              131737.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            91 
+Sensor junctions:           273 
+Number of events:           236
+Min impact:                 20.2624
+Mean impact:                78585.1276
+Lower quartile impact:      1467.2300
+Median impact:              125152.0000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+
+Number of sensors:          1
+Total cost:                 0.0000
+Sensor node IDs:            92 
+Sensor junctions:           275 
+Number of events:           236
+Min impact:                 68.5027
+Mean impact:                74729.3201
+Lower quartile impact:      1544.8900
+Median impact:              92817.6000
+Upper quartile impact:      143999.0000
+Value at Risk (VaR) (  5%): 144329.0000
+TCE                 (  5%): 144555.5000
+Max impact:                 144733.0000
+

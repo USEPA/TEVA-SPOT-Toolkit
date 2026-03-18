@@ -1,0 +1,14 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for OSF are used everywhere.		#
+#-----------------------------------------------------------------------#
+
+MPI_DIR=/Net/local/mpi/mpich-1.1.0
+MPI_INCLUDES=-I$(MPI_DIR)/include 
+MPI_LIBS=-lmpi
+MPI_LDFLAGS=-L$(MPI_DIR)/lib/alpha/ch_p4
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+

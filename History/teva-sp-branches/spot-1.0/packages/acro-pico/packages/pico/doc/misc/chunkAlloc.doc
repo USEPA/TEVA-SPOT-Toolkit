@@ -1,0 +1,69 @@
+Quick Notes on Using the Chunk Allocator
+========================================
+
+Jonathan Eckstein, November 2000
+
+This note describes the chunkAllocator class.  The idea is that for
+small classes that may have many instances, to
+
+(1)  Reduce the number of calls to malloc
+
+(2)  Reduce system memory overhead -- for example, on Janus, each call
+     to new/malloc imposes an overhead of 32 bytes.
+
+The idea is that classes using the chunk allocator will allocate large
+blocks of memory at a time, reducing the number of system calls and
+amortizing any per-allocated-fragment overhead.
+
+If this tool proves satisfactory, we may want to move it from pico to
+utilib shorty.
+
+To use chunk allocation for a class, you just have to do three things:
+
+(1) Make sure you #include "memUtil.H" in your class header.
+
+(2) Somewhere within the declaration of the class, insert the line
+
+    #include "chunkAlloc.H"
+
+(this could also be done with a macro, but this method is less
+confusing to source-level debuggers).  
+
+(3)  Somewhere in the .C or .cpp code file for the class, insert the
+     line
+
+     CHUNK_ALLOCATOR_DEF(<class-name>,<mult>);
+
+where <class-name> is the name of your class, and <mult> is the number
+of instances you want to created in each actual call to malloc.  For
+classes on the order of 50 bytes, I've been using values of <mult> of
+around 100.  
+
+These steps do a number of things
+
+(a) Creates a static memory allocator object for the class.
+
+(b) Overloads the class's "new" and "delete" operators to use this
+    object.  Each actual call to malloc will allocate <mult> instances
+    of the class, which the allocator object will parcel out
+    one-by-one.
+
+(c)  Provides and additional, static method "memClear()" for the class.  
+
+The objects returned by the overloaded "new" are always double- and
+void*-aligned. 
+
+When you call the overloaded "delete", the memory for the object in
+question in question will be reused by later calls to "new", but only
+for the same kind of object.  If it becomes critical, I think it
+should be possible to overcome this restriction and have several
+similarly-sized classes share the same memory pool, but not with the
+simple includes/macros described above.
+
+The <class-name>::memClear() method truly frees all memory associated
+with <class-name> objects.  If called with no arguments, or an argument of
+TRUE, it also does a cursory check for obvious memory leaks.  If
+called with an argument of FALSE, this check is omitted.  MemClear()
+should be used with caution, since ALL pointers to <class-name>
+objects will be invalid as soon as it returns.
+

@@ -1,0 +1,278 @@
+/*! 
+ * \page spExecutable Executable sp
+
+\section spOverview Overview
+
+The \b sp executable provides a common interface for sensor placement
+solvers in TEVA-SP.
+
+
+\section Usage
+
+\verbatim
+   sp [options...] --network=<network> --objective=<objective-ids>
+                   --ub=<objective>,<ub-limit>
+\endverbatim
+
+
+\section Options
+
+\verbatim
+  -h, --help            show this help message and exit
+  -n NETWORK, --network=NETWORK
+                        Name of network file
+  --objective=OBJECTIVE
+                        Objective names have the form: <goal>_<statistic>
+                        ..The objective goals are:
+                        ....cost   the cost of sensor placement
+                        ....ec     extent of contamination
+                        ....dec    detected extent of contamination
+                        ....td     time to detection
+                        ....dtd    detected time to detection
+                        ....mc     mass consumed
+                        ....dmc    detected mass consumed
+                        ....nfd    number of failed detections
+                        ....ns     the number of sensors
+                        ....pe     population exposed
+                        ....dpe    detected population exposed
+                        ....pk     population killed
+                        ....dpk    detected population killed
+                        ....pd     population dosed
+                        ....dpd    detected population dosed
+                        ....vc     volume consumed
+                        ....dvc    detected volume consumed
+                        ..The objective statistics are:
+                        ....mean   the mean impact
+                        ....median the median impact
+                        ....var    value-at-risk of impact distribution
+                        ....tce    tail-conditioned expectation of imp dist
+                        ....cvar   approximation to TCE used with IPs
+                        ....worst  the worst impact
+                        An objective name of the form <type> is assumed to
+                        refer to the objective <type>_mean.  This option may
+                        listed more than once.
+  -r RTIME, --response-time=RTIME
+                        the response time (in minutes)
+  -g GAMMA, --gamma=GAMMA
+                        Specifies the fraction of the distribution of impacts
+                        that will be used to compute the var, cvar and tce
+                        measures.  Gamma is assumed to lie in the interval
+                        (0,1].  It can be interpreted as specifying the
+                        100*gamma percent of the worst contamination incidents
+                        that are used for these calculations.  Default: .05
+  --imperfect-scfile=SCFILE
+                        Specifies the name of a file defining detection
+                        probabilities for all sensor categories. Used with the
+                        imperfect-sensor model.  Must be specified in
+                        conjunction with the --imperfect-jc option.
+  --imperfect-jcfile=JCFILE
+                        Specifies the name of a file defining a sensor
+                        category for each network junction. Used with the
+                        imperfect-sensor model. Must be specified in
+                        conjunction with the --imperfect-sc option.
+  --num=NUMSAMPLES, --numsamples=NUMSAMPLES
+                        Specifies the number of candidate solutions generated
+                        by the heuristic solvers. Defaults vary based on
+                        statistic and sensor model formulation (perfect vs.
+                        imperfect).
+  --heuristic-representation=HEURISTIC_REPRESENTATION
+                        Specifies whether the heuristic solvers use a sparse
+                        matrix (0) or dense matrix (1) representation to store
+                        the impact file contents.  The default is 1.
+  --impact-dir=IMPACT_DIRECTORY
+                        Specifies the directory the contains impact files.  By
+                        default the current directory is used.
+  --aggregation-threshold=AGGREGATION_THRESHOLD, --threshold=AGGREGATION_THRESHOLD
+                        Specifies the value (as '<goal>,<value>') used to
+                        aggregate 'similar'  impacts.  This is used to reduce
+                        the total size of the sensor placement formulation
+                        (for large problems). The solution generated with non-
+                        zero thresholds is not guaranteed to be globally
+                        optimal.
+  --aggregation-percent=AGGREGATION_PERCENT, --percent=AGGREGATION_PERCENT
+                        A '<goal>,<value>' pair where value is a double
+                        between 0.0 and 1.0.  This is an alternate way to
+                        compute the aggregation threshold.   Over all
+                        contamination incidents, we compute the maximum
+                        difference d between the impact if the   contamination
+                        incident is not detected and the impact it is detected
+                        at the earliest possible feasible location.  We set
+                        the threshold to d * aggregation_percent.  If both
+                        threshold and percent are set to valid values in the
+                        command line, percent takes priority.
+  --aggregation-ratio=AGGREGATION_RATIO
+                        A '<goal>,<value>' pair where value is a double
+                        between 0.0 and 1.0.
+  --conserve-memory=MAXIMUM_IMPACTS
+                        If location aggregation is chosen, and the original
+                        impact files are very large, you can choose to process
+                        them in a memory conserving mode.  For example "--
+                        conserve_memory=10000" requests that while original
+                        impact files are being processed into smaller
+                        aggregated files, no more than 10000 impacts should be
+                        read into memory at any one time.  Default is 10000
+                        impacts.  Set to 0 to turn this off.
+  --distinguish-detection=DISTINGUISH_GOAL, --no-event-collapse=DISTINGUISH_GOAL
+                        A goal for which aggregation should not allow events
+                        to become trivial.  That is, if the threshold is so
+                        large that all locations, including the dummy, would
+                        form a single superlocation, this forces the dummy to
+                        be in a superlocation by itself.  Thus the sensor
+                        placement will distinguish between detecting and not
+                        detecting. This option can be listed multiple times,
+                        to specify multiple goals.
+  --disable-aggregation=DISABLE_AGGREGATION
+                        Do not do aggregation for this goal, even at value
+                        zero, which would incur no error.  Each witness event
+                        will be in a separate superlocation. This option can
+                        be listed multiple times, to specify multiple goals.
+                        You may list the goal 'all' to specify all goals.
+  --ub-constraint=UB_CONSTRAINT, --ub=UB_CONSTRAINT
+                        This option specifies a constraint (<objective>,<ub-
+                        value>) on the maximal value of an objective type.
+                        This option can be repeated multiple times with
+                        different objectives.
+  --baseline-constraint=BASELINE_CONSTRAINT, --baseline=BASELINE_CONSTRAINT
+                        Baseline constraints are not currently supported
+  --reduction-constraint=REDUCTION_CONSTRAINT, --reduction=REDUCTION_CONSTRAINT
+                        Reduction constraints are not currently supported
+  --costs=COST_FILE, --costs_ids=COST_FILE
+                        This file contains costs for the installation of
+                        sensors throughout the distribution network.  This
+                        file contains id/cost pairs, and default costs can be
+                        specified with the id: __default__
+  --costs-indices=COST_INDEX_FILE
+                        This file contains costs for the installation of
+                        sensors throughout the distribution network.  This
+                        file contains index/cost pairs, and default costs can
+                        be specified with the index: -1
+  --sensor-locations=LOCATIONS_FILE
+                        This file contains information about whether network
+                        ids are feasible for sensor placement, and whether a
+                        sensor placement is fixed at a given location.
+  --solver=SOLVER       This option specifies the type of solver that is used
+                        to find sensor placement(s).  The following solver
+                        types are currently supported:
+                        ..heuristic  multistart local search heuristic
+                        ..lagrangian lagrangian relaxation heuristic solver
+                        ..pico       mixed-integer programming (MIP) solver
+                        ..picoamp    MIP solver with AMPL
+                        ..cplexamp   commercial MIP solver
+                        The default solver is heuristic.
+  --solver-options=SOLVER_OPTIONS
+                        This option contains solver-specific options for
+                        controlling the sensor placement solver.  The options
+                        are added to the solver command line.
+  --runtime=RUNTIME     Terminate the solver after the specified number of
+                        wall clock minutes have elapsed.  By default, no limit
+                        is placed on the runtime.  Some solvers can provide
+                        their best solution so far at the point of
+                        termination.
+  --notify=INTERVAL     Some solvers can output preliminary solutions while
+                        they are running.This option supplies the interval in
+                        minutes at which candidate solutionsshould be printed
+                        out.
+  --compute-bound       Only compute a bound on the value of the optimal
+                        solution.
+  --memmon              Summarize the maximum memory used by any of the
+                        executables
+  --memcheck=MEMCHECKTARGET
+                        This option indicates that valgrind should run on one
+                        or more executables.
+                        ..all (run valgrind on all executables)
+                        ..solver (run valgrind on the solver only)
+                        ..setupIPData (run valgrind on setupIPData)
+                        ..preprocessImpacts (run it on preprocessImpacts)
+                        ..evalsensor (run valgrind on evalsensor)
+                        ..aggregateImpacts(run valgrind on aggregateImpacts)
+                        Output will be written to memcheck.{name}.{pid}
+  --tmp-file=TMP_FILE   Name of temporary file prefix used in this
+                        computation. The default name is '<network-name>'.
+  -o OUTPUT_FILE, --output=OUTPUT_FILE
+                        Name of the output file that contains the sensor
+                        placement. The default name is '<network-
+                        name>.sensors'
+  --summary=SUMMARY_FILE
+                        Name of the output file that contains summary
+                        information about the sensor placement.
+  --format=FORMAT       Format of the summary information
+  --print-log           Print the solver output
+  --path=PATH           Add this path to the set of paths searched for
+                        executables and IP models.
+  --amplcplexpath=AMPLCPLEXPATH
+                        Look for ampl and cplexamp executables in this
+                        directory. This defaults to a 'blank' path, which
+                        implies that the user's system path is used.
+  --picopath=PICOPATH   Look for the PICO executable in this directory. This
+                        defaults to the path used for executables specified
+                        by. the --path option.
+  --ampl=AMPL           The name of the ampl executable (this defaults to
+                        'ampl').
+  --ampldata=AMPLDATA   An auxillary AMPL data file.  This option is used when
+                        integrating auxillary information into the AMPL IP
+                        model.
+  --amplmodel=AMPLMODEL
+                        An alternative AMPL model file.  This option is used
+                        when applying a non-standard AMPL model for solving
+                        sensor placement with an IP.
+  --seed=SEED           The value of a seed for the random number generator
+                        used by the solver.  This can be used to ensure a
+                        deterministic, repeatable output from the solver.
+                        Should be >= 1.
+  --eval-all            This option specifies that all impact files found will
+                        be used to evaluate the final solution(s).
+  --debug               List status messages while processing
+  --gap=GAP             TODO gap help string
+\endverbatim
+
+
+\section Description
+
+The <b>sp</b> executable is a python script that coordinates the execution
+of the SPOT sensor placement solvers.  The command-line options
+can specify any of a set of performance/cost goals as the objective
+to be optimized, as well as constraints on performance/cost goals.
+The problem formulation that is solved by the sensor placement solvers
+is described  
+\latexonly
+in Section 
+\endlatexonly
+\ref formulations "here".
+
+The <b>sp</b> script currently interfaces with 
+integer programming (IP) solvers, a family of multi-start
+local search heuristics, and a Lagrangian heuristic. 
+The IP formulation can be used to find globally 
+optimal solutions, the multi-start heuristics have proven effective at 
+finding optimal solutions to a variety of large-scale applications,
+ and the Lagrangian heuristic finds a near-optimal selection while computing a confidence bound.
+
+The following files are generated during the execution of <b>sp</b>:
+<ul>
+
+<li> \<tmpfile\>.config - the \ref spConfigFile
+
+<li> \<tmpfile\>.dat - an AMPL data file (if using an IP solver)
+
+<li> \<tmpfile\>.mod - an AMPL script (if using an IP solver)
+
+<li> \<tmpfile\>.log - a log file that captures the solver output
+
+<li> \<tmpfile\>.sensors - a \ref sensorPlacementFile that contains the final solution
+
+</ul>
+
+See \latexonly Section \endlatexonly\ref solvers "here" for further a detailed discussion of how this command can be used.
+
+
+\section spNotes Notes
+
+The heuristic solvers do not currently support the "median" performance
+measure.  The IP solvers do not currently support "median", "var", or
+"tce" performance measures.  The aggregation threshold does not currently
+impact the problem formulation used by the heuristic solvers.
+
+This solver interface assumes that event likelihoods are uniform.
+The format for specifying non-uniform likelihoods remains unresolved.
+
+*/

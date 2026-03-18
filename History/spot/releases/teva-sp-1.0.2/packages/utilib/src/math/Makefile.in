@@ -1,0 +1,18 @@
+
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+LIBRARY=libutilib
+
+#
+# Define objects and headers
+#
+SRCS= median.cpp cov.c cholesky.cpp math.c
+
+#
+# Define compiler flags
+#
+#OPTIMIZATION= -g
+
+include ../MakeMacros
+include Makefile.dependencies

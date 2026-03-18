@@ -1,0 +1,459 @@
+#-----------------------------------------------------------------------------
+#
+# Make macros that are used everywhere.  These macros are
+# 	extentions of the standard make macros to specify the 
+#	C++ compiler, and to generate more verbage during the compilation.
+#
+#-----------------------------------------------------------------------------
+
+
+
+
+##
+##
+## COMPILE definitions
+##
+##
+
+TOUCH= touch -c
+
+CPPFLAGS = $(INCLUDES)
+CFLAGS =  $(ARCH_FLAGS) $(PROFILE_FLAG) $(CWARNINGS) $(OPTIMIZATION) $(XTRAFLAGS)
+C++FLAGS = $(ARCH_FLAGS) $(PROFILE_FLAG) $(C++WARNINGS) $(OPTIMIZATION) $(XTRAFLAGS) $(C++LOCAL)
+
+
+COMPILE.c = $(INSURE) $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+LINK.c = $(INSURE) $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+
+COMPILE.cc = $(INSURE) $(C++) $(C++FLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+LINK.cc = $(INSURE) $(C++) $(C++FLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
+
+COMPILE.C = $(COMPILE.cc)
+LINK.C = $(LINK.cc)
+
+COMPILE.F = $(F77) $(FFLAGS) $(PROFILE_FLAG) $(INCLUDES) $(TARGET_ARCH) -c
+LINK.F = $(F77) $(FFLAGS) $(INCLUDES) $(LDFLAGS) $(TARGET_ARCH)
+
+OUTPUT_OPTION = -o $*.o
+
+.SUFFIXES: .o .c .cpp .cc .C .H .a .pi .so .i .F .f .dxx .Ht .Ct .ht .cppt .for .FOR .py .swig
+
+##
+## Compiling *.c files
+##
+
+.c: 
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(LINK.c) -o $@ $< $(LDLIBS)
+	if [ $(MPI_EXEC_DIR) ] ; then \
+	   cp $@ $(MPI_EXEC_DIR);\
+	fi
+	@$(ECHO)
+
+.c.o:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(COMPILE.c) $(OUTPUT_OPTION) $<
+	@$(ECHO)
+
+.c.pi:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.pi
+	$(COMPILE.c) $(CC_SHARED) $(OUTPUT_OPTION) $<
+	mv $*.o $*.pi
+	@$(ECHO)
+
+##
+## Compiling *.cc files
+##
+.cpp:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(LINK.cc) -o $@ $< $(LDLIBS)
+	if [ $(MPI_EXEC_DIR) ] ; then \
+	   cp $@ $(MPI_EXEC_DIR);\
+	fi
+	@$(ECHO)
+
+.cpp.o:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+	@$(ECHO)
+
+.cpp.pi:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o $*.pi
+	$(COMPILE.cc) $(C++_SHARED) $(OUTPUT_OPTION) $<
+	mv $*.o $*.pi
+	@$(ECHO)
+
+
+##
+## Compiling *.cc files
+##
+.cc:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(LINK.cc) -o $@ $< $(LDLIBS)
+	if [ $(MPI_EXEC_DIR) ] ; then \
+	   cp $@ $(MPI_EXEC_DIR);\
+	fi
+	@$(ECHO)
+
+.cc.o:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(COMPILE.cc) $(OUTPUT_OPTION) $<
+	@$(ECHO)
+
+.cc.pi:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o $*.pi
+	$(COMPILE.cc) $(C++_SHARED) $(OUTPUT_OPTION) $<
+	mv $*.o $*.pi
+	@$(ECHO)
+
+
+##
+## Compiling *.C files
+##
+.C:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File-- " $<
+	@$(ECHO) " ---------------------"
+	$(LINK.C) -o $* $< $(LDLIBS)
+	if [ $(MPI_EXEC_DIR) ] ; then \
+	   cp $@ $(MPI_EXEC_DIR);\
+	fi
+	@$(ECHO)
+
+.C.o:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(COMPILE.C) $(OUTPUT_OPTION) $<
+	@$(ECHO)
+
+.C.pi:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o $*.pi
+	$(COMPILE.C) $(C++_SHARED) $(OUTPUT_OPTION) $<
+	mv $*.o $*.pi
+	@$(ECHO)
+
+
+##
+## Compiling fortran files
+##
+.f:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(LINK.F) -o $@ $< $(LDLIBS)
+	if [ $(MPI_EXEC_DIR) ] ; then \
+	   cp $@ $(MPI_EXEC_DIR);\
+	fi
+	@$(ECHO)
+
+.F:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(LINK.F) -o $@ $< $(LDLIBS)
+	if [ $(MPI_EXEC_DIR) ] ; then \
+	   cp $@ $(MPI_EXEC_DIR);\
+	fi
+	@$(ECHO)
+
+.for:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(LINK.F) -o $@ $< $(LDLIBS)
+	if [ $(MPI_EXEC_DIR) ] ; then \
+	   cp $@ $(MPI_EXEC_DIR);\
+	fi
+	@$(ECHO)
+
+.FOR:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(LINK.F) -o $@ $< $(LDLIBS)
+	if [ $(MPI_EXEC_DIR) ] ; then \
+	   cp $@ $(MPI_EXEC_DIR);\
+	fi
+	@$(ECHO)
+
+.f.o:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File -- " $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+	@$(ECHO)
+
+.F.o:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File --" $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+	@$(ECHO)
+
+.for.o:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File --" $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+	@$(ECHO)
+
+.FOR.o:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File --" $<
+	@$(ECHO) " ---------------------"
+	$(RM) $*.o
+	$(COMPILE.F) $(OUTPUT_OPTION) $<
+	@$(ECHO)
+
+##
+##
+## Generating preprocessed files
+##
+##
+
+.c.i:
+	$(CC) $(ARCH_FLAGS) $(CPPFLAGS) $(DEBUGGING) $(XTRAFLAGS) $(CWARNINGS) -E $< > $*.i
+
+.cpp.i:
+	$(C++) $(ARCH_FLAGS) $(CPPFLAGS) $(DEBUGGING) $(XTRAFLAGS) $(C++WARNINGS) -E $< > $*.i
+
+.cc.i:
+	$(C++) $(ARCH_FLAGS) $(CPPFLAGS) $(DEBUGGING) $(XTRAFLAGS) $(C++WARNINGS) -E $< > $*.i
+
+.C.i:
+	$(C++) $(ARCH_FLAGS) $(CPPFLAGS) $(DEBUGGING) $(XTRAFLAGS) $(C++WARNINGS) -E $< > $*.i
+
+.f.i:
+	$(F77) $(ARCH_FLAGS) $(CPPFLAGS) $(DEBUGGING) $(XTRAFLAGS) -E $< > $*.i
+
+.F.i:
+	$(F77) $(ARCH_FLAGS) $(CPPFLAGS) $(DEBUGGING) $(XTRAFLAGS) -E $< > $*.i
+
+.for.i:
+	$(F77) $(ARCH_FLAGS) $(CPPFLAGS) $(DEBUGGING) $(XTRAFLAGS) -E $< > $*.i
+
+.FOR.i:
+	$(F77) $(ARCH_FLAGS) $(CPPFLAGS) $(DEBUGGING) $(XTRAFLAGS) -E $< > $*.i
+
+
+##
+##
+## Archiving files
+##
+##
+
+# MSE, 12/19/00: causes unwanted override of ARFLAGS in mt-*
+#ARFLAGS=rcv
+
+.c.a:
+	@$(ECHO) ""
+	@$(ECHO) " Compiling and Archiving Source File -- " $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.c) -o $% $<
+	$(AR) $(ARFLAGS) $@ $%
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+
+.cpp.a:
+	@$(ECHO) ""
+	@$(ECHO) " Compiling and Archiving Source File -- " $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.cc) -o $% $<
+	$(AR) $(ARFLAGS) $@ $%
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+
+.cc.a:
+	@$(ECHO) ""
+	@$(ECHO) " Compiling and Archiving Source File -- " $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.cc) -o $% $<
+	$(AR) $(ARFLAGS) $@ $%
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+
+.C.a:
+	@$(ECHO) ""
+	@$(ECHO) " Compiling and Archiving Source File -- " $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.C) -o $% $<
+	$(AR) $(ARFLAGS) $@ $%
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+
+.c.so:
+	@$(ECHO) ""
+	@$(ECHO) " Compiling and Archiving Source File -- " $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.c) $(CC_SHARED) -o $*.o $<
+	mv $*.o $*.pi
+	$(AR) $(ARFLAGS) $@ $*.pi
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+
+.cpp.so:
+	@$(ECHO) ""
+	@$(ECHO) " Compiling and Archiving Source File -- " $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.cc) $(C++_SHARED) -o $*.o $<
+	mv $*.o $*.pi
+	$(AR) $(ARFLAGS) $@ $*.pi
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+
+.cc.so:
+	@$(ECHO) ""
+	@$(ECHO) " Compiling and Archiving Source File -- " $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.cc) $(C++_SHARED) -o $*.o $<
+	mv $*.o $*.pi
+	$(AR) $(ARFLAGS) $@ $*.pi
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+
+.C.so:
+	@$(ECHO) ""
+	@$(ECHO) " Compiling and Archiving Source File -- " $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.C) $(C++_SHARED) -o $*.o $<
+	mv $*.o $*.pi
+	$(AR) $(ARFLAGS) $@ $*.pi
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+
+.f.a:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File and Archiving --" $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.F) -o $% $<
+	$(AR) $(ARFLAGS) $@ $%
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+ 
+.F.a:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File and Archiving --" $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.F) -o $% $<
+	$(AR) $(ARFLAGS) $@ $%
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+ 
+.for.a:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File and Archiving --" $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.F) -o $% $<
+	$(AR) $(ARFLAGS) $@ $%
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+ 
+.FOR.a:
+	@$(ECHO)
+	@$(ECHO) " Compiling Source File and Archiving --" $<
+	@$(ECHO) " -----------------------------------"
+	$(COMPILE.F) -o $% $<
+	$(AR) $(ARFLAGS) $@ $%
+	$(ARCLEAN) $%
+	@$(ECHO)
+	@$(RM) -f $(LIBRARY_STATUS)
+ 
+
+##
+##
+## Misc stuff
+##
+##
+.y.c:
+	$(YACC) $<
+	grep -v "^#line" y.tab.c > $@
+	$(RM) y.tab.c
+
+.y.cc:
+	$(YACC) $<
+	grep -v "^#line" y.tab.c > $@
+	$(RM) y.tab.c
+
+.y.cpp:
+	$(YACC) $<
+	grep -v "^#line" y.tab.c > $@
+	$(RM) y.tab.c
+
+.l.c:
+	$(LEX) -l -t $< | grep -v "^#line" > $@
+
+
+##
+## DOC++ Conversions
+##
+.H.dxx:
+	docify $< $*.dxx
+
+.h.dxx:
+	docify $< $*.dxx
+
+
+##
+## Template Conversions
+##
+.H.Ht:
+	@$(BINDIR)/gentemps -temp $* $(TEMPLATE_DEFNS)
+
+.C.Ct:
+	@$(BINDIR)/gentemps -temp $* $(TEMPLATE_DEFNS)
+
+.h.ht:
+	@$(BINDIR)/gentemps -temp $* $(TEMPLATE_DEFNS)
+
+.cpp.cppt:
+	@$(BINDIR)/gentemps -temp $* $(TEMPLATE_DEFNS)

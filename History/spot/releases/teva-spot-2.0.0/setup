@@ -1,0 +1,22 @@
+#!/bin/sh
+##
+## Dummy script that calls testdriver to manage configuration, builds
+## and testing
+##
+
+if [ -e packages/acro-pico ]; then
+   pushd packages/acro-pico
+   ./setup
+   popd
+else
+   echo "ERROR: acro-pico was not properly checked out!"
+   exit
+fi
+
+if [ "$#" != "0" ] ; then
+  ./packages/fast/client/driver --I=packages/fast/client --S=config $*
+  # Make sure user sees configure warnings
+  if [ "$1" == "configure" ]; then
+    grep WARN test/config.out
+  fi
+fi

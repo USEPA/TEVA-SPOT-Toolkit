@@ -1,0 +1,87 @@
+The COIN directory tree is organized by component.  The tree looks
+like this:
+
+	COIN
+	|
+	+---Alps---include
+	|
+	+---Bcp---<Bcp subtree>
+	|
+	+---Common+---include
+        |         +---make
+        |
+	+---Cbc+---include
+        |      +---Test
+        |      +---Samples
+        |      +---Docs
+        |     
+	+---Cgl---include
+	|
+	+---Clp+---include
+        |      +---Test
+        |      +---Test---include
+        |      +---Samples
+        |      +---Docs
+        |     
+	+---Examples---<Example subtree>
+	|
+	+---Ipopt---<Ipopt subtree>
+	|
+	+---Mps---<MPS file subtree>
+	|
+	+---NLPAPI---<NLPAPI subtree>
+	|
+	+---Osi---include
+	|
+	+---Vol---include
+	|
+	+---multifario---<Multifario subtree>
+
+Depending on what packages/modules you have checked out you may have
+only a subset of these directories.
+
+Common/ contains header files that are used in several other modules, 
+and various helper makefiles.
+
+The Mps* directories contain input data for test problems.  Sample/ 
+contains a few small test problems.  Big/ consists of large test
+problems (gzipped).  Netlib/ contains a copy of the problems in the
+Netlib test set (already converted to MPS format and gzipped, but not
+filtered through CPLEX's convert utility).
+
+The Examples directory contains several sample programs illustrating
+the use of different components of COIN.  Each problem resides in a
+separate subdirectory.  Each subdirectory contains source files, data
+(if necessary), documentation, and a Makefile.
+
+Within components, each directory contains source (usually including a
+unit test program), an include/ subdirectory containing header files,
+and a Makefile.  Documentation for each component is contained in a
+Doc/ subdirectory or is created using "make doc".
+
+The Osi component (Open Solver Interface) contains classes that wrap
+several different math programming solvers with a solver-independent
+interface.  This interface provides a packed matrix class and calls to
+load problems from MPS files or from matrices and vectors created on
+the fly, modify loaded problems, solve LPs an MIPs, and access
+solution information.
+
+The Volume solver is one of the solvers supported by the Osi.
+
+The Cgl component (Cut Generation Library) contains classes
+implementing several types of generic cutting planes, written to
+conform to the Open Solver API.
+
+The Bcp (Branch-Cut-Price) component subtree is documented in the Bcp
+directory.
+
+The Ipopt component (Interior Point Optimizer for general nonlinear
+constrained optimization problems) is independent of the other
+components in COIN.  Documentation files can be found in
+COIN/Ipopt/doc .
+
+The NLPAPI component is independent of the other components in COIN.
+Documentation files can be found in COIN/NLPAPI/Doc .
+
+The multifario component is independent of the other components in COIN.
+Documentation files can be found in COIN/multifario/Doc .

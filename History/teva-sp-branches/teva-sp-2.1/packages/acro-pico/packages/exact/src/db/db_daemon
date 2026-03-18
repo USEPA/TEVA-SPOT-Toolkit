@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+#
+# Stefan Chakerian (schake@sandia.gov)
+# Sandia National Labs
+# Jan, 2005
+#
+# This extracts xml and output files from the data directory,
+# moves the pertinent ones to webspace, and
+# removes them from cvs repository.
+#
+
+#
+# Get the DB Server configuration
+#
+unshift @INC, ".";
+require db_config;
+#
+# generic setup
+# 
+$ENV{CVSROOT} = $cvsroot;
+$ENV{PATH} = "/bin:/usr/bin:" . $ENV{PATH};
+umask 002;
+my $webroot="/home/sqe/public_html/testdata";
+
+
+sub update_datadirectory {
+  my $project = shift;
+  if (-d "data") {
+  } else {
+      `mkdir data`;
+  }
+  if (!(-d $db_config{$project}{'dir'})) {
+     die "cvs failed: $_" if ($_ = `$db_config{$project}{'checkout'}`);
+  } else {
+     die "cvs failed: $_" if ($_ = `$db_config{$project}{'update'}`);
+  }
+  opendir DATADIR, ($db_config{$project}{'dir'}) or die ("opendir failed");
+  @dirlist = grep /(\.xml|\.out)$/, readdir DATADIR;
+  closedir DATADIR;
+  return @dirlist;
+}
+
+sub delete_file {
+  my $curname = shift;
+  my $project = shift;
+  my $explanation = shift;
+  unlink("$db_config{$project}{'dir'}/$curname");
+  die "cvs remove $curname failed\n$result"
+		  if ($result = `$db_config{$project}{'remove'} $db_config{$project}{'dir'}/$curname > /dev/null 2>&1`);
+  if ($explanation ne "OK") {
+     printf "Bad filename: $curname\n";
+     die "Explanation:  $explanation\n";
+  }
+}
+
+##
+## MAIN
+##
+#
+# Iterate through the software projects
+#
+foreach $project (keys %db_config) {
+  print "  Processing project $project ...\n";
+  #
+  # Update the data directory
+  #
+  @files = update_datadirectory($project);
+  foreach $file (@files) {
+    print "FILE $file\n";
+  }
+  #
+  # Move everything a $webroot subdirectory.
+  # The particular subdirectory is specified by the output file.
+  #
+  # Note: we need to move both *.out and *.xml files.
+  #
+  foreach $curname (@files) {
+    #
+    # Split the filename into various pieces
+    #
+    @tmp = split /#/, $curname;
+    if ($#tmp < 5) {
+       delete_file($curname,$project,"Bad filename format");
+    }
+    ($cdate,$ctime,$cwho,$chost,$ccat,$cfile) = split /#/, $curname;
+    $framework = (split(/-/,$ccat))[0];
+    if ($framework ne $project) {
+       delete_file($curname,$project,"Project configuration error");
+       }
+    #
+    # Create the webroot directory if it doesn't exist
+    #
+    unless (-d "$webroot/$project/$cdate" && -w "$webroot/$project/$cdate" ) {
+      die $_ if ($_ = `mkdir -p $webroot/$project/$cdate`);
+    }
+    #
+    # Move files
+    #
+    #print "mv $db_config{$project}{'dir'}/$curname $webroot/$project/$cdate\n";
+    die "mv $curname failed\n$result"
+		if ($result = `mv $db_config{$project}{'dir'}/$curname $webroot/$project/$cdate`);
+    delete_file($curname,$project,"OK");
+    }
+  #
+  # Commit 'remove' events
+  #
+  die "commit result\n-------\n$result"
+    if ($result = `$db_config{$project}{'commit'} $db_config{$project}{'dir'} > /dev/null 2>&1`);
+  }
+

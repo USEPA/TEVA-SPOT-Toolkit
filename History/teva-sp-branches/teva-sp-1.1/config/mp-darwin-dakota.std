@@ -1,0 +1,13 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=DARWIN  at site=DAKOTA.STD       #
+#-----------------------------------------------------------------------#
+
+MPI_DIR=
+MPI_INCLUDES=-I$(DAKOTA)/VendorPackages/mpi/include
+MPI_LIBS=
+MPI_LDFLAGS=
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=

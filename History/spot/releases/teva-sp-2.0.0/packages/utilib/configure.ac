@@ -1,0 +1,401 @@
+#
+# TODO For BitArrayBase:  Default is not set, code will select a default. 
+#    --enable-bit-arrays=byte
+#    --enable-bit-arrays=word
+# Define BIT_ARRAYS_BY_BYTE or BIT_ARRAYS_BY_WORD
+#
+# TODO: cleanup tests for linpack library and add it to the link line 
+# when building tests
+#
+# TODO: We probably don't want to error-out on the absence of 
+# all these headers. We can work around not having strings.h, etc. 
+# Let's wait till we fail on a platform to decide what we want
+# to work around.
+#
+# These were recommended by autoscan.  TODO: Define replacement
+# functions for these three if autoconf test decides they
+# are faulty, and include AC_LIBOBJ commands to replace them.
+#
+#AC_FUNC_ERROR_AT_LINE
+#AC_FUNC_MALLOC
+#AC_FUNC_STRTOD
+#
+
+
+###############################################################
+# boilerplate
+
+AC_PREREQ(2.59)
+AC_INIT([utilib], [1.0-Beta], [acro-help@sandia.gov])
+AM_MAINTAINER_MODE
+
+
+###############################################################
+# A file or directory that should be found here, so we know
+# we are in the right place.
+ 
+AC_CONFIG_SRCDIR([src/math/cholesky.cpp])
+
+
+###############################################################
+# Location of our m4 macros.  These test for the features
+# we are interested.  This doesn't actually work.  Documentation
+# says it will in the future.  We need to define
+# ACLOCAL_AMFLAGS in Makefile.am instead.  autoconf looks there
+# for some reason.
+
+AC_CONFIG_MACRO_DIR([config])
+AC_CONFIG_AUX_DIR([config])
+
+
+###############################################################
+# Create this header file which will help configure our Makefiles
+# and source files at build time.
+
+AC_CONFIG_HEADERS([utilib/config.h])
+AX_PREFIX_CONFIG_H([utilib/utilib_config.h])
+AH_BOTTOM(
+#include <utilib/utilib_config_bool.h>
+#include <utilib/utilib_config_explicit.h>
+)
+
+
+
+###############################################################
+# Setup platform information and initialize automake
+
+AC_CANONICAL_BUILD
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+
+
+###############################################################
+# Platform ID
+
+ACRO_PLATFORM
+
+###############################################################
+# Is utilib being built as part of acro?  If so we will
+# copy our library to acro/lib when done.  If not, we'll
+# copy it to top_builddir/lib.
+# TODO - is there a better way for utilib to know it's a subpackage?
+# TODO - is there a variable containing the path that was used
+#   to run configure?  If so we could check for a file in the
+#   build directory.
+
+if test -d ../../packages ; then
+  AM_CONDITIONAL(I_AM_SUBPACKAGE, true)
+  ac_cv_subpackage=yes
+else
+  AM_CONDITIONAL(I_AM_SUBPACKAGE, false)
+  ac_cv_subpackage=no
+fi
+
+
+###############################################################
+# Configure command line options
+
+if test X${ac_cv_subpackage} = Xyes ; then
+  #
+  # If utilib is a subpackage of acro, ignore the command line
+  # compiler options.  They have already been processed and
+  # the result is in the environment variables CFLAGS, CXXFLAGS, etc.
+  #
+  ACRO_COMPILER_OPTIONS(subpackage)
+else
+  ACRO_COMPILER_OPTIONS
+fi
+
+# Control whether UTILIB CommonIO mapping is used
+ACRO_COMMONIO_OPTION
+# Control whether UTILIB memory debugging utilities are used
+ACRO_MEMDEBUG_OPTION
+# Control whether UTILIB checksum is used
+ACRO_CHECKSUM_OPTION
+# Control whether executables are built
+ACRO_EXECUTABLES_OPTION
+# Control the type of compiler used
+ACRO_COMPILER_OPTION
+# Control wether test codes are built
+ACRO_TEST_OPTION
+# Control wether code validation is used
+ACRO_VALIDATING_OPTION
+# Various options to setup the use of MPI
+ACRO_MPI_OPTIONS
+    
+#
+# Will application using utilib link in linpack? Default is NO.
+#
+AC_ARG_WITH(linpack,
+[AC_HELP_STRING([--with-linpack],[Allow utilib to call linpack functions])],
+[WITH_LINPACK=$withval],
+[WITH_LINPACK=no]
+)
+
+if test X${WITH_LINPACK} = Xyes; then
+    AC_DEFINE(YES_LINPACK,,[define whether linpack will be included])
+fi
+
+
+###############################################################
+# Checks for programs
+
+ACRO_MPI_COMPILERS
+
+temp_fflags=${FFLAGS}
+temp_cflags=${CFLAGS}
+temp_cxxflags=${CXXFLAGS}
+
+# AC_PROG_CC: If environment variable CC is set, that becomes
+#  the compiler to use, otherwise search for compilers in list.
+#  (There are sensible defaults to search for if the list is
+#  empty.)  This macro sets the variable $ac_cv_prog_cc_stdc to
+#  'yes' or 'no' if the compiler is ANSI or not.  If compiler is
+#  GNU C, shell variable GCC is set to 'yes'.  CFLAGS is set
+#  to "-g -O2" if not already set.
+if test -z "${MPI_CC}" ; then
+  AC_PROG_CC(cc gcc)
+else
+  CC=${MPI_CC}
+fi
+
+# AC_PROG_CXX: If environment variable CXX or CCC is set, this
+#  becomes the compiler to use, otherwise this macro searches
+#  the list of compilers provided to it.  If compiler is
+#  GNU C++, this macro sets the shell variable GXX to 'yes'.
+#  This macro sets CXXFLAGS to "-g -O2" if it was not already set.
+if test -z "${MPI_CXX}" ; then
+  if test X${build_os} = Xcygwin ; then
+    cpp_compilers="g++ c++ gcc cxx"
+  else
+    cpp_compilers="CC g++ c++ gcc cxx"
+  fi
+    
+  AC_PROG_CXX(${cpp_compilers})
+else
+  CXX=${MPI_CXX}
+fi  
+  
+if test -z "${MPI_F77}" ; then
+  AC_PROG_F77(f77 g77 f90 xlf90 ifort)
+else
+  F77=${MPI_F77}
+fi
+
+AC_PROG_CXXCPP
+AC_PROG_RANLIB
+AC_PROG_LN_S
+AM_PROG_AS
+
+FFLAGS=${temp_fflags}
+CFLAGS=${temp_cflags}
+CXXFLAGS=${temp_cxxflags}
+
+
+###############################################################
+# Platform-specific compiler options
+
+if test X${ac_cv_subpackage} = Xno ; then
+  #
+  # If utilib is a subpackage of acro, these flags were 
+  # already incorporated into CFLAGS, CXXFLAGS, etc.
+  #
+  ACRO_PLATFORM_FLAGS
+fi
+
+
+###############################################################
+# Setup compiler flags
+
+ACRO_COMPILER_FLAGS
+
+###############################################################
+# Validate MPI builds
+
+if test X${ac_cv_subpackage} = Xyes ; then
+  #
+  # flag that we're a subpackage so macro doesn't add MPI library
+  # path again onto LDFLAGS, test again that MPI works, etc.
+  #
+  ACRO_MPI_TESTS(subpackage)
+else
+  ACRO_MPI_TESTS
+fi
+
+AC_MSG_NOTICE(CC=${CC})
+AC_MSG_NOTICE(CXX=${CXX})
+AC_MSG_NOTICE(F77=${F77})
+AC_MSG_NOTICE(CPPFLAGS=${CPPFLAGS})
+AC_MSG_NOTICE(CFLAGS=${CFLAGS})
+AC_MSG_NOTICE(CXXFLAGS=${CXXFLAGS})
+AC_MSG_NOTICE(FFLAGS=${FFLAGS})
+AC_MSG_NOTICE(LDFLAGS=${LDFLAGS})
+AC_MSG_NOTICE(LIBS=${LIBS})
+
+
+###############################################################
+# Checks for libraries
+
+
+###############################################################
+# Checks for headers
+#
+
+# Define STDC_HEADERS if system has ANSI C header files.  Right
+# now we wouldn't be able to compile if this fails.  We can
+# fix this if we find platforms without standard C headers.
+AC_HEADER_STDC
+
+# Define TIME_WITH_SYS_TIME if system is one where both
+# time.h and sys/time.h should be included
+AC_HEADER_TIME
+
+# Define HAVE_SYS_TIME_H if this header file exists
+AC_CHECK_HEADERS([sys/time.h])
+
+# Define HAVE_TIMEB_H if sys/timeb.h exists.  This is obsolete
+# and we'll only use it if we don't find better time functions
+AC_CHECK_HEADERS([sys/timeb.h])
+
+AC_CHECK_HEADERS([sys/resource.h])
+
+# Notes on defined max/min constants:
+#   We need float.h (which defines FLT_MAX) and limits.h
+#   (which defines INT_MAX).  If they don't exist, we will
+#   take values.h (which defines MAXINT), which is obsolete.  
+#   If none of these exist, we fail.  To be more careful we
+#   could also check here if the values we need are defined.
+AC_CHECK_HEADERS([float.h limits.h],,[AC_CHECK_HEADERS([values.h],,[AC_MSG_ERROR(missing headers)])])
+
+AC_CHECK_HEADERS([malloc.h memory.h stddef.h stdlib.h string.h strings.h unistd.h], , [AC_MSG_ERROR(missing headers)])
+
+AC_MSG_NOTICE([Warnings about rejection of header files by preprocessor may be IGNORED])
+
+
+###############################################################
+# Checks for typedefs, structures and compiler behavior
+
+# Defines HAVE_STDBOOL_H.  If not defined we need to include bool
+#  information in every source that uses type bool.
+AC_HEADER_STDBOOL
+
+# Define "const" to be empty if compiler doesn't support const
+AC_C_CONST
+
+# Redefine "inline" if necessary
+AC_C_INLINE
+
+# For now, it's an error if size_t is not defined.
+AC_CHECK_TYPES([size_t],,[AC_MSG_ERROR(missing size_t)])
+
+#
+# TODO - replace ptrdiff_t if it's not defined
+#
+AC_CHECK_TYPES([ptrdiff_t])
+
+# defines HAVE_LONG_DOUBLE if the long double type exists and
+# has more precision than double
+AC_C_LONG_DOUBLE
+
+
+###############################################################
+# Checks for compiler behavior
+#
+# AC_CXX_* are checks for C++ behavior
+ 
+# Defines HAVE_NAMESPACES if we can use them
+#   TODO - find out if the means std namespace only, or any namespace
+#          is it possible we can declare namespaces, but there's no std?
+#          Modifying sources to use HAVE_NAMESPACES is not complete
+AC_CXX_NAMESPACES
+
+# Defines HAVE_TEMPLATES_AS_TEMPLATE_ARGUMENTS if we can pass a template
+# argument in for a template parameter
+AC_CXX_TEMPLATES_AS_TEMPLATE_ARGUMENTS
+
+# Defines HAVE_EXCEPTIONS if we can use throw/catch
+AC_CXX_EXCEPTIONS
+
+# Defines HAVE_STD if was can include ISO C++ headers 
+# (iostream, map, iomanip and cmath) 
+AC_CXX_HAVE_STD
+
+# Define HAVE_SSTREAM if we have stringstreams
+AC_CXX_HAVE_SSTREAM
+
+# Define HAVE_EXPLICIT if we can use the explicit keyword
+AC_CXX_EXPLICIT
+
+# Define HAVE_MEMBER_TEMPLATES if class member functions can be templated
+AC_CXX_MEMBER_TEMPLATES
+
+
+###############################################################
+# Checks for functions
+
+#
+#  It is an error if neither stricmp or strcasecmp are defined.
+#
+AC_CHECK_FUNCS([stricmp],,[AC_CHECK_FUNCS([strcasecmp],,AC_MSG_ERROR([missing functions]))])
+
+#
+# It's an error if these are not defined.
+#
+AC_CHECK_FUNCS([atexit strchr],,[AC_MSG_ERROR([missing functions])])
+
+#
+# It's NOT an error if these are not defined.
+#
+AC_CHECK_FUNCS([nrand48])
+
+#
+# There was some code in utilib that uses _getcwd() from direct.h
+# on Windows machines if getcwd() from unistd.h is not available.
+# For now we will consider it an error if getcwd() does not exist.
+# If this fails on a platform, we will add code to look for _getcwd()
+# and use it in the code.  (Modern cygwin and mingw systems seem to
+# have getcwd().)
+#
+AC_CHECK_FUNCS([getcwd],,[AC_MSG_ERROR([missing headers])])
+
+# Notes on time functions:
+#  We want getrusage() (sys/resource.h)
+#    next choice would be times() 
+#       (sys/times.h and requires sysconf(_SC_CLOCK_TICK))
+#    last choice would be clock() (time.h)
+#
+#  We want gettimeofday() (sys/time.h)
+#    next choice would be localtime() (time.h)
+#    last choice would be ftime (sys/timeb.h)
+#
+# TODO: the default names are confusing: HAVE_GETRUSAGE, HAVE_TIMES, etc.
+#   we really mean USE_GETRUSAGE, USE_TIMES, etc.  We may have them but
+#   not define them because we don't want to use them.
+#
+# TODO: We could replace a missing "floor()" fuction.
+
+AC_CHECK_FUNCS([sysconf])
+
+AC_CHECK_FUNCS([getrusage],,[AC_CHECK_FUNCS([times sysconf],,[AC_CHECK_FUNCS([clock],,[AC_MSG_ERROR([no process time usage functions])])])])
+AC_CHECK_FUNCS([gettimeofday],,[AC_CHECK_FUNCS([localtime],,[AC_CHECK_FUNCS([ftime],,[AC_MSG_ERROR([no time functions])])])])
+
+AC_CHECK_LIB([m], [sqrt],,[AC_MSG_ERROR([cannot find sqrt in math library])])
+AC_CHECK_LIB([m], [floor],,[AC_MSG_ERROR([cannot find floor in math library])])
+AC_CHECK_LIB([m], [pow],,[AC_MSG_ERROR([cannot find pow in math library])])
+AC_CHECK_LIB([m], [lround], [AC_DEFINE([HAVE_LROUND],,[define whether libm contains lround()])])
+
+
+
+###############################################################
+# output
+
+AC_CONFIG_FILES([
+Makefile
+src/Makefile
+src/headers/Makefile
+test/Makefile
+])
+
+AC_OUTPUT
+

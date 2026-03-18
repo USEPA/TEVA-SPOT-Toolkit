@@ -1,0 +1,417 @@
+      SUBROUTINE PTNEW(XGNEW , IPOLY , VNEW  , PNTINT, LPTINT, N     , 
+     +                 POLY  , LPOLY , NIND  , BASE  , DELTA , LB    ,  
+     +                 UB    , A     , LDA   , NCLIN , NCNLN , PIVVAL,  
+     +                 PIVTHR, XCHTHR, WRK   , LWRK  , IWRK  , LIWRK , 
+     +                 FAIL  , INFO  , MINMAX, X0)                   
+
+C
+C  *****************************************************************************       
+C  THIS SUBROUTINE TRIES TO FIND A NEW POINT THAT CAN BE INCLUDED IN 
+C  INTERPOLATION TO IMPROVE GEOMETRY. IF THE INTERPOLATION SET IS NOT
+C  COMPLETE, THEN WE LOOK FOR A 'GOOD' POINT TO ADD TO THE SET; IF
+C  THE INTERPOLATION SET IS COMPLETE, THEN WE CHOOSE A 'BAD' POINT THAT
+C  WE WOULD LIKE TO REPLACE AND TRY TO FIND A 'GOOD' POINT TO REPLACE IT.
+C  IF WE FIND SUCH A POINT THEN FAIL=FASLE AND THE NEW POINT IS XGNEW.
+C  IF WE DO NOT FIND IT THEN FAIL=TRUE.
+C
+C  PARAMETERS 
+C    
+C  POLY   (INPUT)  THE ARRAY OF NEWTON FUNDAMENTAL POLYNOMIALS
+C
+C  PNTINT (INPUT)  THE ARRAY OF INTERPOLATION POINTS
+C
+C  NIND   (INPUT)  CARDINALITY OF THE INTERPOLATION SET
+C
+C  LB     (INPUT)  LOWER BOUNDS OF THE PROBLEM
+C
+C  LU     (INPUT)  UPPER BOUNDS OF THE PROBLEM
+C
+C  DELTA  (INPUT)  TRUST REGION RADIUS
+C
+C  A      (INPUT)  MATRIX OF LINEAR CONSTRAINTS OF THE PROBLEM
+C
+C  PIVVAL (INPUT)  ARRAY OF PIVOT VALUES ASSOCIATED WITH THE
+C                  INTERPOLATION POINTS                
+C  PIVTHR (INPUT)  THRESHOLD FOR ACCEPTABLE PIVOT VALUE
+C                
+C  XCHTHR (INPUT)  THRESHOLD FOR THE MINIMUM ACCEPTABLE IMPROVEMENT 
+C                  IN THE PIVOT VALUE DUE TO REPLACING A POINT
+C  X0     (INPUT)  CURRENT SHIFT OF THE POINTS FROM THE ORIGINAL POSITION
+C
+C  XGNEW  (OUTPUT) THE NEW POINT FOUND IN ORDER TO IMPROVE GEOMETRY
+C
+C  VNEW   (OUTPUT) THE PIVOT VALUE CORRESPONDING TO XGNEW, IN CASE IT
+C                  CAN BE ADDED               
+C  IPOLY  (OUTPUT) THE INDEX WHICH SHOULD BE ASSIGNED TO XGNEW, WHEN
+C                  IT IS INCLUDED IN THE INTERPOLATION SET.
+C                  (IF XGNEW IS ADDED, THEN IPOLY=NIND+1, OTHERWISE
+C                   IPOLY IS THE INDEX OF THE POINT WHICH IS TO BE
+C                   REPLACED BY XGNEW 
+C  FAIL   (OUTPUT) LOGICAL VARIABLE INDICATING IF THE SEARCH SUCCEEDED
+C                  FAIL=TRUE INDICATES THAT WE COULD NEITHER FIND ANY
+C                  POINT TO BE ADDED TO THE SET, NOR WE COULD FIND A
+C                  POINT WHICH WOULD REPLACE ANOTHER POINT IN THE SET
+C                  WITH SIGNIFICANT IMPROVEMENT IN GEOMETRY.
+C                  (NOTICE: WE DID NOT FIND SUCH POINTS, DOES NOT MEAN
+C                           THAT THEY DO NOT EXISTS)
+C  MINMAX (INPUT)  INDICATOR THAT ENABLES USER TO MINIMIZE THE NEXT
+C                  POLYNOMIAL, IF ON THE PREVIOUS CALL IT WAS MAXIMIZED
+C                  0 IF WE SHOULD MAXIMIZE OF ABSOLUTE VALUE OF PIVOT
+C                 -1 IF WE SHOULD MINIMIZE THE REAL VALUE OF PIVOT
+C                  1 IF WE SHOULD MAXIMIZE THE REAL VALUE OF PIVOT
+C         (OUTPUT) 1 IF THE INPUT VALUE WAS 0 AND ANSWER ACHIEVED
+C                    BY MAXIMIZATION
+C                 -1 IF THE INPUT VALUE WAS 0 AND ANSWER ACHIEVED
+C                    BY MINIMIZATION
+C                  0 IF THE INPUT VALUE WAS 1 OR -1
+C  ********************************************************************
+C
+
+
+
+
+
+
+      INTEGER          NIND  , N, LPOLY   , LPTINT, LWRK, IPOLY, LDA  , 
+     +                 INFO  , IWRK(LIWRK), LIWRK , BASE, NCLIN, NCNLN,
+     +                 MINMAX
+
+      DOUBLE PRECISION POLY(LPOLY   )   , XGNEW(N) , PNTINT(LPTINT),
+     +                 PIVVAL(NIND+1)   , WRK(LWRK), DELTA   ,  
+     +                 LB(N+NCLIN+NCNLN), A(LDA*N) , VNEW    ,   
+     +                 UB(N+NCLIN+NCNLN), PIVTHR   , XCHTHR  , X0(N)
+       
+      LOGICAL          FAIL
+C  
+C  COMMON VARIABLES
+C
+      INCLUDE 'dfo_model_inc.f'
+
+C
+C  PRINTOUT PARAMETERS
+C
+
+      DOUBLE PRECISION MCHEPS, CNSTOL
+      INTEGER          IOUT  , IPRINT
+      COMMON / DFOCM / IOUT  , IPRINT, MCHEPS, CNSTOL
+      SAVE / DFOCM /
+C
+C  EXTERNAL SUBROUTINES
+C
+
+
+      EXTERNAL          MINTR, FUNOBJ, FUNCON
+
+
+C
+C  APPLICATIONS: MINTR, GETNP, NEXTNP
+C
+
+
+
+C  
+C  LOCAL VARIABLES
+C
+
+      DOUBLE PRECISION  VMAX, KAPPA, MVAL  , PIVMIN, KMOD
+      INTEGER           LENW, ICURW, IXBASE, MINPIV, DD,
+     +                  NP1 , I    , J     , IG    , IH
+
+C
+C  CONSTANTS  
+C
+      DOUBLE PRECISION  ZERO, ONE, HALF
+      PARAMETER        (ZERO = 0.0D0, ONE = 1.0D0, HALF = 0.5D0)
+
+
+
+C
+C  PARTITION THE REAL SPACE
+C
+
+      IG     = 1
+      IH     = IG+N
+      IXBASE = IH+N*N
+      ICURW  = IXBASE+N
+      LENW   = LWRK-ICURW+1
+
+C
+C  CHECK IF REAL SPACE IS SUFFICIENT
+C
+      IF ( LENW .LT. 1 ) THEN
+        IF ( IPRINT .GE. 0 ) WRITE (IOUT, 1000) - LENW + 1
+        STOP
+      ENDIF
+
+
+      NP1 = N + 1
+      DD  =(NP1)*(N+2)/2
+
+C
+C  NO POINT WAS FOUND YET, THEREFORE FAIL IS TRUE
+C
+      FAIL =.TRUE.
+      VMAX = ZERO
+C
+C  IF THE INTERPOLATION SET IS INCOMPLETE THEN WE LOOK FOR
+C  A POINT TO BE ADDED. WE DO IT BY MAXIMIZING THE NEXT PIVOT.
+C  THE NEXT PIVOT IS THE VALUE AT A CERTAIN POINT OF THE 'NEXT' 
+C  (NIND+1ST) POLYNOMIAL, UPDATED SO, THAT IS IS ZERO AT ALL  
+C  POINT IN THE SET. 
+
+      IF ( NIND .LT. DD ) THEN
+
+C
+C  UPDATE THE 'NEXT POLYNOMIAL, SO THAT IT IS ZERO AT ALL POINTS
+C  OF THE INTERPOLATION SET
+C
+       
+        CALL NEXTNP(NIND+1, POLY, PNTINT, NIND, N, LPOLY, LPTINT)
+C
+C  PUT THE COEFFICIENTS OF THE POLYNOMIAL IN THE FORM OF QUADRATIC FORM 
+C
+          
+        CALL GETNP(NIND+1, POLY, LPOLY, N, KAPPA, WRK(IG),WRK(IH))
+
+        IF ( MINMAX .NE .1 ) THEN
+C
+C  SET PARAMETERS FOR TRUST-REGION MINIMIZATION
+C
+          CALL DCOPY(N, PNTINT((BASE-1)*N+1), 1, WRK(IXBASE), 1)
+          KMOD = KAPPA
+          DO 20 I=1,N
+            GMOD(I)= WRK(IG+I-1)
+            KMOD   = KMOD - GMOD(I)*X0(I)
+            DO 10 J=1,N
+              HMOD(I,J) = WRK(IH+(I-1)*N+J-1)
+              GMOD(I)   = GMOD(I) - HMOD(I,J)*X0(J)
+              KMOD      = KMOD + HALF*X0(I)*HMOD(I,J)*X0(J)
+ 10         CONTINUE
+ 20       CONTINUE
+
+C
+C  MINIMIZE THE 'NEXT' POLYNOMIAL OVER THE TRUST-REGION
+C       
+          CALL UNSHFT( N, X0, WRK(IXBASE) )
+          CALL MINTR( N           , WRK(IXBASE), MVAL , DELTA, LB   ,
+     +                UB          , A          , LDA  , NCLIN, NCNLN,
+     +                WRK( ICURW ), LENW       , IWRK , LIWRK, INFO , 1)
+          CALL SHIFT( N, X0, WRK(IXBASE) )
+ 
+C
+C  STORE THE VALUE AND THE POINT
+C
+          IF ( INFO .EQ. 0 ) THEN
+            VNEW = MVAL + KMOD
+            VMAX = ABS(VNEW)
+            CALL DCOPY(N, WRK(IXBASE), 1, XGNEW, 1)
+          ENDIF
+        ENDIF
+C
+C  SET PARAMETERS FOR MAXIMIZATION OVER THE TRUST-REGION (MINIMIZATION
+C  WITH NEGATIVE SIGN)
+C
+
+        IF ( MINMAX .NE. -1 ) THEN
+          KMOD = -KAPPA
+          DO 40 I=1,N
+            GMOD(I)= -WRK(IG+I-1)
+            KMOD   = KMOD - GMOD(I)*X0(I)
+            DO 30 J=1,N
+              HMOD(I,J) = -WRK(IH+(I-1)*N+J-1)
+              GMOD(I)   = GMOD(I) - HMOD(I,J)*X0(J)
+              KMOD      = KMOD + HALF*X0(I)*HMOD(I,J)*X0(J)
+ 30         CONTINUE
+ 40       CONTINUE
+
+    
+
+          CALL DCOPY(N, PNTINT((BASE-1)*N+1), 1, WRK(IXBASE), 1)
+
+C
+C  MAXIMIZE THE 'NEXT' POLYNOMIAL OVER THE TRUST-REGION
+C 
+          CALL UNSHFT( N, X0, WRK(IXBASE) )
+          CALL MINTR( N   , WRK(IXBASE), MVAL , DELTA,LB          ,UB  , 
+     +                A   , LDA        , NCLIN, NCNLN,WRK( ICURW ),LENW,
+     +                IWRK, LIWRK      , INFO , 1 )
+          CALL SHIFT( N, X0, WRK(IXBASE) )
+
+        ENDIF
+C
+C  CHOOSE THE LARGER ABSOLUTE VALUE BETWEEN THE MAXIMUM AND THE MINIMUM
+C  AND PICK APPROPRIATE POINT
+C 
+
+
+
+        IF ( MINMAX .EQ. 0 ) THEN
+          IF ( ABS(MVAL+KMOD) .GT. VMAX .AND. INFO .EQ. 0 ) THEN
+            VNEW   = - MVAL - KMOD
+            MINMAX = 1
+            VMAX   = ABS(VNEW)
+            CALL DCOPY(N, WRK(IXBASE), 1, XGNEW, 1)
+          ELSE
+            MINMAX = -1 
+          ENDIF
+        ELSE
+          MINMAX = 0
+          IF (  ABS(MVAL+KMOD) .GT. VMAX .AND. INFO .EQ. 0 ) THEN
+            VNEW   = - MVAL - KMOD
+            VMAX   = ABS(VNEW)
+            CALL DCOPY(N, WRK(IXBASE), 1, XGNEW, 1)
+          ENDIF
+        ENDIF
+C
+C  IF THE PIVOT VALUE IS ACCEPTABLE, THEN WE ARE DONE
+C
+
+        IF (VMAX.GT.PIVTHR) THEN
+          FAIL  = .FALSE.
+          IPOLY =  NIND+1
+          INFO  =  0
+          IF ( IPRINT .GE. 3 ) WRITE(IOUT,8000) IPOLY, VMAX
+        ENDIF
+      ENDIF
+
+C
+C  IF WE DID NOT MANAGE TO FIND A POINT TO ADD (BECAUSE THE
+C  INTERPOLATION SET WAS FULL OR PIVOT VALUE TOO SMALL), THEN
+C  WE TRY TO FIND A POINT TO INCLUDE BY REPLACING SOME OTHER POINT
+C
+
+      IF (FAIL) THEN
+C
+C  FIRST CHOOSE A POINT WHICH WE WANT TO REPLACE. IT WILL BE THE POINT
+C  WITH THE SMALLEST ASSOCIATED PIVOT VALUE
+C
+        PIVMIN=ONE - CNSTOL*DELTA
+        MINPIV=0 
+        DO 45 I=1,NIND
+          IF (ABS(PIVVAL(I)).LT.ABS(PIVMIN)) THEN
+            PIVMIN=ABS(PIVVAL(I))
+            MINPIV=I
+          ENDIF
+ 45     CONTINUE
+
+C
+C  IF THE THERE SMALLEST PIVOT IS REASONABLY SMALL AND THE CHOSEN POINT
+C  IS NOT THE BASE, THEN WE SET IPOLY EQUAL TO MINPIV - THE INDEX OF
+C  THE CANDIDATE FOR REPLACEMENT.
+C
+
+
+
+        IF ( MINPIV.GT.0   .AND. MINPIV.NE.BASE .AND. 
+     +     ( MINPIV.GT.NP1 .OR.  NIND.LE.NP1)       ) THEN
+
+          IPOLY=MINPIV
+            
+
+C
+C  MAXIMIZE THE ABSOLUTE VALUE OF THE NEWTON POLYNOMIAL WITH  INDEX IPOLY
+C
+          CALL GETNP(IPOLY, POLY, LPOLY, N, KAPPA, WRK(IG), WRK(IH))
+
+          CALL DCOPY(N, PNTINT((BASE-1)*N+1), 1, WRK(IXBASE), 1)
+
+
+          KMOD = KAPPA
+          DO 60 I=1,N
+            GMOD(I)= WRK(IG+I-1)
+            KMOD   = KMOD - GMOD(I)*X0(I)
+            DO 50 J=1,N
+              HMOD(I,J) = WRK(IH+(I-1)*N+J-1)
+              GMOD(I)   = GMOD(I) - HMOD(I,J)*X0(J)
+              KMOD      = KMOD + HALF*X0(I)*HMOD(I,J)*X0(J)
+ 50         CONTINUE
+ 60       CONTINUE
+
+       
+C
+C  DO TRUST-REGION MINIMIZATION
+C
+          CALL UNSHFT( N, X0, WRK(IXBASE) )
+          CALL MINTR( N   , WRK(IXBASE), MVAL, DELTA, LB   , 
+     +                UB  , A          , LDA , NCLIN, NCNLN, 
+     +                WRK( ICURW )     , LENW, IWRK , LIWRK, INFO, 1 )
+          CALL SHIFT( N, X0, WRK(IXBASE) )
+
+          IF ( INFO .EQ. 0 ) THEN
+            VNEW = MVAL + KMOD  
+            VMAX = ABS(VNEW)
+            CALL DCOPY( N, WRK(IXBASE), 1, XGNEW, 1 )
+          ENDIF
+
+          KMOD = -KAPPA
+          DO 80 I=1,N
+            GMOD(I)= -WRK(IG+I-1)
+            KMOD   = KMOD - GMOD(I)*X0(I)
+            DO 70 J=1,N
+              HMOD(I,J) = -WRK(IH+(I-1)*N+J-1)
+              GMOD(I)   = GMOD(I) - HMOD(I,J)*X0(J)
+              KMOD      = KMOD + HALF*X0(I)*HMOD(I,J)*X0(J)
+ 70         CONTINUE
+ 80       CONTINUE
+
+           
+ 
+          CALL DCOPY(N, PNTINT((BASE-1)*N+1), 1, WRK(IXBASE), 1)
+
+C
+C  DO TRUST-REGION MAXIMIZATION
+C 
+          CALL UNSHFT( N, X0, WRK(IXBASE) )
+          CALL MINTR( N   , WRK(IXBASE), MVAL, DELTA, LB   , 
+     +                UB  , A          , LDA , NCLIN, NCNLN, 
+     +                WRK( ICURW )     , LENW, IWRK , LIWRK, INFO, 1 )
+          CALL SHIFT( N, X0, WRK(IXBASE) )
+
+
+C
+C  CHOOSE THE BETTER POINT BETWEEN MAXIMIZER AND MINIMIZER
+C
+          IF ( ABS( MVAL+KMOD ) .GT. VMAX .AND. INFO .EQ. 0) THEN
+            VNEW = - MVAL - KMOD  
+            VMAX = ABS(VNEW)
+            CALL DCOPY( N, WRK(IXBASE), 1, XGNEW, 1)
+          ENDIF
+
+
+C
+C  CHECK IF THE NEW PIVOT GIVES AT LEAST  'XCHTHR' TIMES IMPROVEMENT
+C  OVER THE OLD PIVOT VALUE. IF IT DOES, WE ACCEPT THE POINT BY SETTING
+C  FAIL=FALSE
+C
+          
+          IF ( VMAX.GT.XCHTHR ) THEN
+            FAIL =.FALSE.
+            INFO = 0
+            IF ( IPRINT .GE. 3 ) WRITE(IOUT,8020) IPOLY, PIVMIN, VMAX 
+          ELSE 
+            IF ( IPRINT .GE. 3 ) WRITE(IOUT,8030) IPOLY, PIVMIN, VMAX
+          ENDIF
+        ELSE
+          IF ( IPRINT .GE. 3 ) WRITE(IOUT,8010) 
+        ENDIF
+      ENDIF
+      RETURN
+
+ 1000 FORMAT(' PTNEW:  *** ERROR: LWRK TOO SMALL!' /
+     +       '            IT SHOULD BE AT LEAST ',I12 ,/)
+ 8000 FORMAT(' PTNEW: A new point is found by maximizing the pivot,',/
+     +       '       polynomial: ', I4,' pivot value: ', D14.7,/ ) 
+ 8010 FORMAT(' PTNEW: No point which can be  replaced was found',/)
+ 8020 FORMAT(' PTNEW: A new point replaced the ',I4,'-th point',/,
+     +       '       old pivot: ', D14.7, ' new pivot: ', D14.7,/)
+ 8030 FORMAT(' PTNEW: A new point DID NOT replace the ',I4,'-th point',/
+     +       '       old pivot: ', D14.7, ' new pivot: ', D14.7 ,/)
+      END
+        
+
+
+
+
+
+
+

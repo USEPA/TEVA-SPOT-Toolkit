@@ -1,0 +1,34 @@
+#----------------------------------------------------#
+# Target ARCHitecture dependent definitions - COUGAR #
+#----------------------------------------------------#
+
+AR		= xar
+ARFLAGS		= ruv
+RANLIB		= xranlib
+ARCLEAN		= $(RM)
+
+CC		= cicc
+CWARNINGS	= 
+
+CCC		= ciCC
+C++		= $(CCC)
+C++WARNINGS	= +p -rwstl -tlocal
+
+F77		= cif77
+FFLAGS		= -O
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= -Bstatic
+LDFLAGS		=
+OPTIMIZATION	= -O2
+
+ARCH_LIBS	= #-L/home/rebenne -lm -lpuma_defrag8_11.24.04 -lc_defrag8_11.24.04 #-lpuma_8bytehdr -lc_8bytehdr
+ARCH_INCLUDES	= -I.
+ARCH_FLAGS	= -DUNIX -DCOUGAR -DTFLOPS -DMULTITASK -DNO_TEMPLATE_TEMPLATE_PARAMETERS
+XTRAFLAGS	= 
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard

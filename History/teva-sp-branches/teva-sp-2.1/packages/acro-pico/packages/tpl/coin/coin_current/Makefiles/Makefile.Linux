@@ -1,0 +1,103 @@
+ifeq ($(wildcard /bgl),/bgl)
+    BLUE_GENE := true
+endif
+
+###############################################################################
+
+CP := /bin/cp -p
+LN := ln -s
+
+###############################################################################
+
+LibType ?= SHARED
+
+###############################################################################
+
+ifeq ($(BLUE_GENE),true)
+    LibType := STATIC
+    CC  := blrts_xlc
+    CXX := blrts_xlC -qrtti -DBLUE_GENE_XLC
+    FF  := lbrts_xlf
+else
+    CC  := gcc
+    CXX := g++
+    FF  := g77
+endif
+
+DEPCC  := gcc -MM
+DEPCXX := g++ -MM
+DEPFF  := g77 -MM
+
+ARCH=$(shell arch)
+
+###############################################################################
+
+compilerOptFlags := -O -O1 -O2 -O3 -O4 -O5 -O6
+
+ifeq ($(findstring g++,$(CXX)),g++)
+    ifeq ($(OptLevel),-O)
+        OPTFLAG = -O6
+    else
+        OPTFLAG = $(OptLevel)
+    endif
+    ifeq (,$(filter -g,$(OptLevel)))
+        ifneq ($(PROFILE),true)
+	    CXXFLAGS += -fomit-frame-pointer
+        endif
+        ifneq ($(ARCH),alpha)
+            CXXFLAGS += -ffast-math
+        endif
+    endif
+    ifeq ($(ARCH),x86_64)
+        CXXFLAGS += -march=k8
+    else
+        CXXFLAGS += -march=$(ARCH)
+    endif
+endif
+
+ifeq ($(findstring xlC,$(CXX)),xlC)
+    ifeq ($(OptLevel),-O)
+        OPTFLAG := -O3
+    else
+        OPTFLAG = $(OptLevel)
+    endif
+endif
+
+ifneq (,$(filter $(compilerOptFlags),$(OptLevel)))
+    # If any optimization flag occurs then:
+    CXXFLAGS += -DNDEBUG
+#    CXXFLAGS += -DCOIN_ASSERT
+endif
+
+###############################################################################
+
+SYSLD +=
+ifeq ($(BLUE_GENE),true)
+    STATICSYSLD += -qstaticlink
+else
+    STATICSYSLD += -static -lpthread
+endif
+
+###############################################################################
+
+SHARED_LIBEXT := .so
+STATIC_LIBEXT := .a
+
+ifeq (${LibType},SHARED)
+    LD  := $(CXX) -o
+    LIBLDFLAGS := -shared
+    LIBEXT := $(SHARED_LIBEXT)
+    CXXFLAGS += -fPIC
+    SHLINKPREFIX := -Wl,-rpath,
+else
+    ifeq ($(BLUE_GENE),true)
+        LD := powerpc-bgl-blrts-gnu-ar r
+    else
+        LD  := ar -q
+    endif
+    LIBLDFLAGS :=
+    LIBEXT := $(STATIC_LIBEXT)
+    CXXFLAGS +=
+endif
+
+EFENCE := -lefence

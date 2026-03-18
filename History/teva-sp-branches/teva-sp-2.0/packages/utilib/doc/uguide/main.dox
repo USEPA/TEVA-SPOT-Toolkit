@@ -1,0 +1,70 @@
+/*! 
+
+\mainpage <center>UTILIB: A Utility Library for Portable C/C++ Software </center>
+
+<center>
+William E. Hart<br>
+Discrete Mathematics and Algorithms Dept<br>
+Sandia National Laboratories<br>
+P.O. Box 5800<br>
+Albuquerque, NM<br>
+http://www.cs.sandia.gov/~wehart<br>
+wehart@sandia.gov
+</center>
+
+<center>
+<table borderwidth=0><tr><td width=500 align=left nowrap>
+This document describes the UTILIB software library.  UTILIB includes a 
+variety of generic components for C++ software development including
+abstract data types, I/O management, sorting routines, and random number
+generators.  The UTILIB library has been used by several software projects
+at Sandia, including DAKOTA, PICO, SGOPT, Coliny and NETV.
+</td></tr></table>
+</center>
+
+<h2> Table of Contents</h2>
+
+\htmlonly
+<table borderwidth=0> <tr> <td align=left valign=top nowrap>
+\endhtmlonly
+User's Guide<br>
+<ul>
+<li> \ref intro
+<li> Software Components
+<ul>
+<li> \ref adt
+<li> \ref inputoutput
+<li> \ref math
+<li> \ref parameters
+<li> \ref ranlib
+<li> \ref sort
+<li> \ref sys
+</ul>
+<li> \ref install
+<li> \ref refs
+</ul>
+\htmlonly
+</td> <td align=left valign=top nowrap>
+\endhtmlonly
+\htmlonly <a href="../html-ref/index.html">Reference Guide (with tree frame)</a>\endhtmlonly <br>
+<ul>
+<li> \htmlonly <a href="../html-ref/namespaces.html">Namespace List</a> \endhtmlonly
+<li> \htmlonly <a href="../html-ref/hierarchy.html">Class Hierarchy</a> \endhtmlonly
+<li> \htmlonly <a href="../html-ref/classes.html">Class List</a> \endhtmlonly
+<li> \htmlonly <a href="../html-ref/annotated.html">Compound List</a> \endhtmlonly
+<li> \htmlonly <a href="../html-ref/files.html">File List</a> \endhtmlonly
+<li> \htmlonly <a href="../html-ref/namespacemembers.html">Namespace Members</a> \endhtmlonly
+<li> \htmlonly <a href="../html-ref/functions.html">Compound Members</a> \endhtmlonly
+<li> \htmlonly <a href="../html-ref/globals.html">File Members</a> \endhtmlonly
+<li> \htmlonly <a href="../html-ref/todo.html">Documented TODO List</a> \endhtmlonly
+</ul>
+\ref acknowledgements
+\htmlonly
+</td> </tr> </table>
+\endhtmlonly
+
+\latexonly
+\ref acknowledgements
+\endlatexonly
+
+*/

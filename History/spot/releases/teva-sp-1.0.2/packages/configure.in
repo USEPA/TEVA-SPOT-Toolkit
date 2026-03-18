@@ -1,0 +1,77 @@
+# This file is a shell script fragment that supplies the information
+# necessary to tailor a template configure script into the configure
+# script appropriate for this directory.  For more information, check
+# any existing configure script.
+
+if [ ! -d config ]; then
+   ln -s ../config .;
+fi
+
+srctrigger=Makefile.in
+configdirstmp=""
+configdirsaux=""
+srcname="Packages directory"
+                                                                                
+
+# add in required dependency packages for --with-foo
+
+if [ "${with_tevalib}" != "no" ]; then
+    configdirstmp="$configdirstmp tevalibs"
+    configdirsaux="$configdirsaux tevalibs"
+fi
+
+if [ "${with_sp}" != "no" ]; then
+    if [ "${with_acro}" = "" ]; then
+       configdirstmp="$configdirstmp utilib sp"
+       configdirsaux="$configdirsaux utilib sp"
+    else
+       configdirstmp="$configdirstmp acro sp"
+       configdirsaux="$configdirsaux acro sp"
+    fi
+fi
+
+configdirs="$configdirsaux"
+
+# per-host:
+                                                                                
+host_makefile_frag=../config/mf-${with_host}-${with_target}${with_compiler}-${site}
+site_makefile_frag=../config/ms-${site}
+                                                                                
+# per-target:
+                                                                                
+Makefile=Makefile-${with_target}
+touch $Makefile
+files="Makefile-${with_target}"
+links="Makefile"
+
+
+# post-target:
+
+##
+## Unexport the 'with_mpi' variable.  APPS doesn't need to know about this
+## when being built withing Acro
+##
+#export -n with_mpi
+with_mpi_tmp=${with_mpi}
+with_mpi=
+export with_mpi
+
+#if [ "${norecursion}" != "yes" ]; then
+  #if [ "${with_trilinos}" != "no" ]; then
+    #make -f Makefile-${with_target} trilinos_stamp
+  #fi
+  #if [ "${with_apps}" != "no" ]; then
+    #make -f Makefile-${with_target} apps_stamp
+  #fi
+  #if [ "${with_glpk}" != "no" ]; then
+    #make -f Makefile-${with_target} glpk_stamp
+  #fi
+  #if [ "${with_mtl}" != "no" ]; then
+    #make -f Makefile-${with_target} mtl_stamp
+  #fi
+#fi
+
+with_mpi=${with_mpi_tmp}
+export with_mpi
+
+configdirs=$configdirstmp

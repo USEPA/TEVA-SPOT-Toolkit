@@ -1,0 +1,7 @@
+This directory provides an example for how to setup a simple Makefile that
+can access the Acro libraries and build and executable.  
+
+Note that before you can type 'make' you need to setup the following symbolic links:
+
+  ln -s ../dummy/.deps .
+  ln -s ../dummy/Makefile.am .

@@ -1,0 +1,38 @@
+#-------------------------------------------------#
+# Target ARCHitecture dependent definitions - SGI #
+#-------------------------------------------------#
+ 
+AR              = ar
+ARFLAGS         = ruv
+RANLIB          = ls
+ARCLEAN		= $(RM)
+ 
+CC              = cc
+CWARNINGS       = -64 $(C++WARNINGS)
+CC_SHARED	=
+ 
+CCC             = CC
+C++             = $(CCC)
+C++WARNINGS     = -64 -exceptions -LANG:std -ptused -FE:eliminate_duplicate_inline_copies -FE:template_in_elf_section -TENV:large_got=ON
+C++_SHARED	=
+ 
+F77             = f77
+FFLAGS          = -64 -O #-u -libmil
+F_SHARED	=
+ 
+INCLUDES        = $(ARCH_INCLUDES)
+LIB_PATH        = $(ARCH_LIB_PATH)
+LIBS            = $(ARCH_LIBS)
+LDSTATIC        =
+LDFLAGS         =
+OPTIMIZATION    = -O2
+ 
+ARCH_LIB_PATH	=
+ARCH_LIBS       = -lftn -ll #-lF77 -lI77 -lisam -lU77
+ARCH_INCLUDES   = -I. -I/usr/include/X11R5
+ARCH_FLAGS      = -DUNIX -DSGI -DMULTITASK -DMPI_NO_CPPBIND -DANSI_HDRS -DANSI_NAMESPACES -DNO_TEMPLATE_TEMPLATE_PARAMETERS
+XTRAFLAGS       =
+ 
+DEFINES         = $(ARCH_DEFINES)
+TARGET_ARCH     =
+LIBRARY_TARGET  = library_standard

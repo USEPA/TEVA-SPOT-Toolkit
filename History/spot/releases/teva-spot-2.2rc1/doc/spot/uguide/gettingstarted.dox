@@ -1,0 +1,154 @@
+/*! 
+ * \page gstarted Getting Started
+
+\if USER_GUIDE
+This section describes how to download, build and install the TEVA-SPOT
+Toolkit (SPOT) software. Further, we use a simple example to illustrate
+how to run SPOT.
+
+\section gStartedInstalling Installing SPOT
+\else
+\latexonly
+\section*{Installing SPOT}
+\endlatexonly
+\endif
+
+\if USER_GUIDE
+\subsection gStartedInstallingWindows Windows
+\else
+\latexonly
+\subsection*{Windows}
+\endlatexonly
+\endif
+
+NOTE: these instructions will likely change once we have an automated installer.  In fact, these instructions may not be necessary at all!
+
+The SPOT distribution for MS Windows is a gzip'd archive with executables and
+scripts.  Although this can be extracted anywhere, it's convenient to extract it in a standard place, such as the root disk, or in "C:\Program Files".
+Native MS Windows executables can be used in the DOS shell by configuring the MS Windows environment. For Windows NT, 2000 and XP, you will need to add a string such as
+\verbatim
+    ;C:\teva-spot_2.0\bin
+\endverbatim
+to the current setting for the PATH environment variable, which you
+will find in the properties window of "My Computer" under the "Advanced"
+tab. If you don't find a properties window at "My Computer", the same
+tool may be found on the "Control Panel" at "System Properties".
+
+Note that if you have sufficient privilege you might get a choice of
+installing the settings either for the Current User or for System. The
+latter is preferred if you want everybody to be able to run SPOT on
+the machine. At this stage you may need to reboot your system to have the new setting take effect; you probably will not need to reboot
+for XP.
+
+Using SPOT in a DOS shell requires the additional installation of Python.  The latest Python release can be obtained at 
+\htmlonly
+<a href="http://www.python.org">http://www.python.org</a>
+\endhtmlonly
+\latexonly
+\c http://www.python.org
+\endlatexonly
+.  Python is installed with a MSI installer that is easy to use.  To employ Python from a DOS shell requires an additional step: the PATH environmental variable needs to be edited to specify the location of the Python executable. This is the same process used to configure SPOT, but the Python MS Windows FAQ provides further details:
+\htmlonly
+<a href="http://www.python.org/doc/faq/windows.html">http://www.python.org/doc/faq/windows.html</a>.
+\endhtmlonly
+\latexonly
+http://www.python.org/doc/faq/windows.html .
+\endlatexonly
+
+
+\if USER_GUIDE
+\subsection gStartedInstallingUnix Unix
+\else
+\latexonly
+\subsection*{Unix}
+\endlatexonly
+\endif
+
+In Unix, a user can install SPOT executables from the tarball distribution.
+The command
+\verbatim
+    gzcat teva-spot.tar.gz | tar xf -
+\endverbatim
+extracts the files from the tarball into a local subdirectory, such as \c teva-spot_2.0/bin. A user can setup the \c PATH environment variable to configure the command shell to use these executables. The details of this depend on the command shell. For example, if the SPOT files were extracted in the user's home
+directory, then a BASH shell would be configured by adding the lines
+\verbatim
+    PATH=$PATH:$HOME/teva-spot_2.0/bin
+    export PATH
+\endverbatim
+to the \c ~/.bashrc file.
+
+
+
+\if USER_GUIDE
+\section gStartedExecutables SPOT Executables
+\else
+\latexonly
+\section*{SPOT Executables}
+\endlatexonly
+\endif
+
+The following executables included in SPOT can be used from a command line:
+<ul>
+
+<li> \ref tevasimExecutable "tevasim" - A command to execute an ensemble of contamination incidents, using EPANET. This command builds a \c  TSO file that summarizes these simulation results in a compact manner.
+
+<li> \ref tso2ImpactExecutable "tso2Impact" - A command that reads a \c TSO file and creates one or more \c IMPACT files that are used to formulate sensor placement problems.
+
+<li> \ref scenarioAggrExecutable "scenarioAggr" - A command that reads an \c IMPACT file and creates an \c IMPACT file with fewer events, along with a file of event probabilities.
+
+<li> \ref spExecutable "sp" - The SPOT solver interface for performing sensor placement, which uses data from \c IMPACT files.
+
+<li> \ref evalsensorExecutable "evalsensor" - A command that reads in one or more sensor placements and summarizes their performance according to various metrics.
+
+</ul>
+A variety of other executables are provided with SPOT, many of which are used by \ref spExecutable "sp" to
+perform sensor placement.
+
+
+\if USER_GUIDE
+
+\section gStartedDownload Downloading and Building SPOT Source Code (FOR DEVELOPERS)
+
+The SPOT software is
+distributed with an open-source license, and it
+can be downloaded directly from the University of Cincinnati
+subversion repository using the following command line:
+\verbatim
+    svn checkout https://software.sandia.gov/svn/teva/spot/spot/trunk spot
+\endverbatim
+
+
+The SPOT software can be compiled on UNIX systems within a standard Unix shell. SPOT can also be compiled in a similar way on Windows within the Cygwin shell application. After checking out SPOT, 
+move into the \c spot directory and run the setup script:
+\verbatim
+    cd spot
+    ./setup configure build
+\endverbatim
+The \c setup script automates much of the setup activity
+associated with building SPOT on various
+hardware platforms.  This script recursively configures SPOT for the specific characteristics of the hardware platform, and it then
+generates the SPOT executables and libraries.
+
+Several output files can be viewed to assess whether the \c setup script 
+worked properly:
+<ol>
+
+<li> spot/test/config.out - the logfile for the configuration process
+
+<li> spot/test/config.xml - a summary of errors and warnings from the \c config.out file 
+
+<li> spot/test/build.out - the logfile for the build process 
+
+<li> spot/test/build.xml - a summary of errors and warnings from the \c build.out file 
+
+</ol>
+
+The executables built within the Cygwin shell can only run within this shell. However, SPOT can be configured to build "native" Windows executables, which can run in a DOS shell:
+\verbatim
+    cd spot
+    ./setup configure --with-compiler=mingw build
+\endverbatim
+
+\endif
+
+*/

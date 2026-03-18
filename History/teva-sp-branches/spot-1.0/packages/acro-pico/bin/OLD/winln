@@ -1,0 +1,27 @@
+#!/bin/sh
+#
+# winln
+# Wrapper for LN 
+#
+
+usage()
+{
+    cat <<EOF
+Usage: winln [OPTIONS]
+
+winln is a wrapper around the junction code
+EOF
+    exit $1
+}
+
+tmp1=`echo "$1" | sed 's/\/cygdrive\/c/c:/'`;
+tmp2=`echo "$2" | sed 's/\/cygdrive\/c/c:/'`;
+
+if test ! -e "$tmp1"
+then
+   echo "junction $tmp2 $tmp1";
+   eval "junction $tmp2 $tmp1";
+fi
+exit 0
+
+    

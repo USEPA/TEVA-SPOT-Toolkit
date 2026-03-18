@@ -1,0 +1,59 @@
+#!/bin/bash
+#
+#  A bash script to change the path to the bin and etc directory 
+#  in the test scripts. 
+#
+
+fnames=$(ls test1* aggregation_demo exp.* sp* teva-sp* *.xml bigtests/test*)
+
+unix_bin_fnames=$(grep -l '\.\.\/\.\.\/bin' $fnames)
+#echo "UNIX bin:"
+#echo $unix_bin_fnames
+
+dos_bin_fnames=$(grep -l '\.\.\\\.\.\\bin' $fnames)
+#echo "DOS bin:"
+#echo $dos_bin_fnames
+
+for fname in $unix_bin_fnames ; do \
+    sed s/'\.\.\/\.\.\/bin'/'\.\.\/bin'/ $fname > $fname.new ; 
+    mv $fname.new $fname ; 
+    chmod +x $fname ; 
+done
+
+for fname in $dos_bin_fnames ; do \
+    sed s/'\.\.\\\.\.\\bin'/'\.\.\\bin'/ $fname > $fname.new ; 
+    mv $fname.new $fname ; 
+    chmod +x $fname ; 
+done
+
+unix_etc_fnames=$(grep -l '\.\.\/\.\.\/etc' $fnames)
+#echo "UNIX etc:"
+#echo $unix_etc_fnames
+
+#dos_etc_fnames=$(grep -l '\.\.\\\.\.\\etc' $fnames)
+#echo "DOS etc:"
+#echo $dos_etc_fnames
+
+for fname in $unix_etc_fnames ; do \
+    sed s/'\.\.\/\.\.\/etc'/'\.\.\/etc'/ $fname > $fname.new ; 
+    mv $fname.new $fname ; 
+    chmod +x $fname ; 
+done
+
+unix_mod_fnames=$(grep -l '\.\.\/mod' $fnames)
+dos_mod_fnames=$(grep -l '\.\.\\mod' $fnames)
+
+for fname in $unix_mod_fnames ; do \
+    sed s/'\.\.\/mod'/'\.\.\/\.\.\/etc\/mod'/ $fname > $fname.new ; 
+    mv $fname.new $fname ; 
+    chmod +x $fname ; 
+done
+
+for fname in $dos_mod_fnames ; do \
+    sed s/'\.\.\\mod'/'\.\.\\\.\.\\etc\\mod'/ $fname > $fname.new ; 
+    mv $fname.new $fname ; 
+    chmod +x $fname ; 
+done
+
+
+

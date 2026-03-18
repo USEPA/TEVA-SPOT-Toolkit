@@ -1,0 +1,19 @@
+#!/bin/sh 
+
+pushd pyunit
+../../../python/bin/python runtests
+popd
+
+#pushd studies
+#./runstudy -f tso.study.xml
+#./runstudy -f impact.study.xml
+#./runstudy -f opt.study.xml
+#popd
+
+if [ -e unit/runner ]; then
+   pushd unit
+   ./runner
+   popd
+fi
+
+lbin test.tevaspot

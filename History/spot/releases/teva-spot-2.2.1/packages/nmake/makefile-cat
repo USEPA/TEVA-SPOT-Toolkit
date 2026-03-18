@@ -1,0 +1,252 @@
+##
+## nmake file - to build in compiler console window for
+##    microsoft compiler (cl) or compilers (like intel's icl)
+##    which try to be mostly compatible (but better)
+##
+## build consequence assessment code
+##
+## it depends on the output of makefile-sim and makefile-hia
+##
+## it expects to find a writeable spot source directory at TOP
+##
+## "nmake /F makefile-cat all" builds static libraries and executables
+## 
+##  nmake /F makefile-cat dlls  JDK_ROOT=C:\Java\jdk1.6.0  TODO _TEST THIS
+##
+## TODO create a make check that runs some executables
+
+TOP=..\..
+
+PACKAGES=$(TOP)\packages
+TPL=$(TOP)\tpl
+
+## TODO how many of these winflags do we actually need
+WINFLAGS=-D_WIN32 -DWIN32 -D_WINDOWS 
+## the shared flags are never used in healthImpacts, functions are not exported
+SHAREDFLAGS=-D_USRDLL -DLIBEPANET_JNI_EXPORTS -DDLL
+DONTWARN=/wd4996 /wd4518 /wd4502 /wd4430 /wd4530 /wd4018 /wd4101 /wd4715
+CFLAGS = $(CFLAGS) $(WINFLAGS) $(DONTWARN) -DANSI -DANSI_NAMESPACES 
+
+!IFDEF USE_SHARED_FLAGS
+CFLAGS = $(CFLAGS) $(SHAREDFLAGS)
+!ENDIF
+
+all: sp_includes header \
+     static\libdetect.lib \
+     static\libsp.lib \
+     static\tso2Impact.exe \
+     static\evalsensor.exe \
+     static\setupIPData.exe \
+     static\setupLagData.exe \
+     static\aggregateImpacts.exe \
+     static\preprocessImpacts.exe \
+     static\scenarioAggr.exe
+
+dll: dlls
+
+dlls: shared\libdetect.dll \
+      shared\libsp.dll \
+      shared\libtso2ImpactModule
+
+header:
+    copy teva_config.txt teva_config.h
+
+##
+## location of libutilib
+##
+UTILIB_DIR=$(TPL)\acro-pico\packages\utilib
+UTILIB_LIB_DIR=$(UTILIB_DIR)\mvs\nmake
+UTILIB_LIB=$(UTILIB_LIB_DIR)\static\libutilib.lib
+UTILIB_DLL=$(UTILIB_LIB_DIR)\shared\libutilib.lib
+UTILIB_INCLUDE= \
+  /I $(UTILIB_LIB_DIR) \
+  /I $(UTILIB_DIR)\src\ranlib \
+  /I $(UTILIB_DIR)\src\adt \
+  /I $(UTILIB_DIR)\src\math \
+  /I $(UTILIB_DIR)\src\core \
+  /I $(UTILIB_DIR)\src\io \
+  /I $(UTILIB_DIR)\src\sys \
+  /I $(UTILIB_DIR)\src\typemngr
+
+TEVAUTIL_DIR=$(PACKAGES)\tevaUtils\tso\src
+
+##
+## DETECTION LIBRARY
+##
+##
+DETECT_DIR=$(PACKAGES)\detect
+DETECT_INCLUDE= /I $(DETECT_DIR) /I $(TEVAUTIL_DIR)
+
+DETECT_SRC = $(DETECT_DIR)\Detection.cpp
+DETECT_OBJ = $(DETECT_SRC:.cpp=.obj)
+
+{$(DETECT_DIR)}.cpp.{$(DETECT_DIR)}.obj: 
+    $(CPP) $(CFLAGS) $(CPPFLAGS) $(DETECT_INCLUDE) /Fo$@ /c $*.cpp
+
+static\libdetect.lib: $(DETECT_OBJ) 
+    lib /out:static\libdetect.lib $(DETECT_OBJ)
+
+#static\libdetect.lib: $(DETECT_OBJ) static\libtevautil.lib
+#    lib /out:static\libdetect.lib $(DETECT_OBJ) static\libtevautil.lib
+
+#  
+#  "lib /def /out:libdetect.lib /name:libdetect.dll "
+#  builds the import library and export file, which would
+#  be created automatically if the functions were exported in the source
+#
+shared\libdetect.dll: $(DETECT_OBJ)
+    link /dll /out:shared\libdetect.dll $(DETECT_OBJ)
+    lib /def /out:shared\libdetect.lib /name:shared\libdetect.dll 
+
+##
+## SP LIBRARY
+##
+##
+SP_DIR=$(PACKAGES)\cat\tso2Impact
+SP_INCLUDE=  \
+  /I .         \
+  /I $(SP_DIR)  \
+  $(DETECT_INCLUDE)  \
+  $(UTILIB_INCLUDE) \
+  /I $(PACKAGES)\sim\TEVAepanet\src \
+  /I $(PACKAGES)\healthImpacts\dcdflib \
+  /I $(PACKAGES)\healthImpacts\threatAssess
+
+SP_SRC = \
+  $(SP_DIR)\Objectives.cpp \
+  $(SP_DIR)\impacts.cpp \
+  $(SP_DIR)\scenario.cpp \
+  $(SP_DIR)\SPProblem.cpp \
+  $(SP_DIR)\tso2ImpactAPI.cpp  \
+  $(SP_DIR)\EventImpacts.cpp
+
+SP_OBJ = $(SP_SRC:.cpp=.obj)
+
+sp_includes:
+    if not exist sp mkdir sp
+    copy $(SP_DIR)\*.h sp
+
+{$(SP_DIR)}.cpp.{$(SP_DIR)}.obj:
+    $(CPP) $(CFLAGS) $(CPPFLAGS) $(SP_INCLUDE) /Fo$@ /c $*.cpp
+
+static\libsp.lib: $(SP_OBJ) static\libdetect.lib $(UTILIB_LIB)
+    lib /out:static\libsp.lib $(SP_OBJ) static\libdetect.lib $(UTILIB_LIB)
+
+#  
+#  "lib /def /out:libsp.lib /name:libsp.dll "
+#  builds the import library and export file, which would
+#  be created automatically if the functions were exported in the source
+#
+shared\libsp.dll: $(SP_OBJ) shared\libdetect.lib $(UTILIB_DLL)
+    link /dll /out:shared\libsp.dll $(SP_OBJ) shared\libdetect.lib $(UTILIB_DLL)
+    lib /def /out:shared\libsp.lib /name:shared\libsp.dll 
+
+##
+## Executables
+##
+##
+
+TEVALIBS = static\libthreatassess.lib static\libtevautil.lib static\libepanet.lib
+INC_DIRS = $(SP_INCLUDE) /I $(PACKAGES)\sim\tevasim 
+
+static\tso2Impact.exe: $(SP_DIR)\tso2Impact.cpp static\libsp.lib static\libdetect.lib $(TEVALIBS) $(UTILIB)
+     $(CPP) $(CFLAGS) $(CPPFLAGS) $(INC_DIRS) /Fe$@ $**
+
+static\evalsensor.exe: $(SP_DIR)\evalsensor.cpp static\libsp.lib $(TEVALIBS) $(UTILIB)
+     $(CPP) $(CFLAGS) $(CPPFLAGS) $(INC_DIRS) /Fe$@ $**
+
+static\setupIPData.exe: $(SP_DIR)\setupIPData.cpp static\libsp.lib $(TEVALIBS) $(UTILIB)
+     $(CPP) $(CFLAGS) $(CPPFLAGS) $(INC_DIRS) /Fe$@ $**
+
+static\setupLagData.exe: $(SP_DIR)\setupLagData.cpp static\libsp.lib $(TEVALIBS) $(UTILIB)
+     $(CPP) $(CFLAGS) $(CPPFLAGS) $(INC_DIRS) /Fe$@ $**
+
+static\aggregateImpacts.exe: $(SP_DIR)\aggregateImpacts.cpp static\libsp.lib $(TEVALIBS) $(UTILIB)
+     $(CPP) $(CFLAGS) $(CPPFLAGS) $(INC_DIRS) /Fe$@ $**
+
+static\preprocessImpacts.exe: $(SP_DIR)\preprocessImpacts.cpp static\libsp.lib $(TEVALIBS) $(UTILIB)
+     $(CPP) $(CFLAGS) $(CPPFLAGS) $(INC_DIRS) /Fe$@ $**
+
+static\scenarioAggr.exe: $(SP_DIR)\scenarioAggr.cpp static\libsp.lib $(TEVALIBS) $(UTILIB)
+     $(CPP) $(CFLAGS) $(CPPFLAGS) $(INC_DIRS) /Fe$@ $**
+
+##
+## tso2Impact Module
+##
+##
+ANLDIR=$(PACKAGES)\tevaUtils\anl
+ANLDLL=$(ANLDIR)\libs\win32\libANLUtils.dll
+ANLLIB=$(ANLDIR)\libs\win32\libANLUtils.lib
+ANLINCLUDE=/I $(ANLDIR)\include /I $(ANLDIR)\src /I $(ANLDIR)\ANLUtils\include
+
+HIA_DIR=$(PACKAGES)\healthImpacts
+
+MODULE_DIR=$(HIA_DIR)\cat\tso2ImpactModule
+MODULE_INCLUDE=  \
+  $(SP_INCLUDE) \
+  $(ANLINCLUDE) \
+  /I $(MODULE_DIR) \
+  /I $(HIA_DIR)/hia/TEVAHIAModule/include \
+  /I $(HIA_DIR)/hia/include \
+  /I $(HIA_DIR)/threatAssess \
+  /I $(HIA_DIR)/cat/include \
+  /I $(JDK_ROOT) 
+
+
+MODULE_C_SRC = $(MODULE_DIR)\realpath_subst.c
+MODULE_CPP_SRC = \
+    $(MODULE_DIR)\tso2ImpactAnalysisIA.cpp \
+    $(MODULE_DIR)\tso2ImpactAnalysisAggr.cpp \
+    $(MODULE_DIR)\tso2ImpactAnalysisJNI.cpp \
+    $(MODULE_DIR)\tso2ImpactAnalysisUtil.cpp 
+
+MODULE_CPP_OBJ = $(MODULE_SRC:.cpp=.obj)
+MODULE_C_OBJ = $(MODULE_SRC:.c=.obj)
+
+{$(MODULE_DIR)}.cpp.{$(MODULE_DIR)}.obj:
+    $(CPP) $(CFLAGS) $(CPPFLAGS) $(MODULE_INCLUDE) /Fo$@ /c $*.cpp
+
+{$(MODULE_DIR)}.c.{$(MODULE_DIR)}.obj:
+    $(CC) $(CFLAGS)) $(MODULE_INCLUDE) /Fo$@ /c $*.c
+
+#  
+#  "lib /def /out:libsp.lib /name:libsp.dll "
+#  builds the import library and export file, which would
+#  be created automatically if the functions were exported in the source
+#
+
+MODULE_LIBS=\shared\libHIAModules.lib \shared\libsp.lib \shared\libAnalysisModule.lib \shared\libthreatassess.lib $(ANLLIB) $(UTILIB_DLL)
+
+shared\libtso2ImpactModule.dll: $(MODULE_CPP_OBJ) $(MODULE_C_OBJ) $(MODULE_LIBS)
+    link /dll /out:shared\libtso2ImpactModule.dll $**
+    lib /def /out:shared\libtso2ImpactModule.lib /name:shared\libtso2ImpactModule.dll 
+
+help:
+   @echo "nmake all" will build the static libraries and executables
+   @echo "nmake dlls " will build the shared versions
+   @echo "nmake clean-objs" will delete the object files only
+   @echo "nmake clean" will delete all generated files
+   @echo "nmake check" will run and check the executables (not implemented yet)
+   @echo "nmake /?" lists all nmake options
+
+##
+## clean up
+##
+OBJ_FILES = $(DETECT_OBJ) $(SP_OBJ)
+
+clean-objs:
+        @-del /Q $(OBJ_FILES)
+        @-del /Q *.obj
+
+clean:
+        @-del /Q $(OBJ_FILES)
+        @-del /Q *.obj
+        @-del static\libdetect.lib 
+        @-del static\libsp.lib 
+        @-del static\tso2Impact.exe 
+        @-del static\evalsensor.exe 
+        @-del static\setupIPData.exe
+        @-del static\setupLagData.exe 
+        @-del static\aggregateImpacts.exe 
+        @-del static\preprocessImpacts.exe
+        @-rmdir /S /Q sp

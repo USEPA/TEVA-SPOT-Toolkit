@@ -1,0 +1,13 @@
+#!/bin/sh
+##
+## Dummy script that calls ./bin/configure
+##
+
+if [ ! -d bin ]; then
+   ln -s ../../bin .
+fi
+
+./bin/configure $*
+
+make scripts
+make library_dir

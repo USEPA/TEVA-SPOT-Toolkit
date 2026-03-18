@@ -1,0 +1,13 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=CPLANT at site=DAKOTA.STD       #
+#-----------------------------------------------------------------------#
+
+MPI_DIR=/home/mrglick/mpich-1.2.5.2
+MPI_INCLUDES=-I$(MPI_DIR)/include
+MPI_LIBS= -lmpich
+MPI_LDFLAGS=-L$(MPI_DIR)/lib
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=

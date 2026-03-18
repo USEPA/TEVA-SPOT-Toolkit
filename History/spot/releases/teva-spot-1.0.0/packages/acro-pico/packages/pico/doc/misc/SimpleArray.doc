@@ -1,0 +1,46 @@
+
+SimpleArray is a subclass of BasicArray that adds IO stream operators and 
+logical operators to this class.  The constructors for SimpleArray have the
+same semantics as the constructors for BasicArray.
+
+int  operator== (const SimpleArray<T>& array);
+
+  Returns TRUE(1) if every element in 'array' is equal to its corresponding 
+  element in ArrayData.
+
+int  operator!= (const SimpleArray<T>& array);
+
+  Returns FALSE(0) if at least one element in 'array' is not equal to its 
+  corresponding element in ArrayData.
+
+int write(ostream& output) const;
+
+  Writes the array to 'output'
+
+int read(istream& input);
+
+  Reads an array from 'input'.  This method is not currently implemented.
+
+int write(PackBuffer& output) const;
+
+  Packs the array into 'output'
+
+int read(UnPackBuffer& input);
+
+  Unpacks an array from 'input'.
+
+ostream& operator<<(ostream& output, const SimpleArray<T>& array)
+
+  A stream operator that calls the 'write' method.
+ 
+istream& operator>>(istream& input, SimpleArray<T>& array);
+
+  A stream operator that calls the 'read' method.
+
+PackBuffer& operator<<(PackBuffer& output, const SimpleArray<T>& array)
+
+  A stream operator that calls the 'write' method.
+ 
+UnPackBuffer& operator>>(UnPackBuffer& input, SimpleArray<T>& array);
+
+  A stream operator that calls the 'read' method.

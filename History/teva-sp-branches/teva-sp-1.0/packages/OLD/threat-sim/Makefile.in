@@ -1,0 +1,23 @@
+OBJ = teva.o
+
+# needs to be set by configure:
+TEVA_AC_LIB = $(HOME)/code/TEVA/teva-ac/trunk/teva-ac/lib
+TEVA_AC_INCLUDE = $(HOME)/code/TEVA/teva-ac/trunk/teva-ac/include
+
+LFLAGS = -L$(TEVA_AC_LIB) -ltevautil -lepanet -lm
+
+.c.o:
+	gcc -c -O6 -I$(TEVA_AC_INCLUDE) $<
+
+threat_sim: $(OBJ)
+	gcc -o $@ $(OBJ) -I$(TEVA_AC_INCLUDE) $(LFLAGS)
+
+install: threat_sim
+	cp threat_sim ../../bin/.
+
+
+clean: 
+	rm -f *.o lib*.a threat_sim
+
+nrutil.c: nrutil.h
+teva.c: teva.h

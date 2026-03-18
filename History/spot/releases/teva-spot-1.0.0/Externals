@@ -1,0 +1,7 @@
+test -r1635 http://engcvs.uc.edu/repos/TEVA/teva-sp-qa/test
+packages/tevalibs/TEVAUtils -r1651 http://engcvs.uc.edu/repos/TEVA/TEVAUtils/trunk
+packages/tevalibs/TEVAEpanet  -r1651   http://engcvs.uc.edu/repos/TEVA/Epanet/trunk
+packages/tevalibs/TEVAThreatSim -r1651 http://engcvs.uc.edu/repos/TEVA/ThreatSim/trunk
+packages/tevalibs/TEVAThreatAssess -r1651 http://engcvs.uc.edu/repos/TEVA/ThreatAssess/trunk
+packages/tevalibs/TEVADCDFlib -r1651  http://engcvs.uc.edu/repos/TEVA/DCDFlib/trunk
+

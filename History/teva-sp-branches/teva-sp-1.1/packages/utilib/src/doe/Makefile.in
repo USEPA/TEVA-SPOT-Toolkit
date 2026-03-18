@@ -1,0 +1,36 @@
+
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+MPI_EXEC_DIR=$(ROOT_DIR)/bin
+
+LIBRARY=libutilib
+
+#
+# Define objects and headers
+#
+SRCS = dummy.cpp
+
+#
+# Define compiler flags
+#
+
+include ../MakeMacros
+ 
+
+EXECUTABLES= complete_doe.exe
+
+
+clean:
+	@$(RM) $(EXECUTABLES) $(EXECUTABLES:.exe=)
+
+executables: complete_doe
+	@$(RM) $(ROOT_DIR)/bin/complete_doe
+	@$(RM) $(ROOT_DIR)/bin/complete_doe.exe
+	@ln complete_doe $(ROOT_DIR)/bin
+	@$(RM) $(ROOT_DIR)/bin/runexp
+	@ln runexp $(ROOT_DIR)/bin
+	@$(RM) $(ROOT_DIR)/bin/TestLib.pm
+	@ln TestLib.pm $(ROOT_DIR)/bin
+	@$(RM) $(ROOT_DIR)/bin/testlib_exec
+	@ln testlib_exec $(ROOT_DIR)/bin

@@ -1,0 +1,8 @@
+NOTE:
+
+To create the baselines, do the following:
+
+  cd linux64
+  lbin tevasim --tsg ../../../../../etc/tsg/quarterly.tsg --tso Net3_quarterly.tso ../Net3.inp Net3.out
+
+

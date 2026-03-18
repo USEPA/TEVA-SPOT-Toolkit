@@ -1,0 +1,24 @@
+<NodeID1> <SrcTypeIDX1> <SrcSpecieIDX1> <SrcStrngth1> <Start1> <Stop1>  <NodeIDN>...
+ <SrcTypeIDXN> <SrcSpecieIDXN> <SrcStrngthN> <StartN> <StopN>
+
+<NodeIDi>:		Epanet label identifying the ith node where contaminant is 
+			introduced.  [Character string]
+<SrcTypeIDXi>:		The Epanet source type index of the ith contaminant source.  
+			Each Epanet source type is associated with an integer index 
+			(see Epanet toolkit documentation fo reference). [Int]
+<SrcSpecieIDXi>:	The Epanet specie index of the ith contaminant source [Int]
+<SrcStrngthi>:		The strength of the ith contaminant source (see Epanet 
+			documentation for description of sources).  This value 
+			represents the product of contaminant flow rate and 
+			concentration. [Float]
+<Starti>:		The time, in seconds, measured from the start of simulation, 
+			when the ith contaminant injection is started. [Integer]
+<Stopi>:		The time, in seconds, measured from the start of simulation, 
+			when the ith contaminant injection is stopped. [Integer]
+
+One water quality simulation will be run for each scenario specified in the threat 
+simulation input file.  For each such simulation, the source associated with each 
+contaminant location <NodeIDi>, i=1,,N will be activated as the specified type source, 
+and all other water quality sources disabled.  If a source node is specified in the 
+Epanet input file, the "baseline source strength" and "source type" will be ignored, 
+but the source pattern will be used, if one is specified.

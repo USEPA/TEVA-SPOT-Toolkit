@@ -1,0 +1,28 @@
+
+This directory supports user-defined applications.  The 'dummy' directory
+contains a Makefile that can be imported into a user-specific application
+directory.  To setup an application directory 'app', do the following:
+
+  mkdir app
+  cd app
+  ln -s ../dummy/.deps .
+  ln -s ../dummy/Makefile.am .
+
+The first line of the Makefile in the 'app' directory should have the line:
+
+  include ../dummy/Makefile
+
+Subsequent lines in this file can contain whatever build targets are 
+desirable for the Acro-related executable that you wish to build.
+
+This use of the acro/user/dummy/Makefile file enables a user to quickly
+setup an application and link the application code with the current Acro
+libraries.  In particular, the user can transparently utilize the 
+Acro configuration (compiler, flags, etc) when building their application.
+
+--------------------------------------------------------------------------
+NOTE: this reuse of the acro/user/dummy/Makefile is somewhat experimental.
+This is _not_ a typical use of an autoconf-generated Makefile.  Further,
+this requires the availability of the autoconf/automake utilities.  These 
+get called during the invocation of 'make' from an application directory!
+--------------------------------------------------------------------------

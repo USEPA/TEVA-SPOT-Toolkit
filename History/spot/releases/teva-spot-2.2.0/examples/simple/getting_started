@@ -1,0 +1,18 @@
+#!/bin/csh
+#
+# This script runs the "Getting Started" experiments in the SPOT
+# User Guide
+#
+set path = ($path `pwd`/../../bin)
+
+echo "tevasim --tsg Net3.tsg --tso Net3.tso Net3.inp Net3.out > tevasim.out"
+tevasim --tsg Net3.tsg --tso Net3.tso Net3.inp Net3.out >&! tevasim.out
+
+echo "tso2Impact --mc --vc --td --nfd --ec --epanetin Net3.inp Net3 Net3.tso > tso2Impact.out"
+tso2Impact --mc --vc --td --nfd --ec --epanetin Net3.inp Net3 Net3.tso > tso2Impact.out
+
+echo "sp --path=../../bin --path=../../etc/mod --print-log --network='Net3' --objective=mc --solver=heuristic --ub=ns,5 --seed=1234567 > sp.out"
+sp --path=../../bin --path=../../etc/mod --print-log --network=Net3 --objective=mc --solver=heuristic --ub=ns,5 --seed=1234567 >&! sp.out
+
+echo "evalsensor --nodemap=Net3.nodemap Net3.sensors Net3_ec.impact Net3_mc.impact Net3_nfd.impact > evalsensor.out"
+evalsensor --nodemap=Net3.nodemap Net3.sensors Net3_ec.impact Net3_mc.impact Net3_nfd.impact >&! evalsensor.out

@@ -1,0 +1,23 @@
+
+
+priority - 
+
+message categories
+
+make time slices reasonable:
+
+  quick and fast
+
+  time-slice length  adaptively varied.
+
+  granularity of time slices vs. relative time slice
+
+  load-balancer for B&B
+
+  communicate GApoints with load balancing information?
+
+  Parallel Programming Using C++
+  MIT Press
+  Gregory W. Wilson   Paul Lu
+
+

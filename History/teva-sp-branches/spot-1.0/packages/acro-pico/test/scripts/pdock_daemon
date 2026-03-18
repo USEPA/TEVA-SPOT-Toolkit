@@ -1,0 +1,23 @@
+#!/bin/csh -v
+
+set dir = `pwd`
+
+mkdir test
+mkdir bin
+
+cvs.a -Q checkout acro-coliny
+cd acro
+./setup  --o=$dir/test --name=acro-coliny-app-pdock configure --with-debugging build
+cd ..
+
+#
+# We only archive info for acro's configuration process
+#
+cp acro/test/config.out test
+cp acro/test/config.xml test
+
+cp ../Makefile.pdock Makefile
+cvs.pdock -Q checkout pdock
+pwd
+make >&! test/build.out
+acro/test/testdriver --name=acro-coliny-app-pdock build --logfile=test/build.out

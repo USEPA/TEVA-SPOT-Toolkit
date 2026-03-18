@@ -1,0 +1,13 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=CPLANT at site=DAKOTA.STD       #
+#-----------------------------------------------------------------------#
+
+MPI_DIR=
+MPI_INCLUDES=
+MPI_LIBS= -lmpi
+MPI_LDFLAGS=
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=

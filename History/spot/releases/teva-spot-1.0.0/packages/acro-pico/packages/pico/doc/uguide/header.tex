@@ -1,0 +1,142 @@
+\documentclass[11pt]{article}
+
+%\documentclass[10pt]{book}
+\newcommand{\chaptermark}{1}{}
+
+\usepackage{makeidx}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{multicol}
+\usepackage{float}
+\usepackage{alltt}
+\usepackage{url}
+\usepackage{ifthen}
+\usepackage{doxygen}
+\setcounter{tocdepth}{1}
+%\makeindex
+%\setlength{\footrulewidth}{0.4pt}
+
+
+
+\setlength{\topmargin}{-.25in}
+\setlength{\textheight}{9in}
+\setlength{\oddsidemargin}{0.0in}
+\setlength{\evensidemargin}{0.0in}
+\setlength{\textwidth}{6.5in}
+
+\setlength{\headwidth}{6.5in}
+%\setlength{\footrulewidth}{0pt}
+\setlength{\parindent}{3ex}
+\setlength{\parsep}{0pt}
+
+\setcounter{tocdepth}{1}
+
+\pagestyle{plain}
+
+
+\newenvironment{lpconstraintsraw}{%
+\displaystyle\begin{array}{ll}
+}{%
+\end{array}%
+}
+\newenvironment{lpconstraints}{\begin{center}\f$\begin{lpconstraintsraw}%
+}{\end{lpconstraintsraw}\f$\end{center}}
+\newenvironment{lp}[3]{%
+\begin{center}
+\begin{tabular}{lrlr}
+\ifthenelse{\equal{#1}{}}{}{({#1})} & {#2} & \f$\displaystyle{#3}\f$ &\\
+                                    & where & \f$\left\{\begin{lpconstraintsraw}
+}{%
+\end{lpconstraintsraw}\right.\f$ &\\
+\end{tabular}
+\end{center}%
+}
+\newenvironment{minlp}[2]{\begin{lp}{#1}{minimize}{#2}}{\end{lp}}
+\newenvironment{maxlp}[2]{\begin{lp}{#1}{maximize}{#2}}{\end{lp}}
+
+
+\begin{document}
+
+\lhead{}
+\rhead{}
+\rfoot{}
+\lfoot{}
+\cfoot{}
+\chead{}
+
+%%
+%% Title Page
+%%
+
+\begin{center}
+SANDXXXX--XXXX
+
+Unlimited Release
+
+Printed December XXXX
+\end{center}
+
+\vspace{0.8in}
+
+\begin{center}
+{\bf \LARGE PICO User Manual\\
+[1ex]\Large Version 1.0}
+\vspace*{0.4in}
+
+William E. Hart\\
+Discrete Algorithms and Mathematics Department\\
+Sandia National Laboratories\\
+P. O. Box 5800\\
+Albuquerque, NM\\
+{\tt wehart@sandia.gov}\\
+\mbox{}\\
+Cynthia A. Phillips\\
+Discrete Algorithms and Mathematics Department\\
+Sandia National Laboratories\\
+P. O. Box 5800\\
+Albuquerque, NM\\
+{\tt caphill@sandia.gov}\\
+\mbox{}\\
+Jonathan Eckstein\\
+MSIS Department\\
+Faculty of Management and RUTCOR\\
+Rutgers University\\
+640 Bartholomew Road\\
+Piscataway, NJ 08854\\
+{\tt jeckstei@rutcor.rutgers.edu}
+\end{center}
+
+%\vspace*{1.0in}
+\newpage
+
+\pagestyle{fancy}
+\begin{quote}
+{\bf\large Abstract}
+\input{../abstract}
+\end{quote}
+
+\vfill
+\newpage
+
+
+\pagenumbering{roman}
+%\tableofcontents
+
+\clearemptydoublepage
+\pagenumbering{arabic}
+\setcounter{page}{3}
+\cfoot{\thepage}
+
+
+\input{../uguide}
+
+\newpage
+\bibliographystyle{abbrv}
+\bibliography{../../pico}
+
+\end{document}
+
+END-OF-DOC
+
+
+

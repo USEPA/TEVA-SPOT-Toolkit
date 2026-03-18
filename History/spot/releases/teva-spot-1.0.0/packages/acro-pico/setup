@@ -1,0 +1,8 @@
+#!/bin/sh
+##
+## Dummy script that calls testdriver to manage configuration, builds
+## and testing
+##
+
+./packages/exact/src/testing/testdriver --I=packages/exact/src/testing --S=config $*
+

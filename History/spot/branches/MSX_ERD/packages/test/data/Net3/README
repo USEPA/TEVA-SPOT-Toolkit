@@ -1,0 +1,6 @@
+NOTE:
+
+To create the baselines, run the create_baseline.sh script:
+
+./create_baseline.sh linux64  (or linux32/win32/win64 as appropriate)
+

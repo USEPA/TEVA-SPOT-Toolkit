@@ -1,0 +1,137 @@
+       SUBROUTINE NEXTNP(IPOLY , POLY , PNTINT, NIND, N, LPOLY,
+     .                   LPTINT)
+
+
+
+C 
+C  *******************************************************************
+C  THIS SUBROUTINE UPDATES THE IPOLY-TH  NEWTON POLYNOMIAL SO THAT
+C  IT HAS ZERO VALUE AT ALL POINTS IN THE SAME BLOCK AND BELLOW
+C
+C  PARAMETERS 
+C
+C    IPOLY  (INPUT) INDEX OF THE POLYNOMIAL WHICH IS UPDATED
+C
+C    POLY   (INPUT/OUTPUT) THE ARRAY (LPOLY) OF NEWTON POLYNOMIALS
+C
+C    PNTINT (INPUT) THE ARRAY (LPTINT) OF CURRENT INTERPOLATION POINTS
+C
+C    NIND   (INPUT) THE NUMBER OF POINTS IN THE INTERPOLATION
+C
+C    N      (INPUT) PROBLEM DIMENSION
+C  *******************************************************************
+C
+
+
+C
+C  PARAMETERS
+C
+
+       DOUBLE PRECISION  POLY(LPOLY), PNTINT(LPTINT)
+                
+
+       INTEGER           IPOLY, NIND ,N, LPOLY, LPTINT
+
+C
+C  PROCESS CONTROL PARAMETERS
+C
+      INTEGER          IOUT  , IPRINT
+      DOUBLE PRECISION MCHEPS, CNSTOL
+      COMMON / DFOCM / IOUT  , IPRINT, MCHEPS, CNSTOL     
+      SAVE / DFOCM /
+
+C
+C  LOCAL VARIABLES 
+C            
+       DOUBLE PRECISION VAL
+   
+       INTEGER          NP1, DD, Q, BLOCK, NPBEG, NPEND, I, J
+      
+       INTRINSIC        MAX
+C
+C  SUBROUTINES AND FUNCTIONS CALLED:
+C
+C    APPLICATION     :       EVALNP
+C    FORTRAN SUPPLIED:       MAX
+C
+
+       NP1 = N + 1 
+       DD  = NP1*(N+2)/2
+       Q   = MAX(IPOLY, NIND)
+C
+C  CHECK IN WHICH BLOCK WE ARE DOING THE UPDATES
+C
+
+       IF ( IPOLY .LE. NP1 ) THEN
+         BLOCK=1
+         IF ( NIND .GT. NP1 ) THEN
+           IF ( IPRINT .GT. 0 ) WRITE( IOUT, 1000 )
+           STOP
+         ENDIF
+       ELSE
+         BLOCK=2
+       ENDIF
+
+       IF (BLOCK.EQ.1) THEN
+
+C
+C  IF A POLYNOMIAL IN THE LINEAR BLOCK IS UPDATED
+C
+         NPBEG =(IPOLY-2)*NP1 + 2
+         NPEND = NPBEG + N
+         CALL EVALNP(VAL, PNTINT, 1, POLY, IPOLY, N, LPTINT, LPOLY)
+         POLY(NPBEG)=POLY(NPBEG)-VAL*POLY(1)
+
+         DO 20 J=2,NIND
+           IF ( J .NE. IPOLY ) THEN
+             CALL EVALNP(VAL, PNTINT, J, POLY, IPOLY, N, LPTINT, LPOLY) 
+             DO 10 I=NPBEG,NPEND
+               POLY(I)=POLY(I)-VAL*POLY(I-NPBEG+2+(J-2)*NP1)
+ 10          CONTINUE 
+           ENDIF 
+ 20      CONTINUE
+       
+C
+C  IF A POLYNOMIAL IN THE QUADRATIC BLOCK IS UPDATED
+C
+
+       ELSE
+         NPBEG = (IPOLY-N-2)*DD + N*NP1 + 2
+         CALL EVALNP(VAL, PNTINT, 1, POLY, IPOLY, N, LPTINT, LPOLY)
+         POLY(NPBEG) = POLY(NPBEG) - VAL*POLY(1)
+
+C
+C  "ORTHOGONALIZE" THE IPOLY-TH POLYNOMIAL WITH THE LINEAR BLOCK
+C
+
+         DO 40 J=2, NP1
+            CALL EVALNP(VAL, PNTINT, J, POLY, IPOLY, N, LPTINT,
+     +                  LPOLY)
+            NPEND = NPBEG + N
+            DO 30 I = NPBEG, NPEND
+              POLY(I) = POLY(I) - VAL*POLY(I-NPBEG+2+(J-2)*NP1)
+ 30         CONTINUE  
+ 40      CONTINUE
+
+C
+C  "ORTHOGONALIZE" THE IPOLY-TH POLYNOMIAL WITH THE QUADRATIC BLOCK
+C
+         DO 60 J = N+2, NIND
+           IF ( J .NE. IPOLY ) THEN
+             CALL EVALNP(VAL, PNTINT, J, POLY, IPOLY, N, 
+     +                   LPTINT, LPOLY)
+             NPEND = NPBEG + DD - 1
+             DO 50 I = NPBEG,NPEND
+               POLY(I) = POLY(I) - VAL*POLY(I-NPBEG+2+N*NP1+(J-N-2)*DD)
+ 50          CONTINUE  
+           ENDIF
+ 60      CONTINUE
+       ENDIF
+
+       RETURN
+ 1000  FORMAT(' NEXTNP: ERROR! UPDATING POLYNOMIAL IN LINEAR BLOCK',/
+     +        '         WHEN QUADRATIC BLOCK IS PRESENT',/)  
+       END
+
+
+

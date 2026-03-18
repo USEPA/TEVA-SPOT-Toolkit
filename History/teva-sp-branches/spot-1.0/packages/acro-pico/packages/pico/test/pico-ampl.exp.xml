@@ -1,0 +1,29 @@
+<experimental-study name="pico-ampl">
+  <tags>
+    <tag>smoke</tag>
+    <tag>nightly</tag>
+    <tag>pico</tag>
+  </tags>
+
+  <experiment>
+    <factors>
+      <factor name="test">
+        <level>_optimum=0.1381709355 _opttol=1e-4 _data=../etc/ampl/diet.mod</level>
+      </factor>
+
+      <factor name="lptype">
+        <level>lpType=clp</level>
+      </factor>
+    </factors>
+
+    <controls>
+       <executable type="runexp_driver">./exp.pico.pl --ampl</executable>
+    </controls>
+  </experiment>
+
+  <analyze>
+    <test name="FinalValue" type="validate">
+      <options>_measurement='Value' _tolerance=_opttol</options>
+    </test>
+  </analyze>
+</experimental-study>

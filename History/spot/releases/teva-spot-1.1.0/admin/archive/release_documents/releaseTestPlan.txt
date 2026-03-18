@@ -1,0 +1,17 @@
+$Id: releaseTestPlan.txt 1882 2007-02-19 21:04:58Z lafisk $
+
+Release Test Plan Checklist
+===========================
+
+___ Determine tests and test platforms:
+
+    Linux IA-64
+    Windows em64t
+    Windows 32 bit
+
+    Tests:
+
+   
+___ Save output of representative tests in qa/01_00/test
+
+

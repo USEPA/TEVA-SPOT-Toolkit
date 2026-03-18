@@ -1,0 +1,39 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+INCLUDES += $(PYTHON_INCLUDES)
+CPPFLAGS += -DHAVE_CONFIG_H
+
+LIBRARY=libutilib
+LIBRARY_DEPENDENCIES=swig
+
+SRCS=utilib_wrap.cpp python_main.cpp
+
+include ../MakeMacros
+
+#OPTIMIZATION= -g
+
+
+swig:
+	@$(ECHO) "Applying SWIG..."
+	@swig -globals uglbl -c -dhtml -I../../include -c++ -python -shadow -v utilib.swig > swig.out 2>&1
+	@cat utilib_extras.py >> utilib.py
+	@mv utilib_wrap.c tmp
+	@awk '{if ($$0 == "#define SWIGCODE") \
+printf "#define SWIGCODE\n#undef _DEBUG\n";\
+else\
+print $$0;}' tmp > utilib_wrap.cpp
+	@rm -f tmp
+
+
+python_module:
+	@$(MAKE) swig
+	@$(MAKE) utilib_wrap.pi
+	$(RM) $(LIBDIR)/$(LIBRARY)cmodule.so
+	$(LINK.C) -o $(LIBDIR)/$(LIBRARY)cmodule.so $(C++_SHARED) utilib_wrap.pi $(LIBDIR)-shared/lib$(LIBRARY).so $(PACKAGE_LIBS) $(ARCHLIBS) -lm
+
+
+
+pyutilib: pyutilib.o
+	$(LINK.C) pyutilib.o -o ../../bin/pyutilib $(LDFLAGS) $(LDLIBS) $(SWIG_LD_FLAGS) $(SWIG_LIBS) $(PYTHON_LDFLAGS) $(PYTHON_LIBS) 
+	chmod 555 ../../bin/pyutilib

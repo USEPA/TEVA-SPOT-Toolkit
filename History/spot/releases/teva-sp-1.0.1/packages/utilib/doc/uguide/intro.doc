@@ -1,0 +1,110 @@
+/*! 
+ * \page intro
+
+
+\section intro Introduction
+
+UTILIB is a general-purpose C++ library that includes a variety of
+algorithmic utilities for software development.  These utilities define
+useful datatypes and classes as well as generic routines.  In particular,
+UTILIB provides a variety of services that facilitate the portability
+of codes, and in particular porting to parallel computing platforms
+at Sandia.  This library has proven useful in the development of several
+codes at Sandia, including the SGOPT global optimization library, the PICO
+parallel branch-and-bound library, and the DAKOTA optimization toolkit.
+
+
+In its current form, this documentation provides more of a reference manual
+than a user's guide.  There are several reasons for this:
+
+ - While documenting classes, I realized that there are many inconsistencies
+	that need to be resolved before a polished documentation can be
+	created.  For example:
+    - Although the format of the dynamic ADTs like heaps and splay trees is
+	very similar, there are subtle differences in the way that they
+	manage keys versus associated data.
+    - Some I/O routines developed by Jonathan Eckstein (e.g. \c signalError)
+	need to be resolved with existing UTILIB routines.
+
+ - The support for vectors and matrices will change in the near future,
+	as UTILIB provides more support for the serial and parallel vectors
+	and matrices in the Sandia Petra package.  If I'm lucky, all numerical
+	vector/matrix operations will be removed from UTILIB.
+
+ - Similarly, the STL libraries in ANSI C++ may eliminate the need to support
+	some of the ADT classes.
+
+ - Documentation is rather time consuming, and I felt that it was more
+	important to get a reference guide out soon rather than wait
+	a much longer time period for a detailed user's guide.
+
+Consequently, the documentation provided in this document provides a
+sketch of the detail needed to fully explain the functionality of this
+software.  Further, some of the classes and functions are only partially
+documented, which reflects the fact that I expect them to be revised in
+the future.  However, I hope it will be sufficient to get started using
+these libraries.
+
+It is worth noting some points about the design philosophy for the
+classes in UTILIB:
+
+- \b Encapsulation:  One of the chief advantages for using UTILIB data types 
+	(e.g. arrays) is the encapsulation of memory allocation that they
+	provide.  This feature has been heavily exploited in my subsequent
+	code, and thus memory allocation is generally quite robust.  Further,
+	some classes (e.g. \c LinkedList) include mechanisms for efficiently
+	'reallocating' memory.
+
+- \b Robustness:  A related aspect of UTILIB's design is robustness.  I have
+	almost always favored design considerations that ensure robustness.
+	For example, the default behavior for \c BasicArray's is to perform
+	bounds checking.  In practice, the performance hit that this causes
+	has been far outweighed by the hours saved tracking down obscure
+	errors.
+
+- \b Portability: Portability across many different architectures is another
+	very important aspect of UTILIB.  For example, the common 
+	definitions for sorting in \c sort.h have proven very effective
+	for defining portable sorting routines.  Similarly, the hard-coded
+	template instantions have facilitated the use of UTILIB on a wide
+	range of parallel computing platforms, many of which support
+	rudimentary implementations of C++.
+
+- \b Efficiency: There is generally no \e best way to implement many 
+	algorithms and datatypes,
+	since there invariably are performance/utility trade-offs that 
+	need to be made.  In the design of UTILIB classes, I have generally
+	looked for solutions that admit a reasonably efficient capability while
+	providing the most general possible design.  For example, 
+	ADT's like splay trees are very general in their capabilities. Still,
+	they include methods that allow the user to track pointers to items
+	in the tree, which can later be used to efficiently remove those		items from the tree.
+
+- \b Parallelization: Support for parallelization is an important function
+	for UTILIB.  In particular, UTILIB includes mechanisms for managing		parallel I/O through the \c CommonIO class, and the \c uMPI class
+	provides wrappers for parallel communication with MPI.
+
+The components of the UTILIB library include
+
+ - \b Abstract \b Data \b Types: standard abstract data types like
+   trees and arrays
+
+ - \b Input/Output \b Routines: facilities for encapsulating error
+   routines as well as redirecting I/O through user-defined streams
+
+ - \b Mathematical \b Routines: commonly used mathematical routines,
+   especially array operations
+
+ - \b Random \b Number \b Generation: generators for commonly used
+   probability distributions and a portable random number generator
+
+ - \b Sorting: a variety of common sorting routines, as well as
+   a portable definition of sorting methods
+
+ - \b System \b Support: miscellaneous routines, especially to support
+   portability between different operating systems
+
+These components of the libraries are described in greater detail in the
+following sections.
+
+*/

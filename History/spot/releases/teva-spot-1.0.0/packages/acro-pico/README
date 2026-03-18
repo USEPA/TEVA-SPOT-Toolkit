@@ -1,0 +1,92 @@
+------------------------------------------------------------------------------
+Acro version 1.0
+
+The Acro Project is an effort to facilitate the design, development,
+integration and support of optimization software libraries.  The goal
+of the Acro Project is to develop (parallel) optimization solvers and
+libraries using object-oriented software frameworks that facilitate the
+application of these solvers to large-scale engineering and scientific
+applications.  Thus Acro includes both individual optimization solvers
+as well as optimization frameworks that provide abstract interfaces for
+flexible interoperability of solver components.  Acro has been written
+to support optimizers that are broadly useful for DOE's engineering and
+scientific applications.  In particular, many solvers included in Acro
+can exploit parallel computing resources to solve optimization problems
+more quickly.
+
+------------------------------------------------------------------------------
+Authors.
+
+William E. Hart
+Sandia National Laboratories
+wehart@sandia.gov 
+
+------------------------------------------------------------------------------
+License.
+
+Acro is distributed under the GNU Lesser General Public License.  See
+the file in this directory named COPYING.LIB.
+------------------------------------------------------------------------------
+Installation.
+
+The Acro installation process is described in a file in this directory
+named INSTALL.
+
+------------------------------------------------------------------------------
+Overview.
+
+The principle directories contained in this distribution are
+
+bin			Executables used to configure/compile Acro.
+
+config			Files used by the configure process.
+
+doc			Documentation about Acro.  See below.
+
+include			A common directory where package include directories
+			are linked
+
+lib			A common directory where package libraries are linked
+
+packages		The directories of Acro packages
+
+------------------------------------------------------------------------------
+Dependencies.
+
+Acro is not strictly dependent on any external software packages.
+The parallel solvers are dependent on MPI (using the mpich library).
+There are a variety of external libraries integrated into Acro.
+There exist COLIN interfaces to commercial packages like DOT, and the
+COIN library includes interfaces to commercial LP solvers.
+
+------------------------------------------------------------------------------
+Platforms.
+
+This package is quite generic and thus it should compile on a wide range
+of platforms.  Acro is actively supported with nightly build verifications
+on a variety of platforms.  See
+
+  http://software.sandia.gov/Acro
+
+for links to the latest nightly build test report.
+
+------------------------------------------------------------------------------
+Further Information and Help.
+
+Send email to acro-help@software.sandia.gov to address specific issues
+in the use of Acro.
+
+Online documentation is available at
+
+  http://software.sandia.gov/Acro
+
+The 'Documentation' link provides information on Acro as well as several
+Acro projects.
+
+------------------------------------------------------------------------------
+WARNING.
+
+Many packages in Acro are "research" codes, and thus Acro is
+the subject of continuing active development.  Bug reports, suggestions
+for improvement, and required changes for other machines/compilers
+are welcome.  Direct all messages to acro-developers@software.sandia.gov.

@@ -1,0 +1,20 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+LIBRARY=libutilib
+
+#
+# Define objects and headers
+#
+#SRCS= test.c \
+#	heap_sort.c ins_sort.c quick_sort.c merge_sort.c shell_sort.c compare.cpp \
+#	order.c order_k.c rank.c
+
+#
+# Define compiler flags
+#
+#OPTIMIZATION= -O2
+
+include ../MakeMacros
+include Makefile.dependencies
+

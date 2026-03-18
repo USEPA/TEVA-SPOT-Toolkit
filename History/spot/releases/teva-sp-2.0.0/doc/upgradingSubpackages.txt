@@ -1,0 +1,12 @@
+When upgrading subpackages obtained from acro, make the following
+changes:
+
+utilib
+  Change utilib so that the default is --disable-tests.  (The
+  default is specified in the macro defined in
+  utilib/config/acro_test_option.m4.)
+
+exact
+  Replace calls to the cp_u script in Makefiles to "cp -up"
+  Replace inclusion of acro_config.h with inclusion of teva_config.h
+  Replace macros ACRO_* in sources to TEVA_SP_*.

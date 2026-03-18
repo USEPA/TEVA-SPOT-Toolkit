@@ -1,0 +1,21 @@
+#!/bin/sh
+##
+## Create csh scripts using either csh or tcsh
+##
+
+echo "Beginning mkscripts"
+
+file=`which csh | grep csh 2> /dev/null`
+
+if [ "$file" = "" ]; then
+   file=`which tcsh | grep tcsh 2> /dev/null`
+fi
+
+for FILE in `ls *.csh` ; do
+  newfile=`echo ${FILE} | sed -e 's#\(.*\).csh#\1#g'` ;
+  echo "creating ${newfile}" ;
+  echo "#!${file}" > ${newfile} ;
+  cat ${FILE} >> ${newfile} ;
+  chmod 755 ${newfile} ;
+done
+

@@ -1,0 +1,41 @@
+#!/bin/csh -v
+
+set tname = "$1"
+shift
+
+mkdir test
+set dir=`pwd`
+
+set name = `hostname`
+cvs -Q checkout Dakota
+#gunzip -c /Net/proj/opt/src/Dakota.tar.gz | tar xf -
+cvs.a -Q checkout acro-coliny
+cd Dakota
+setenv DAKOTA `pwd`
+pushd VendorPackages
+if ($name == "zamboni") then
+   ln -s /Net/proj/opt/packages/SOLARIS/mpich/ mpi
+else
+   ln -s /usr/local/mpi/ mpi
+endif
+popd
+pushd VendorOptimizers
+ln -s ../../acro .
+popd
+pwd
+#
+# Configure
+#
+autoreconf --install
+../acro/packages/exact/src/testing/testdriver --o=$dir/test --I=../acro/packages/exact/src/testing --name=$tname configure --disable-f90 $* --without-gsl --without-lhs --without-graphics --with-debugging --enable-debugging --without-optpp --without-ddace --without-petra --without-jega
+#
+# Build
+#
+make >&! $dir/test/build.out
+../acro/packages/exact/src/testing/testdriver --o=$dir/test --I=../acro/packages/exact/src/testing --name=$tname build --logfile=$dir/test/build.out
+#
+# Test
+#
+cd test/acro
+../../../acro/bin/runexp --scenario=$tname --tag=nightly dakota*exp.xml
+cp *test.xml *results.xml ../../../test

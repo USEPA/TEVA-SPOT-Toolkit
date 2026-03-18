@@ -1,0 +1,305 @@
+/*! 
+ * \page spExecutable Executable sp
+
+\section spOverview Overview
+
+The \b sp executable provides a common interface for sensor placement
+solvers in TEVA-SP.
+
+
+\section Usage
+
+\verbatim
+   sp [options...] --network=<network> --objective=<objective-ids>
+                   --ub=<objective>,<ub-limit>
+\endverbatim
+
+
+\section Options
+
+\verbatim
+   ------------------------------------------------------------------
+   The following options control the specification of the type of
+   sensor placement problem that will be solved.
+   ------------------------------------------------------------------
+
+   --network=<network>
+        The name of the network that will be analyzed
+
+   --objective=<objective-ids>
+        This option can be used one or more times to specify sensor
+        placement objectives.  Alternatively, this option can be used
+        once with a comma-delimited list of objectives.
+
+        Objective names have the form: <goal>_<statistic>
+        The objective goals are:
+          cost   the cost of sensor placement
+          ec     extent of contamination
+          td     time to detection
+          mc     mass consumed
+          nfd    number of failed detections
+          ns     the number of sensors
+          pe     population exposed
+          pk     population killed
+          vc     volume consumed
+        The objective statistics are:
+          mean   the mean impact
+          median the median impact
+          var    the value-at-risk of the impact distribution
+          tce    the tail-conditioned expectation of the impact distribution
+          cvar   an approximation to TCE used with IP formulations
+          worst  the worst impact
+        For simplicity, an objective name of the form <type> is
+        assumed to refer to the objective <type>_mean
+
+   --delay=<time>
+        Specifies the response delay (in minutes).
+
+   --impact-dir=<directory>
+        Specifies the directory the contains impact files.  By
+        default the current directory is used.
+
+   --aggregation-threshold=<goal>,<value>
+   --threshold=<goal>,<value>
+        Specifies the value that is used to aggregate 'similar'
+        impacts.  This is used to reduce the total size of the
+        sensor placement formulation (for large problems).
+        The solution generated with non-zero thresholds is not guaranteed
+        to be globally optimal.
+
+   --ub-constraint=<objective>,<ub-value>
+   --ub=<objective>,<ub-value>
+        This option specifies a constraint on the maximal value of
+        an objective type.  This option can be repeated multiple
+        times with different objectives.
+
+   --costs=<filename>
+   --costs-ids=<filename>
+        This file contains costs for the installation of sensors
+        throughout the distribution network.  This file contains
+        id/cost pairs, and default costs can be specified with the
+        id: __default__
+
+   --costs-indices=<filename>
+        This file contains costs for the installation of sensors
+        throughout the distribution network.  This file contains
+        index/cost pairs, and default costs can be specified with the
+        index: -1
+
+   --fixed-ids=<filename>
+   --fixed=<filename>
+        This file contains location ids of predefined sensor placements.
+        Additional sensor locations are considered by the optimizer, up
+        to given constraints on cost or impact values
+
+   --fixed-indices=<filename>
+        This file contains location indices of predefined sensor placements.
+        Additional sensor locations are considered by the optimizer, up
+        to given constraints on cost or impact values
+
+   --invalid-ids=<filename>
+   --invalid=<filename>
+        This file contains location ids where sensors cannot
+        be placed.  These ids are mapped to location indices using
+        the <network>.nodemap file.
+
+   --invalid-indices=<filename>
+        This file contains location indices where sensors cannot
+        be placed.
+
+   ------------------------------------------------------------------
+   The following options control the solver that is used to find
+   optimal sensor placements.
+   ------------------------------------------------------------------
+
+   --solver=<type>
+        This option specifies the type of solver that is used to find
+        sensor placement(s).  The following solver types are currently
+        supported:
+          grasp         A multistart local search heuristic (default)
+          pico          A mixed-integer programming solver
+          picoamp       A mixed-integer programming solver using AMPL
+          cplexamp      A commercial mixed-integer programming solver
+
+   --solver-options=<string>
+        This option contains solver-specific options for controling
+        the sensor placement solver.
+
+   --runtime=<seconds>
+        Terminate the solver after the specified number of seconds
+        have elapsed.  By default, no limit is placed on the runtime.
+        (Not currently supported.)
+
+   --compute-bound
+        Only compute a bound on the value of the optimal solution.
+
+   ------------------------------------------------------------------
+   The following options control the general behavior of this solver
+   interface.
+   ------------------------------------------------------------------
+
+   --tmp-file=<filename>
+        Name of temporary file prefix used in this computation.
+        The default name is "<network-name>".
+
+   --output=<filename>
+   --o=<filename>
+        Name of the output file that contains the sensor placement.
+        The default name is "<network-name>.sensors"
+
+   --summary=<filename>
+        Name of the output file that contains summary information
+        about the sensor placement.
+
+   --format=<string>
+        Format of the summary information.
+
+   --help
+        Print this error message.
+
+   --debug
+        Print debugging information.
+
+   --path=<directory>
+        Add this path to the set of paths search for executables and IP models.
+
+   --amplcplexpath=<directory>
+        Look for ampl and cplexamp executables in this directory.
+        This defaults to a 'blank' path, which implies that the
+        user's system path is used.
+
+   --picopath=<directory>
+        Look for the PICO executable in this directory.
+        This defaults to the path used for executables specified by.
+        the --path option.
+
+   --ampl=<ampl-name>
+        The name of the ampl executable (this defaults to 'ampl').
+
+   --eval-all
+        This option specifies that all impact files found will be used to
+        evaluate the final solution(s).
+\endverbatim
+
+
+\section Description
+
+The <b>sp</b> executable is a python script that coordinates the execution
+of TEVA-SP sensor placement solvers.  This script provides an interface
+for a variety of sensor placement solvers.  The command-line options
+can specify any of a set of performance/cost goals as the objective
+to be optimized, as well as constraints on performance/cost goals.
+The problem formulation that is solved by the sensor placement solvers
+is described in Section \ref formulations.
+
+The <b>sp</b> executable currently interfaces with 
+integer programming (IP) solvers, as well as a GRASP heuristic.
+The IP formulation can be used to find globally optimal solutions, and 
+the GRASP heuristic has proven effective at finding optimal solutions to a
+variety of large-scale applications.
+
+For both solvers, the memory required may exceed the memory available
+on 32-bit workstations.  In particular, memory is a concern for (a)
+large scale applications or (b) applications that integrate many
+performance goals.  For these cases, the aggregation threshold can be
+used to formulate an approximate problem that aggregates sensor placement
+locations (on a per-attack basis).  Thus, non-zero aggregation thresholds
+can be used to use IP solvers in a heuristic manner.
+
+The following files are generated during the execution of <b>sp</b>:
+<ul>
+
+<li> \<tmpfile\>.config - the \ref spConfigFile
+
+<li> \<tmpfile\>.dat - an AMPL data file (if using an IP solver)
+
+<li> \<tmpfile\>.mod - an AMPL script (if using an IP solver)
+
+<li> \<tmpfile\>.log - a log file that captures the solver output
+
+<li> \<tmpfile\>.sensors - a \ref sensorPlacementFile that contains the final solution
+
+</ul>
+
+
+\section Example
+
+The following example can be executed in the teva-sp/packages/sp/test
+directory.  This example minimizes the extent of contamination (ec)
+while limiting the number of sensors (ns) to no more than 5.  The PICO
+solver is used within AMPL to solve this problem.
+
+\verbatim
+[35]% ../bin/sp --path=../bin --path=../mod --network=test1 --objective=ec --ub=ns,5 --solver=pico
+Setting up IP data file...
+Running PICO...
+------------------------------------------------------------------------------
+Sensor placement id:        2948
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            54 19 28 63 75
+Sensor junctions:           193 119 141 207 239
+
+Impact File:                /cygdrive/c/home/wehart/src/teva-sp/packages/sp/test/test1_ec.impact
+Number of attack scenarios: 236
+Min impact:                 0
+Mean impact:                8478.97
+Lower quartile impact:      0
+Median impact:              6949
+Upper quartile impact:      12530
+Value at Risk (VaR):        25960
+TCE:                        33323.3
+Max impact:                 42994.8
+------------------------------------------------------------------------------
+\endverbatim
+
+The following example shows how the lower bound can be computed with a similar
+syntax:
+
+\verbatim
+[43]% ../bin/sp --path=../bin --path=../mod --network=test1 --objective=ec --ub=
+ns,5 --solver=pico --compute-bound
+Setting up IP data file...
+Running PICO...
+Computing a lower bound
+Objective lower bound: 8478.97
+\endverbatim
+
+Similarly, the following example shows how the number of sensors can be
+minimized with a given limit on the extent of contamination:
+
+\verbatim
+[39]% ../bin/sp --path=../bin --path=../mod --network=test1 --objective=ns --ub=ec,40000 --solver=pico
+Setting up IP data file...
+Running PICO...
+------------------------------------------------------------------------------
+Sensor placement id:        3136
+Number of sensors:          1
+Total cost:                 0
+Sensor node IDs:            37
+Sensor junctions:           161
+
+Impact File:                /cygdrive/c/home/wehart/src/teva-sp/packages/sp/test/test1_ec.impact
+Number of attack scenarios: 236
+Min impact:                 0
+Mean impact:                26902
+Lower quartile impact:      3940
+Median impact:              22450
+Upper quartile impact:      38855
+Value at Risk (VaR):        71377.8
+TCE:                        81046.1
+Max impact:                 103746
+------------------------------------------------------------------------------
+\endverbatim
+
+
+\section Notes
+
+The GRASP heuristic currently only supports the "mean" performance measure.
+Further, the aggregation threshold does not impact the problem formulation
+used by the GRASP heuristic.
+
+This solver interface assumes that attack likelihoods are uniform.  The format
+for specifying non-uniform likelihoods remains unresolved.
+
+*/

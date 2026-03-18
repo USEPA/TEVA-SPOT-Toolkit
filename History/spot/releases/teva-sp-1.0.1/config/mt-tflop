@@ -1,0 +1,34 @@
+#-----------------------------------------------------------------#
+# Target ARCHitecture dependent definitions - TFLOP service nodes #
+#-----------------------------------------------------------------#
+
+AR		= xar
+ARFLAGS		= ruv
+RANLIB		= xranlib
+ARCLEAN		= $(RM)
+
+CC		= icc
+CWARNINGS	= 
+
+CCC		= iCC
+C++		= $(CCC)
+C++WARNINGS	= +p -rwstl -tlocal
+
+F77		= if77
+FFLAGS		= -fast -O4 -native #-u
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= -Bstatic
+LDFLAGS		=
+OPTIMIZATION	= -O2
+
+ARCH_LIBS	= -ll
+ARCH_INCLUDES	= -I.
+ARCH_FLAGS	= -DUNIX -DTFLOPS -DTFLOPS_SERVICE -DMULTITASK -DNO_TEMPLATE_TEMPLATE_PARAMETERS
+XTRAFLAGS	= 
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard

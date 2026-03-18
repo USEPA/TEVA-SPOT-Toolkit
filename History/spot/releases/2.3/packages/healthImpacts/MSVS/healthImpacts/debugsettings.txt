@@ -1,0 +1,9 @@
+-Xmx1024M -classpath=../../ANLUtilities;../../TEVA;../../DIAS;../../ANLSpatial;../../TEVA_Filter;../../ANLGUIUtilities;../../EPANETBase;../../EPANet-DIAS;../../DBFCore/src -Dteva.log.dir=../logs "-Danl.property.files=../props/server.properties,../props/simsvr.properties,../props/win32/simsvr.properties,../props/server1.properties,../props/win32/rmi.properties" -Djava.security.policy=../props/server.policy -Djava.library.path=../../TEVA_Libraries/win32 -Danl.jni_path=..\.. -Dteva.server.number=1 -Dteva.server.db.conn.id=Group1 -Danl.teva.modules.definitions=../AnalysisModules/HIA.xml,../AnalysisModules/tso2Impact.xml -Depanet.mc.inp.file=network.inp -Dpython.dir=../vpy64  -Danl.jni.debug_load=true
+
+Working Dir:
+C:\TEVA\EclipseWS\TEVA-35\TEVAData/server-1
+
+Analysis Server
+-Xmx1024M -classpath ../ANLUtilities;../TEVA;../DIAS;../ANLSpatial;../TEVA_Filter;../ANLGUIUtilities;../EPANETBase;../EPANet-DIAS;../DBFCore/bin -Dteva.log.dir=../TEVAData/logs "-Danl.property.files=../TEVAData/props/analysis.properties,../TEVAData/props/win32/rmi.properties" -Djava.security.policy=../TEVAData/props/analysis.policy -Danl.jni_path=.. -Djava.library.path=../TEVA_Libraries/win32 -Danl.teva.modules.definitions=../TEVAData/AnalysisModules/tso2Impact.xml,../TEVAData/AnalysisModules/HIA.xml anl.teva.analysis.AnalysisServerImpl
+
+C:\TEVA\EclipseWS\TEVA-35\TEVA\

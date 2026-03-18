@@ -1,0 +1,15 @@
+#-----------------------------------------------#
+# Host ARCHitecture dependent definitions - SGI #
+#-----------------------------------------------#
+ 
+ECHO            = /bin/echo
+LN              = ln -s
+LND             = ln -s
+MYMAKE		= gmake
+MAKE		= $(MYMAKE) -f Makefile-$(TARGET_NAME)
+PWD		= /bin/pwd | sed 's/\/tmp_mnt//'
+RM              = rm -rf
+SHELL           = /bin/sh
+SYMBTEST	= -h
+YACC		= yacc
+LEX		= lex

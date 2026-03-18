@@ -1,0 +1,11 @@
+#!/bin/sh
+##
+## Dummy script that calls testdriver to manage configuration, builds
+## and testing
+##
+
+pushd packages/acro-pico
+./setup
+popd
+./packages/fast/client/driver --I=packages/fast/client --S=config $*
+

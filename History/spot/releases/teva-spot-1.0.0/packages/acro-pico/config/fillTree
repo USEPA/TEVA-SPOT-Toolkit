@@ -1,0 +1,80 @@
+#!/bin/bash
+# 
+# Because of the way autoconf/automake work, every Makefile listed
+# in AC_CONFIG_FILES in configure.ac (even inside a conditional which 
+# evaluates to false) must appear in the source tree.
+#
+
+##
+## Our Makefiles build these, they appear in AC_CONFIG_FILES
+##
+acro_dirs=packages/tpl
+acro_dirs="$acro_dirs packages/tpl/3po"
+acro_dirs="$acro_dirs packages/tpl/coin"
+acro_dirs="$acro_dirs packages/tpl/soplex"
+acro_dirs="$acro_dirs packages/tpl/ampl"
+acro_dirs="$acro_dirs packages/tpl/filib"
+acro_dirs="$acro_dirs packages/tpl/filib/src"
+acro_dirs="$acro_dirs packages/tpl/filib/test"
+acro_dirs="$acro_dirs packages/tpl/pls"
+acro_dirs="$acro_dirs packages/tpl/pls/src"
+acro_dirs="$acro_dirs packages/tpl/pls/test"
+acro_dirs="$acro_dirs packages/exact"
+acro_dirs="$acro_dirs packages/colin"
+acro_dirs="$acro_dirs packages/colin/src"
+acro_dirs="$acro_dirs packages/colin/test"
+acro_dirs="$acro_dirs packages/coliny"
+acro_dirs="$acro_dirs packages/coliny/src"
+acro_dirs="$acro_dirs packages/coliny/test"
+acro_dirs="$acro_dirs packages/pebbl"
+acro_dirs="$acro_dirs packages/pebbl/src"
+acro_dirs="$acro_dirs packages/pebbl/test"
+acro_dirs="$acro_dirs packages/pico"
+acro_dirs="$acro_dirs packages/pico/src"
+acro_dirs="$acro_dirs packages/pico/test"
+acro_dirs="$acro_dirs packages/gnlp"
+acro_dirs="$acro_dirs packages/gnlp/src"
+acro_dirs="$acro_dirs packages/gnlp/test"
+acro_dirs="$acro_dirs packages/parpcx"
+acro_dirs="$acro_dirs packages/parpcx/src"
+acro_dirs="$acro_dirs packages/parpcx/test"
+acro_dirs="$acro_dirs packages/tpl/glpk"
+
+##
+## Autoconf'ed subpackages, they appear in AC_CONFIG_SUBDIRS,
+## creating these silences a warning from autoreconf.
+##
+ac_dirs=packages/tpl/trilinos
+ac_dirs="$ac_dirs packages/tpl/mtl"
+ac_dirs="$ac_dirs packages/tpl/ipopt"
+ac_dirs="$ac_dirs packages/appspack"
+
+for dir in $ac_dirs ; do
+    echo "Creating empty $dir so autoconf & automake will succeed"
+    mkdir --parents $dir
+    touch $dir/configure.ac
+done
+
+##
+## Directories in which our Makefile.ams are.  Creating these
+## prevents an autoreconf error.
+##
+
+for dir in $acro_dirs ; do
+    echo "Creating empty $dir so autoconf & automake will succeed"
+    mkdir --parents $dir
+    touch $dir/Makefile.in
+done
+
+##
+## Required because of ACLOCAL_AMFLAGS in top Makefile.am
+##
+
+#if ! [ -d packages/appspack/config ] ; then
+  #mkdir packages/appspack/config
+#fi
+
+##
+## MTL doesn't work without this
+##
+touch packages/tpl/mtl/VERSION

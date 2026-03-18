@@ -1,0 +1,5 @@
+#--- $Id: make.linux.x86.intel.dbg,v 1.1 2002/06/25 21:07:09 DEVspx Exp $
+CXX	=	icc
+CXXFLAGS=	-g -mp -Xc -w2 -wd279,383,444,810,981
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

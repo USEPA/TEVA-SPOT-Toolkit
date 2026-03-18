@@ -1,0 +1,9 @@
+TEVA_SPOT CHANGELOG
+==============
+
+-------------------------------------------------------------------------------
+TEVA_SPOT TODO
+-------------------------------------------------------------------------------
+
+- Initial release of the TEVA SPOT Toolkit Python software as a combined
+package.

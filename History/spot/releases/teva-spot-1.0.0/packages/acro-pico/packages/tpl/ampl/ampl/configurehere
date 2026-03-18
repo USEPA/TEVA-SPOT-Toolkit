@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# "configurehere" for system-specific subdirectories of ampl/solvers
+# Written by David M. Gay at Sandia National Labs
+# Approved for Unclassified-Unlimited release: SAND Number 2005-7813P
+# Minor subsequent change: test for -DNON_STDIO removed: it is no longer needed.
+
+## invoke ./configurehere
+## (no args) to compile libamplsolver.a in this directory,
+## and create makefile from makefile.u.
+## Specify CC before invoking to adjust the CC setting in makefile.
+## Specify CFLAGS before invoking to adjust CFLAGS setting in the makefile.
+## CFLAGS may be further adjusted by tests done below.
+
+if [ -f makefile ]; then make clean; rm makefile; fi
+
+case $CFLAGS in '') CFLAGS='-O';; esac
+
+${CC=cc} -c xectim.c && rm xectim.o || CFLAGS="$CFLAGS -DNO_RUSAGE"
+
+SC="s%^CC = cc%CC = $CC%"
+
+case `uname -m` in
+	alpha) CFLAGS="$CFLAGS -ieee_with_no_inexact";;
+	esac
+
+case `uname -s` in
+	AIX) CFLAGS="$CFLAGS -qnomaf";;
+	SunOS) case `uname -i` in i386) SC="$SC;s%^a = \\\\$%a = fpsetprec.s \\\\%";; esac;;
+	CYGWIN_*) SC="$SC;s%/a\.out%a.exe%";;
+	esac
+
+SC="$SC;s%^CFLAGS = -O%CFLAGS = $CFLAGS%";
+
+echo $SC
+sed "$SC" makefile.u >makefile

@@ -1,0 +1,15 @@
+The TEVA-SPOT Toolkit is distributed under the Lesser GNU Public License (LGPL).
+The LGPL is described in the LICENSE.lgpl file.
+
+However, TEVA-SPOT includes a variety of other software packages with 
+different licenses.  The use of this software should be fine for research
+purposes, but there are restrictions on commercial usages in some cases:
+
+- EPANET: Lesser GNU Public License
+
+- tevaUtils: Lesser GNU Public License
+
+- acro-pico: BSD and Common Public License
+
+- grasp: AT&T commercial license
+

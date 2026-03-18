@@ -1,0 +1,21 @@
+#!/bin/csh
+##
+## Test1 test script
+##
+
+setenv bindir `pwd`/../../bin
+setenv moddir `pwd`/../../etc/mod
+
+if (! -e test1.tso) then
+   $bindir/tevasim -tsg test1.tsg -tsi test1.tsi -tso test1.tso Net3.inp Net3.out
+endif
+if ((! -e test1_mc.impact) || (! -e test1_pe.impact) || (! -e test1_vc.impact) || (! -e test1_ec.impact)) then
+   $bindir/tso2Impact test1 test1.tso -mc -vc -ec -epanetin Net3.inp -pe chem.tai
+endif
+
+$bindir/sp --path=$bindir --path=$moddir --network=test1 --objective=mc --ub=ns,5 --solver=lagrangian  --disable-aggregation=all --ub=pe,800 --ub=ec,15000 --ub=vc,25000 --memmon --debug --print-log
+#$bindir/sp --path=$bindir --path=$moddir --network=test1 --objective=mc --ub=ns,5 --solver=lagrangian  --disable-aggregation=all --ub=pe,800 --ub=ec,15000 --ub=vc,22000 --memmon
+#
+# location aggregation does not work with more than one impact file - different
+# superlocations get created in each file
+#$bindir/sp --path=$bindir --path=$moddir --network=test1 --objective=mc --ub=ns,5 --solver=lagrangian  --ub=pe,800 --ub=ec,15000 --ub=vc,25000 --memmon --debug --print-log

@@ -1,0 +1,58 @@
+<experimental-study name="impact">
+  <!--
+	These experiments confirm that the correct impact file
+	is generated from one of the Net3 TSO files in the sp/etc
+	directory.
+   -->
+  <tags>
+    <tag>nightly</tag>
+  </tags>
+
+  <experiment name="tso2Impact-small">
+    <factors>
+      <factor name="impact_prefix">
+        <level>network=small tsofile="smallb.tso" tsofile="smallc.tso"
+	       minQuality="3000000" minQuality="3"
+       </level>
+      </factor>
+      <factor name="objective">
+        <level>objective=td objective=pe
+	       taifile="bio.tai" taifile="chem.tai"
+	</level>
+      </factor>
+    </factors>
+    <controls>
+       <executable>sp_test -multi-impact</executable>
+    </controls>
+  </experiment>
+
+  <experiment name="tso2Impact">
+    <factors>
+      <factor name="impact_prefix">
+        <level>network=Net3 frequency=quarterly</level>
+        <level>network=Net3 frequency=hourly</level>
+      </factor>
+      <factor name="objective">
+        <level>mc</level>
+        <level>vc</level>
+        <level>td</level>
+        <level>nfd</level>
+        <level>ec</level>
+        <level>pe-bio</level>
+        <level>pe-chem</level>
+        <level>pk-bio</level>
+        <level>pk-chem</level>
+      </factor>
+    </factors>
+    <controls>
+       <executable>sp_test -impact</executable>
+    </controls>
+  </experiment>
+
+
+  <analysis name="ImpactDiff" type="validation">
+    <category>validation</category>
+    <data experiment="tso2Impact"/>
+    <options>_measurement="ImpactDiffs" _value=0 _cmp_operator=eq</options>
+  </analysis>
+</experimental-study>

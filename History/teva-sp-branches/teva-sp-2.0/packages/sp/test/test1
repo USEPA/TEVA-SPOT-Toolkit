@@ -1,0 +1,27 @@
+#!/bin/csh
+##
+## Test1 test script
+##
+
+./test1a
+#./test1b
+#./test1c
+#./test1d
+#./test1e
+./test1f
+./test1g
+./test1h
+./test1i
+./test1j
+./test1k
+./test1l
+./test1aa
+./test1m
+./test1n
+./test1o
+./test1q
+
+#
+# Uncomment the following test if you have AMPL.
+#
+#./test1ab

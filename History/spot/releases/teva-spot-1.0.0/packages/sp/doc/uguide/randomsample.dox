@@ -1,0 +1,34 @@
+/*! 
+ * \page randomsampleExecutable Executable randomsample
+
+\section randomsampleOverview Overview
+
+The \b randomsample executable heuristically solves p-median 
+formulations of the sensor placement problem.
+
+\section randomsampleUsage Usage
+
+\verbatim
+   randomsample sp-configuration-file num-sample random-seed time-limit [solution-file]
+\endverbatim
+
+
+\section randomsampleDescription Description
+
+The \b randomsample executable invokes an iterated descent heuristic to solve
+p-median sensor sensor placement problems. Currently, the following statistics
+are supported: mean, var (Value At Risk), tce (Tail-Conditional Expectation), 
+and worst-case. 
+
+\section randomsampleExample Example
+
+None. Usage is intended to be strictly from the 'sp' script, which drives
+both heuristic and exact solvers.
+
+\section randomsampleNotes Notes
+
+The randomsample heuristic currently does not support side constraints 
+other than on the number of sensors. Side-constraints are supported by the
+sideconstraints executable.
+
+*/

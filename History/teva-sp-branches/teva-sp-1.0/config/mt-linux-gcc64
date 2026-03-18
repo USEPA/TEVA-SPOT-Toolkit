@@ -1,0 +1,39 @@
+#-----------------------------------------------------#
+# Target ARCHitecture dependent definitions - LINUX   #
+#-----------------------------------------------------#
+
+AR		= ar
+ARFLAGS		= ruv
+RANLIB		= ls
+ARCLEAN		= $(RM)
+
+CC              = gcc
+CWARNINGS       = $(C++WARNINGS) -Wstrict-prototypes -Wmissing-prototypes 
+CC_SHARED	= -shared
+ 
+CCC             = g++
+C++             = $(CCC)
+C++WARNINGS     = -Wall -fexceptions
+C++_SHARED	= -shared
+ 
+F77		= f77
+FFLAGS		= -O4 #-libmil #-u
+F_SHARED	=
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= 
+LDFLAGS		=
+OPTIMIZATION	= -O
+
+ARCH_LIB_PATH	=
+ARCH_LIBS	= -lg2c #-ll
+ARCH_INCLUDES	= -I. -I/usr/include/X11R5
+ARCH_FLAGS	= -DX64 -DSNUFFLES -DUNIX -DLINUX -DMULTITASK -DANSI_HDRS -DANSI_NAMESPACES -m64
+XTRAFLAGS	= 
+PROFILE_FLAG	= -pg
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard

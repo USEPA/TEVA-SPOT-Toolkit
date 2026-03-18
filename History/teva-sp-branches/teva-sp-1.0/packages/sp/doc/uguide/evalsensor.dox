@@ -1,0 +1,147 @@
+/*! 
+ * \page evalsensorExecutable Executable evalsensor
+
+
+\section evalsensorOverview Overview
+
+The <b>evalsensor</b> executable is used to compute information about the the impact of contamination events for one (or more) sensor placements.
+
+
+\section evalsensorUsage Usage
+
+\verbatim
+   evalsensor [options...] <sensor-file> <impact-file1> [<impact-file2> ... ]
+\endverbatim
+
+
+\section evalsensorOptions Options
+
+\verbatim
+   --debug
+        For each set of sensor locations, output information about each attack
+
+   --delay=<minutes>
+        Specifies the response delay used when evaluating sensor placements.
+
+   --alpha=<double>
+        Specifies the quantile value used to compute the VaR
+        and TCE performance measures. (The default value is 0.95.)
+
+   --format=(cout|xls|xml)
+        Controls the type of output that the evaluation will generate:
+          cout  Generates output that is easily read. (default)
+          xls   Generates output that is easily imported into a MS Excel
+                spreadsheet.
+          xml   Generates an XML-formated output that is used to communicate
+                with the TEVA GUI.  (Not currently supported.)
+
+   --probabilities=<filename>
+        Specifies a file with the probability of the different contamination
+        scenarios.  (Not currently supported.)
+
+   --nodemap=<filename>
+        Specifies a file with the node map information, for translating node
+        IDs into junction labels.
+
+   --costs=<filename>
+        Specifies a file with the cost information for each location id.
+\endverbatim
+
+
+\section evalsensorArguments Arguments:
+
+\verbatim
+   <sensor-file>
+        A sensor placement file, which contains one or more sensor
+        placements that will be evaluated.
+
+   <impact-file>
+        An impact file, which contains the impact data concerning a
+        contamination event.  If one or more impact files are specified, then
+        evaluations are performed for each impact separately.
+\endverbatim
+
+
+\section Description
+
+The <b>evalsensor</b> executable takes sensor placements in a \ref
+sensorPlacementFile and evaluates them using data from an \ref impactFile
+(or a list of impact files).  This executable measures the performance of
+each sensor placement with respect to the set of possible contamination
+locations.  This analysis assumes that probabilities have been assigned
+to these contamination locations.  The following measures are supported:
+<ul>
+
+<li> <b>min</b> - The minimum impact over all contamination events.
+If we make the 
+assumption that a sensor protects the node at which it is placed, then this
+measure will generally be zero.
+
+<li> <b>mean</b> - The mean (or average) impact over all contamination events.
+
+<li> <b>lower quartile</b> - 25% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>median</b> - 50% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>upper quartile</b> - 75% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>VaR</b> - The value at risk (VaR) uses a user-defined quantile: alpha.
+100*alpha% of contamination events,
+weighted by their likelihood, have an impact value less than this quantile.
+
+<li> <b>TCE</b> - The tailed-conditioned expectation (TCE) is the mean value
+of the impacts that are greater than or equal to VaR.
+
+<li> <b>worst</b> - The value of the worst impact.
+
+</ul>
+
+
+\section Example
+
+The following example illustrates the use of <b>evalsensor</b> after 
+running the <b>test1</b> test in teva-sp/packages/sp/test.
+
+\verbatim
+[65]% evalsensor test1.sensors test1_ec.impact
+------------------------------------------------------------------------------
+Sensor placement id:        0
+Number of sensors:          5
+Sensor placement:           2 10 14 46 53
+
+Impact File:                test1_ec.impact
+Number of attack scenarios: 59
+Min impact:                 0
+Mean impact:                17219.6
+Lower quartile impact:      3610
+Median impact:              12444
+Upper quartile impact:      24199
+Value at Risk (VaR):        71651
+TCE:                        87243
+Max impact:                 95789
+------------------------------------------------------------------------------
+[66]% evalsensor --format=xls test1.sensors test1_ec.impact
+Sensor ID Len ImpactFile      Num Attacks Min Mean    Lower Quartile  Median Upper Quartile VaR   TCE   Max
+0         5   test1_ec.impact 59          0   17219.6 3610            12444  24199          71651 87243 95789
+\endverbatim
+
+
+\section Notes
+
+This executable needs to be extended to generate the distribution 
+of impact values for every contamination event.  However, we have not agreed
+on the format for this information.
+
+This executable will not work properly if sensor placements in 
+a \ref sensorPlacementFile have the same ID.  In particular, only the last 
+sensor placement with a given ID will be evaluated.
+
+Cost computations are not currently supported.
+
+This executable appears to run unreasonably slow on even moderatly large
+data sets.
+
+*/

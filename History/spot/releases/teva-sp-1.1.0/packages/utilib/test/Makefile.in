@@ -1,0 +1,252 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+##
+## Needed for COUGAR
+##
+#C++WARNINGS     = --instantiation_dir $(LIBDIR) #--one_instantiation_per_object
+
+
+EXECUTABLES=olist.exe sort_test.exe ttest.exe array.exe bitarray.exe multibitarray.exe timing.exe tuple.exe iotest.exe rngtest.exe triang.exe vectest.exe stltest.exe hash.exe splay.exe ereal.exe heap.exe calloc.exe malloc.exe pvector.exe exception_test.exe class_options.exe any.exe smartptr.exe commonio.exe stringtest.exe listtest.exe iotest_debug.exe commonio_debug.exe packbuf.exe lphash.exe hashedset.exe
+
+TESTS=olist.exe sort_test.exe ttest.exe array.exe bitarray.exe multibitarray.exe tuple.exe iotest.exe vectest.exe stltest.exe splay.exe ereal.exe heap.exe calloc.exe malloc.exe pvector.exe exception_test.exe class_options.exe any.exe smartptr.exe commonio.exe stringtest.exe listtest.exe iotest_debug.exe commonio_debug.exe lphash.exe hashedset.exe
+
+OBJS= $(EXECUTABLES:.exe=.o)
+
+objs:  $(OBJS)
+
+check:
+	@$(MAKE) executables
+	@$(MAKE) tests
+
+executables: clean
+	@$(ECHO) "==============================="
+	@$(ECHO) "==============================="
+	@$(ECHO) "= Building Test Codes - START =" 
+	@$(ECHO) "==============================="
+	@$(ECHO) "==============================="
+	@$(MAKE) all
+	@$(ECHO) "==============================="
+	@$(ECHO) "==============================="
+	@$(ECHO) "= Building Test Codes - END   ="
+	@$(ECHO) "==============================="
+	@$(ECHO) "==============================="
+
+tests:
+	@(for FILE in $(TESTS:.exe=); do \
+	  if [ -x $${FILE} ]; then\
+	     $(BINDIR)/test_script $${FILE} $${FILE};\
+	  fi;\
+	done) > tests.xml
+
+all:	olist sort_test ttest array bitarray multibitarray timing tuple iotest iotest_debug commonio_debug rngtest triang vectest stltest hash splay ereal heap calloc malloc pvector class_options any smartptr commonio stringtest listtest exception_test packbuf lphash
+
+
+library:
+	cd ../.. ; $(MAKE)
+
+cache:
+	$(RM) -Rf SunWS_cache
+
+clean: 
+	@$(RM) -Rf *.o *.i *.ii *.ti SunWS_cache *.out *.diff
+	@$(RM) -Rf $(EXECUTABLES)
+	@$(RM) -Rf $(EXECUTABLES:.exe=)
+
+median:
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+olist:
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+listtest:
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+stringtest:
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+sort_test:
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+ttest:
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+array:
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+bitarray: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+multibitarray: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+paramTest: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+timing: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+tuple: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+iotest: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+commonio_debug: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+iotest_debug: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+rngtest: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+triang: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+vectest: 
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+stltest: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+hash: 
+	@$(MAKE) cache
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+splay: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+ereal: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+heap: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+calloc: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+malloc: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+pvector: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+class_options: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+any: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+smartptr: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+commonio: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+exception_test: 
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+packbuf:
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+lphash:
+	@$(MAKE) cache 
+	@$(RM) -f $@.o
+	@$(MAKE) $@.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)

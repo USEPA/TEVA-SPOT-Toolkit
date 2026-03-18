@@ -1,0 +1,22 @@
+#!/bin/sh
+##
+## Dummy script that calls testdriver to manage configuration, builds
+## and testing
+##
+
+if [ -e tpl/acro ]; then
+   pushd tpl/acro
+   ./setup
+   popd
+else
+   echo "ERROR: acro was not properly checked out!"
+   exit
+fi
+
+if [ "$#" != "0" ] ; then
+  ./tpl/acro/packages/fast/client/driver --I=tpl/acro/packages/fast/client --S=config $*
+  # Make sure user sees configure warnings
+  if [ "$1" == "configure" ]; then
+    grep WARN test/config.out
+  fi
+fi

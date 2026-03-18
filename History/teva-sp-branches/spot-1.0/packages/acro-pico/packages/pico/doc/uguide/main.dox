@@ -1,0 +1,62 @@
+/*! 
+
+\mainpage <center>PICO User Manual</center>
+
+<center>
+<table borderwidth=0>
+<tr>
+<td borderwidth=0 align=center nowrap>
+William E. Hart, Cynthia A. Phillips<br>
+Discrete Mathematics and Algorithms Dept<br>
+Sandia National Laboratories<br>
+P.O. Box 5800<br>
+Albuquerque, NM<br>
+wehart@sandia.gov,caphill@sandia.gov
+</td>
+<td align=center nowrap>
+Jonathan Eckstein<br>
+MSIS Department<br>
+Faculty of Management and RUTCOR<br>
+Rutgers University<br>
+640 Bartholomew Road<br>
+Piscataway, NJ 08854<br>
+jeckstei@rutcor.rutgers.edu
+</td>
+</tr>
+</table>
+</center>
+
+<center>
+<table borderwidth=0><tr><td width=700 align=left nowrap>
+This document provides a user guide for the PICO software library.
+PICO (Parallel Integer and Combinatorial Optimizer) is an object-oriented
+framework for parallel implementation of branch-and-bound algorithms.
+Using object-oriented techniques, PICO's parallel search engine is cleanly
+separated from the details of the application and computing platform. This
+approach allows the same underlying parallel search code to be used on
+a wide variety of branch-and-bound applications.  The PICO software library
+can be used in several ways: (1) as a linear or integer programming
+solver launched by AMPL, (2) as a stand-alone linear or integer programming
+solver, (3) as a framework for developing customized integer programming
+solvers and (4) as a general-purpose framework for serial and parallel
+branching algorithms.  This user guide illustrates each of these uses
+of PICO.
+</td></tr></table>
+</center>
+
+<h2> Table of Contents</h2>
+
+<ul>
+<li> \ref intro
+<li> \ref packages
+<li> \ref install
+<li> \ref framework
+<li> \ref example
+<li> \ref parameters
+<li> \ref mip
+<li> \ref mip_extensions
+<li> \ref refs
+<li> \ref acknowledgements
+</ul>
+
+*/

@@ -1,0 +1,16 @@
+{\small
+\begin{verbatim}
+template <class ProblemT>
+class serialLipshitzian : virtual public pico::branching
+{
+public:
+
+  /// Setup the solver with command-line arguments and a problem object
+  bool setup(int& argc, char**& argv, ProblemT& func_);
+
+  /// Return a new, empty subproblem
+  pico::branchSub* blankSub();
+
+};
+\end{verbatim}
+}

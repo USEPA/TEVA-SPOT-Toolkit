@@ -1,0 +1,77 @@
+#!/bin/csh
+#
+# This script runs experiments from "Impacts" section of the SPOT User Guide
+#
+set path = ($path `pwd`/../../bin)
+
+
+tevasim -tsg Net3.tsg -tso Net3.tso Net3.inp Net3.out >&! solvers1.out
+tso2Impact Net3 Net3.tso -mc -dmc -vc -dvc -td -dtd -nfd -ec -dec -epanetin Net3.inp >&! solvers2.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico > solvers3.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico >&! solvers3.out
+cp Net3.sensors Net3_orig.sensors
+
+echo "../../bin/sp --path=../../bin --network=Net3 --objective=ec --ub=ns,5 --solver=heuristic > solvers3b.out"
+../../bin/sp --path=../../bin --network=Net3 --objective=ec --ub=ns,5 --solver=heuristic >&! solvers3b.out
+
+echo "../../bin/sp --path=../../bin --network=Net3 --objective=ec --ub=ns,5 --solver=lagrangian > solvers3c.out"
+../../bin/sp --path=../../bin --network=Net3 --objective=ec --ub=ns,5 --solver=lagrangian >&! solvers3c.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --compute-bound > solvers4.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --compute-bound >&! solvers4.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ns --ub=ec,40000 --solver=pico > solvers5.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ns --ub=ec,40000 --solver=pico >&! solvers5.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --sensor-locations=locations > solvers6.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --sensor-locations=locations >&! solvers6.out
+
+echo "../../bin/sp --path=../../bin --network=Net3 --objective=ec_tce --ub=ns,5 --solver=heuristic > solvers7.out"
+../../bin/sp --path=../../bin --network=Net3 --objective=ec_tce --ub=ns,5 --solver=heuristic >&! solvers7.out
+
+echo "../../bin/evalsensor --nodemap=Net3.nodemap Net3_ec.sensors Net3_mc.impact > solvers8.out"
+../../bin/evalsensor --nodemap=Net3.nodemap Net3_ec.sensors Net3_mc.impact >&! solvers8.out
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=mc --ub=ns,5 --solver=pico >&! solvers8a.out
+
+echo "../../bin/sp --path=../../bin  --network=Net3 --objective=ec_tce --ub=mc_mean,30000 --ub=ns,5 --solver=heuristic > solvers9.out"
+../../bin/sp --path=../../bin  --network=Net3 --objective=ec_tce --ub=mc_mean,30000 --ub=ns,5 --solver=heuristic >&! solvers9.out
+
+echo "../../bin/evalsensor --nodemap=Net3.nodemap Net3_orig.sensors Net3_ec.impact Net3_mc.impact > solvers11.out"
+../../bin/evalsensor --nodemap=Net3.nodemap Net3_orig.sensors Net3_ec.impact Net3_mc.impact >&! solvers11.out
+
+echo "../../bin/evalsensor --nodemap=Net3.nodemap --sc-probabilities=Net3.imperfectsc --scs=Net3.imperfectjc  Net3_orig.sensors Net3_ec.impact > solvers12.out"
+../../bin/evalsensor --nodemap=Net3.nodemap --sc-probabilities=Net3.imperfectsc --scs=Net3.imperfectjc  Net3_orig.sensors Net3_ec.impact >&! solvers12.out
+
+echo "../../bin/sp --path=../../bin --network=Net3 --objective=ec --ub=ns,5 --imperfect-scfile=Net3.imperfectsc --imperfect-jcfile=Net3.imperfectjc --solver=heuristic > solvers13.out"
+../../bin/sp --path=../../bin --network=Net3 --objective=ec --ub=ns,5 --imperfect-scfile=Net3.imperfectsc --imperfect-jcfile=Net3.imperfectjc --solver=heuristic >&! solvers13.out
+
+echo "../../bin/evalsensor --nodemap=Net3.nodemap Net3_orig.sensors Net3_ec.impact Net3_dec.impact Net3_nfd.impact > solvers14a.out"
+../../bin/evalsensor --nodemap=Net3.nodemap Net3_orig.sensors Net3_ec.impact Net3_dec.impact Net3_nfd.impact >&! solvers14a.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=dec --ub=ns,5 --ub=nfd,0.25 --solver=pico > solvers14b.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=dec --ub=ns,5 --ub=nfd,0.25 --solver=pico >&! solvers14b.out
+
+exit
+
+
+
+#
+# Testing aggregation
+#
+tevasim -tsg ../../etc/tsg/hourly.tsg -tso Net3.tso Net3.inp Net3.out >&! solvers10a.out
+tso2Impact Net3 Net3.tso -mc -vc -td -nfd -ec -epanetin Net3.inp >&! solvers10b.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --disable-aggregation=ec > solvers10c.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --disable-aggregation=ec --print-log >&! solvers10c.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico > solvers10d.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --print-log >&! solvers10d.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --percent=ec,0.125 > solvers10e.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --percent=ec,0.125 --print-log >&! solvers10e.out
+
+echo "../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --distinguish-detection=ec --aggregation-ratio=ec,0.125 > solvers10f.out"
+../../bin/sp --path=../../bin --path=../../etc/mod --network=Net3 --objective=ec --ub=ns,5 --solver=pico --distinguish-detection=ec --aggregation-ratio=ec,0.125 --print-log >&! solvers10f.out
+
+

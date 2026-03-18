@@ -1,0 +1,28 @@
+
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+MPI_EXEC_DIR=$(ROOT_DIR)/bin
+
+LIBRARY=libutilib
+
+#
+# Define objects and headers
+#
+SRCS = 
+
+#
+# Define compiler flags
+#
+
+include ../MakeMacros
+ 
+
+EXECUTABLES= complete_doe.exe
+
+
+clean:
+	@$(RM) $(EXECUTABLES) $(EXECUTABLES:.exe=)
+
+
+executables: complete_doe

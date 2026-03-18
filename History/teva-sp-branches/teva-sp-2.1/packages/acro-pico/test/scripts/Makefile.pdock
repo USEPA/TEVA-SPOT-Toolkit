@@ -1,0 +1,299 @@
+# Generated automatically from Makefile.in by configure.
+# Makefile template for the Particle Simulation Toolkit.
+#
+# In this iteration, the makefile uses find(1) to locate all .cc files
+# in the source directory.  This makes it possible to add modules to the
+# toolkit by adding the .cc file to the directory tree and compiling.
+
+.SUFFIXES:
+.SUFFIXES: .cc .o .d .opt.o .opt.d .prof.o .prof.d
+
+
+# Standard configure stuff
+srcdir        = .
+builddir      = /home/wehart/src/pdock
+prefix        = /home/wehart/src/pdock
+exec_prefix   = ${prefix}
+bindir        = ${exec_prefix}/bin
+sbindir       = ${exec_prefix}/sbin
+libexecdir    = ${exec_prefix}/libexec
+libdir        = ${exec_prefix}/lib
+includedir    = ${prefix}/include
+VPATH         = $(srcdir)
+
+PSTROOT       = /home/dcroe/src/pst-devel/
+PSTSRCDIR     = $(PSTROOT)/build
+PSTINCLUDE    = $(PSTROOT)/src 
+PSTLIBDIR     = $(PSTROOT)/install/lib
+PSTLIB        = $(PSTLIBDIR)/libpst.so
+#PSTLIB        = $(PSTLIBDIR)/libpst.a
+#PST_PARAMETER_PATH = $(PSTROOT)/data
+#PSTLINK       =  -L$(PSTLIBDIR) -lpst $(QTLINK) $(PYTHONLINK) $(QTLINK) $(EXPATLINK) $(GSLLINK)
+#PSTLINK       =  -L$(PSTLIBDIR) -lpst $(QTLINK)  $(QTLINK) $(EXPATLINK)
+#PSTLINK       =  -L$(PSTLIBDIR) -W1,--whole-archive -lpst  -W1,--no-whole-archive  $(QTLINK) $(EXPATLINK) 
+PSTLINK       =  -L$(PSTLIBDIR) -lpst  $(QTLINK) $(EXPATLINK) 
+
+DIANAROOT     = /home/wehart/src/pdock
+DIANADIR      = $(DIANAROOT)/diana
+DIANALIB      = \"$(DIANADIR)/lib\"
+DIANADEFS     = -DDIANA_LIB=$(DIANALIB) 
+DIANAINCLUDE  = -I$(DIANAROOT)/
+
+
+# Set parameters required for the build.
+SHELL         = /bin/sh
+AR            = ar
+CXX           = g++
+CXXDEPENDFLAGS = -M
+#CXXTARGETFLAGS = -O2 -W -Wall
+CFLAGS = -g -O2 -W -Wall
+OPT_CFLAGS = -O3 -funroll-loops -W -Wall
+PROF_CFLAGS = -O0 -g -pg -W -Wall
+
+INSTALL       = /usr/bin/install -c
+#DEFS          =  -DUSE_PYTHON=1 -DSTRINGSTREAM_IS_BROKEN=1 -DHAVE_LIBPTHREAD=1 -DHAVE_CMATH=1 -DHAVE_CSTRING=1 -DHAVE_CSTDDEF=1 -DHAVE_UNISTD_H=1 -DHAVE_CSTDDEF=1 -DHAVE_CCTYPE=1 -DHAVE_CSTDIO=1 -DHAVE_TIME_H=1 -DHAVE_SYS_TIME_H=1 
+
+# The build currently requires Python.
+# The python stuff should be autoprobed from the Python distribution.
+# See configure.in for more information on how this is done.
+PYTHONINCLUDE = -I/home/dcroe/src/Python-2.2.2/Include
+PYTHONFLAGS   = 
+PYTHONLIBDIR  = -L/home/dcroe/src/Python-2.2.2
+PYTHONLIBS    = -lpython2.2 -lutil
+PYTHONLINK    = $(PYTHONLIBDIR) $(PYTHONLIBS)
+
+
+# The variables related to the Qt toolkit.
+QTHOME         = /home/dcroe/src/qt-3.1.1
+QTINCLUDE      = -I/home/dcroe/src/qt-3.1.1/include
+QTLIBDIR       = -L/home/dcroe/src/qt-3.1.1/lib
+QTLIBS         = -lqt
+#QTLINK         = $(QTLIBDIR) $(QTLIBS)
+QTLINK         = 
+
+# The build currently requires the Expat XML Parser,
+# available at www.jclark.com/xml/expat.html.
+# This dependency is scheduled to be removed soon in favor of the QT toolkit.
+#EXPATHOME     = /usr/local
+#EXPATINCLUDE  = -I/usr/local/include
+#EXPATLIBDIR   = -L/usr/local/lib
+EXPATLIBS     = -lexpat
+#EXPATLINK     = $(EXPATLIBDIR) $(EXPATLIBS)
+EXPATLINK     =  $(EXPATLIBS)
+
+# The toolkit can take advantage of the Gnu Scientific Library
+# To use the GSL, the preprocessor option HAVE_GSL must be defined.
+GSLINCLUDE    = 
+GSLLIBDIR     = 
+GSLLIBS       = 
+GSLLINK       = $(GSLLIBDIR) $(GSLLIBS)
+
+#  Adding in the SGOPT optimization library!!
+#SGOPTROOT      = /home/dcroe/acro/packages/sgopt
+#UTILIBROOT      = /home/dcroe/acro/packages/utilib
+#COLINYROOT     = /home/dcroe/acro/packages/coliny/
+#ACROROOT     = /home/wehart/src/acro-debugging/acro/
+ACROROOT     = ${builddir}/acro
+ACROBUILD    = /lib/i686-unknown-linux-g++/
+ACROLIB      = -L$(ACROROOT)/lib
+#ACROLINK     = $(ACROLIB)  -lcoliny -lsgopt -lutilib -lg2c #-ltestprob
+ACROLINK     = $(ACROLIB)   -lcoliny -l3po -lcolin -lpico -lsgopt -lutilib -lappspack -lfl -lg2c
+ACROINCLUDE  = -I$(ACROROOT)/include -I$(ACROROOT)/packages/coliny/packages/include
+ACRODEFS        = -DANSI_HDRS -DUNIX -DLINUX -DANSI_NAMESPACES
+
+
+#SGOPTBUILD    = /lib/i686-unknown-linux-g++/
+#SGOPTBUILD    =  /lib/i686-unknown-linux-g++/
+#SGOPTLIB      = -L$(SGOPTROOT)/$(SGOPTBUILD) -L$(UTILIBROOT)/$(SGOPTBUILD) -L$(COLINYROOT)/$(SGOPTBUILD)
+#SGOPTLINK     = $(SGOPTLIB)  -lcoliny -lsgopt -lutilib -lg2c
+#SGOPTINCLUDE  = -I$(SGOPTROOT) -I$(UTILIBROOT) -I$(COLINYROOT) -I$(COLINYROOT)/packages/include
+#SGOPTINCLUDE  = -I$(SGOPTROOT) -I$(UTILIBROOT) -I$(COLINYROOT) -I$(COLINYROOT)/packages/include
+#SGOPTINCLUDE  = -I$(SGOPTROOT)/include -I$(UTILIBROOT)/include
+#SGDEFS	       = -DUNIX -DLINUX -DMULTITASK -DANSI_HDRS  
+#SGDEFS        = -DANSI_HDRS -DUNIX -DLINUX -DANSI_NAMESPACES
+
+
+ZAPROOT        = 
+ZAPLINK        = 
+ZAPINCLUDE     = 
+ZAPDEFS        = 
+
+# The configure file can be used to specify additional libraries or
+# library file locations.
+LIBS          = -lpthread 
+
+# The toolkit can take advantage of MPI parallelization.
+# If MPI is to be used, the preprocessor flag USE_MPI must be defined.
+USE_MPI       = 0
+MPIINCLUDE    = 
+MPILINK       = 
+MPIDEF        = -DUSE_MPI=$(USE_MPI)
+#DEFINITIONS   = $(MPIDEF) $(DEFS) $(USERDEFS) \
+#                -DPST_DEFAULT_PARAMETER_PATH=\"$(PST_PARAMETER_PATH)\" \
+#                $(DIANADEFS) $(ACRODEFS)
+
+DEFINITIONS   = $(MPIDEF) $(DEFS) $(USERDEFS) \
+                $(DIANADEFS) $(ACRODEFS) $(ZAPDEFS)
+
+# This incarnation of the makefile requires find.
+FIND          = find
+
+# Swig is not used in this version of the code.
+#SWIG          = swig
+
+#LD_RUN_PATH    := $(LD_RUN_PATH):$(subst -L,,$(PYTHONLIBDIR)):$(subst -L,,$(GSLLIBDIR)):$(subst -L,,$(QTLIBDIR))
+LD_RUN_PATH    := $(LD_RUN_PATH):$(subst -L,,$(PSTLIBDIR))
+
+###################################################
+###### This is the end of configure options. ######
+###################################################
+
+# The toolkit currently requires pthreads.
+# Eventually, support for other threading models might be added.
+#LDFLAGS       =  -L/usr/local/lib $(PYTHONLINK) $(EXPATLINK) \
+#                $(MPILINK) $(QTLINK) $(GSLLINK) $(PYTHONFLAGS) -lpthread -lm
+LDFLAGS       =  $(PSTLINK)  $(ACROLINK) $(ZAPLINK) -lm -lpthread 
+
+INCLUDE       = -I$(PSTINCLUDE)  $(DIANAINCLUDE) $(ACROINCLUDE) $(ZAPINCLUDE)
+#INCLUDE       = -I$(PSTSRCDIR) $(PYTHONINCLUDE)  \
+#		$(QTINCLUDE) $(MPIINCLUDE) $(GSLINCLUDE) $(DIANAINCLUDE) \
+#		$(ACROINCLUDE) 
+
+ALL_CFLAGS    = $(INCLUDE) $(CFLAGS) 
+ALL_OPT_CFLAGS    = $(INCLUDE) $(OPT_CFLAGS) 
+ALL_PROF_CFLAGS    = $(INCLUDE) $(PROF_CFLAGS) 
+
+INSTALL_PROG  =$(INSTALL)	
+INSTALL_DATA  =$(INSTALL) -m 644
+
+.cc.o:
+	$(CXX) $(DEFINITIONS) -c  $(ALL_CFLAGS) -o $@ $<
+
+#	$(CXX) $(DEFINITIONS) -c  $(ALL_CFLAGS) \
+#        -o $(shell echo $@ | sed s#$(srcdir)#$(builddir)#)  $<
+.cc.prof.o:
+	$(CXX) $(DEFINITIONS) -c  $(ALL_PROF_CFLAGS) -o $@ $<
+
+.prof.o: %.cc
+	$(CXX) $(DEFINITIONS) -c   $(ALL_OPT_CFLAGS) -o $@ $<
+
+.cc.opt.o:
+	$(CXX) $(DEFINITIONS) -c  $(ALL_OPT_CFLAGS) -o $@ $<
+
+.opt.o: %.cc
+	$(CXX) $(DEFINITIONS) -c   $(ALL_OPT_CFLAGS) -o $@ $<
+
+
+%.d: %.cc
+	set -e; rm -f $@; \
+	$(CXX) -MG -MM $(DEFINITIONS)  $(ALL_CFLAGS) $< | \
+        sed 's,.*\.o,$*\.o $*.d ,' > $@
+
+#   
+#	set -e; rm -f $@; \
+#        sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
+#        rm -f $@.$$$$
+#	set -e; $(CXX) -c $(DEFINITIONS)  $(ALL_CFLAGS)  -MG -MM $< \
+#        | sed 's/.*\.o: *\(.*\).cc/\1.o \1.d: /' > $@; \
+#        [ -s $@ ] || rm -f $@
+
+#	$(CXX) -MM -MG $(CXXDEPENDFLAGS) $(DEFINITIONS) $(ALL_CFLAGS) $< | sed 's#^$*.o#$*.o $*.d#g' > $@
+
+ 
+
+#Files for PDOCK - diana files
+DOCKSRCS := $(shell $(FIND) $(DIANADIR) \( -name \*.cc \! \( -path \*tests\* -o -path \*main\* \) \) \-print)
+DOCKOBJS = $(DOCKSRCS:%.cc=%.o)
+DOCKOPTOBJS =$(DOCKSRCS:%.cc=%.opt.o)
+DOCKPROFOBJS =$(DOCKSRCS:%.cc=%.prof.o)
+
+DOCKProgs = PDock PGrid
+DOCKOptProgs = PDock.opt PGrid.opt
+DOCKProfProgs = PDock.prof
+
+TestProgs = TestMolecule TestDockMolecule TestDockAtom TestLabelDef TestMakeGrid \
+            TestReadGrid TestScoreGrid TestMatch TestOrient TestReader \
+            TestReadKeywords TestLabel TestFlex TestTorsionDrive TestFlexMinimize \
+            TestClone  TestClone-pst TestXYZ TestScoreAmber TestRotamerLibrary \
+	TestSidechainDriver TestAASidechainDriver TestAACombiMolecule \
+	WriteAACombiMolecule TestScoreCombiMolecule RotIDtoSSRot \
+	TestAACombiMolecule2 TestAACombiRots TestAACombiOpt TestAACombiOpt2 \
+        TestAACombiMolecule3 TestAACombiOptboltz TestAACombiOptboltz2 \
+	TestSingleBoltz TestFF TestFF2 Testtmp TestProteinDocking TestZap TestZap2 \
+	TestZapScaffold2 TestAACombScore TestZap3 TestZap4 TestProteinDockingSum
+
+TestProfProgs = TestZap3.prof TestProteinDockingSum.prof TestZap2.prof
+
+MAINSRCS := $(shell $(FIND) $(DIANADIR)/tests $(DIANADIR)/main \( -name \*.cc \) \-print)
+
+#keep all default target
+all:	 $(DOCKProgs) 
+
+tests:   $(TestProgs)
+
+doc:	doc-graphic
+
+doc-graphic:
+	doxygen Doxyfile-graphic
+doc-plain:
+	doxygen Doxyfile-plain
+install:
+uninstall:
+install-strip:
+	$(MAKE) INSTALL_PROG='$(INSTALL_PROGRAM) -s'  install
+
+
+#$(TestProgs): %: $(DIANADIR)/tests/%.o $(DOCKOBJS) $(PSTLIBDIR)/libpst.so  tags
+
+$(TestProgs): %: $(DIANADIR)/tests/%.o $(DOCKOBJS) $(PSTLIB)  tags
+	echo $(LD_RUN_PATH)
+	$(CXX) $(DEFINITIONS) $(ALL_CFLAGS) $(DOCKOBJS)  \
+	$< -o $(bindir)/$@  $(LDFLAGS)
+
+$(DOCKProgs): %: $(DIANADIR)/main/%.o $(PSTLIB) $(DOCKOBJS) tags
+	echo $(LD_RUN_PATH)
+	$(CXX) $(DEFINITIONS) $(ALL_CFLAGS) $(DOCKOBJS)  \
+	$< -o $(bindir)/$@  $(LDFLAGS)
+
+$(DOCKOptProgs): %: $(DIANADIR)/main/%.o $(PSTLIB) $(DOCKOPTOBJS) tags
+	echo $(LD_RUN_PATH)
+	$(CXX) $(DEFINITIONS) $(ALL_CFLAGS) $(DOCKOPTOBJS) \
+	$< -o $(bindir)/$@ \
+	$(ACROLINK) $(ZAPLINK) -L$(PSTLIBDIR) -lpst  -lm -lpthread
+#	$(ACROLINK) $(ZAPLINK) -L$(PSTLIBDIR) -lpst -L/usr/local/lib -lm -lpthread
+
+$(DOCKProfProgs): %: $(DIANADIR)/main/%.o $(PSTLIB) $(DOCKPROFOBJS) tags
+	echo $(LD_RUN_PATH)
+	$(CXX) $(DEFINITIONS) $(ALL_PROF_CFLAGS) $(DOCKPROFOBJS)  \
+	$< -o $(bindir)/$@  $(LDFLAGS)
+
+$(TestProfProgs): %: $(DIANADIR)/tests/%.o $(DOCKPROFOBJS) $(PSTLIB)  tags
+	echo $(LD_RUN_PATH)
+	$(CXX) $(DEFINITIONS) $(ALL_PROF_CFLAGS) $(DOCKPROFOBJS)  \
+	$< -o $(bindir)/$@  $(LDFLAGS)
+
+
+#$(PSTLIBDIR)/libpst.so: 
+$(PSTLIB):
+#	$(AR) -r libpst.a $(LIBOBJS)
+#	( cd $(PSTSRCDIR); $(MAKE) lib )
+	( cd $(PSTSRCDIR); $(MAKE) liba )
+
+clean: # swigclean
+	$(FIND) . \( -name '*.o' -o -name '*.d' \) -exec rm -f {} \;
+oclean: # swi
+	$(FIND) . \( -name '*.o'  \) -exec rm -f {} \;
+
+
+distclean: clean
+	rm -f config.cache ../bin/pst
+
+#maintainer-clean:
+
+#TAGS:
+tags:   $(DOCKSRCS) $(MAINSRCS)
+	etags $(MAINSRCS) $(DOCKSRCS) 
+
+#dist:
+
+include  $(DOCKSRCS:%.cc=%.d) $(MAINSRCS:%.cc=%.d)

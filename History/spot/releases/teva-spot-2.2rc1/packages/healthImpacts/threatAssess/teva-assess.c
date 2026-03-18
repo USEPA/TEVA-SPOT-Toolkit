@@ -1,0 +1,367 @@
+/* System Headers */
+#include <stdlib.h>
+#include <ctype.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include <time.h>
+#include <limits.h>
+#include <float.h>
+
+/* TEVA headers */
+#include "teva-assess.h"
+#include "ta_input.h"
+#include "tai.h"
+#include "sss.h"
+#include "ta_utils.h"
+#include "nrutil.h"
+#include "runif_if.h"
+
+
+void ApplyThreshold(PNode node,PNet net,float threshold);
+
+/*
+**--------------------------------------------------------------
+** Module:  TEVA-ASSESS
+** Usage:   teva-assess.exe <input.tai>
+** Input:   
+** Output:
+** Purpose:
+**---------------------------------------------------------------
+*/
+int main(int argc, char **argv)
+{
+    int
+        i,
+        dtime,
+        dtmin,
+        scenario;
+    time_t
+        cpustart,
+        cpustop;
+    double
+        cpuelapsed;
+	char *taiFile,
+		*sssFile;
+
+    /* Data model - see mem structure */
+    Mem       mem;
+    PIO       io;
+    PTSO      tso;
+    PDR       dr;
+	PopulationDataPtr pd;
+    PNode     node;
+    PLink     link;
+	PNetInfo  netinfo;
+    PNodeInfo nodeinfo;
+    PLinkInfo linkinfo;
+    PNet      net;
+    PXA       xa;
+	IngestionDataPtr ing;
+	/** NEW  **/
+	XA	interimXA;
+	PHIST
+		thisHist,
+		prevHist;
+	/** End NEW **/
+    PTA       ta;
+    PU        u;
+    PSource   sources;
+//    float*    nodedata;
+	PInputFileData taiIFD,sssIFD;
+
+	memset(&mem,0,sizeof(Mem));
+    time( &cpustart );
+
+    if((argc!=2)&&
+       (argc!=3))
+      {
+	printf("***Incorrect invocation\n");
+	printf("***Correct usage is: teva-assess <tai-input-file> [sensor-file]\n");
+	return 0;
+      }
+
+    printf("T H R E A T  E N S E M B L E  V U L N E R A B I L I T Y  A N A L Y S I S\n");
+    printf("                               (T E V A)\n");
+    printf("               H E A L T H  I M P A C T  A N A L Y Z E R\n");
+    printf("                              Version 1.0\n\n");
+
+	set_seed(cpustart);
+	printf("Seed: %ld\n",cpustart);
+	taiFile = argv[1];
+	sssFile = argc==3?argv[2]:NULL;
+	taiIFD = loadTAIFileData(taiFile);
+	if(sssFile != NULL)
+		sssIFD = loadSSSFileData(sssFile);
+	mem.tso = OpenTSOFile(taiIFD,"TSONAME");
+	TSO_ReadPrologue(mem.tso,&netinfo,&mem.nodeinfo,&mem.linkinfo);
+	InitializeAssessMemory(&mem,netinfo);
+	processTAIData(taiIFD,&mem);
+	freeInputFileData(&taiIFD);
+	if(sssFile != NULL) {
+		processSensorSetData(sssIFD,&mem);
+		freeInputFileData(&sssIFD);
+	}
+    /* Copy data model addresses from mem for convenience */
+    io=mem.io;
+    dr=mem.dr;
+	pd=mem.popData;
+    node=mem.node;
+    link=mem.link;
+    net=mem.net;
+    xa=mem.xa;
+    ta=mem.ta;
+    u=mem.u;
+	ing=mem.ingestionData;
+    sources=mem.sources;
+//    nodedata=mem.nodedata;
+	tso=mem.tso;
+	nodeinfo=mem.nodeinfo;
+	linkinfo=mem.linkinfo;
+	/** NEW **/
+	prevHist = NULL;
+	/** End NEW **/
+
+    /* Estimate Population */
+    Population(net,pd,node);
+
+	initializeIngestionData(ing,net, node, dr,pd);
+    /*****************************************************/
+    /*  Health Impact analysis for existing sensors      */
+    /*****************************************************/
+    printf("Health Impact Analysis for Scenario..\n");
+    scenario=0;
+    initialize(net,dr,xa,ta);
+	/** NEW **/
+	initXA(&interimXA,dr->maxsteps);
+//	dot=NULL;
+//	if(mem.dot != NULL) {
+//		dot=(int **)calloc(mem.dot->numThresh,sizeof(int *));
+//		for(i=0;i<mem.dot->numThresh;i++) {
+//			dot[i]=(int *)calloc(tso->count,sizeof(int));
+//		}
+//	}
+	/** End NEW **/
+	printf("Concentration Threshold: %f\n",mem.concentrationThreshold);
+	while (TSO_ReadSimulationResults(tso,net->info,nodeinfo,sources)) {
+		/** NEW **/
+		char tstr[100];
+		ApplyThreshold(node,net,mem.concentrationThreshold);
+
+		resetXA(&interimXA,dr->maxsteps);
+		/** End NEW **/
+
+        scenario++;
+        /* Sampling network detection time is minimum among all sensors */
+        dtmin=INT_MAX;
+        for(i=0;i<net->info->nnodes;i++) {
+            if((node[i].sensor.type==existing || node[i].sensor.type==selected) && node[i].info->nz[0]) {
+                if( (dtime=Detect(net,&node[i]))<dtmin ) dtmin=dtime;
+            }
+        }
+		/** NEW **/
+		/* for each scenario read, enlarge size of histogram data structures */
+		/* if (analyzed-1 > net->nnodes-1){
+		MEMCHECK(hist = (PHIST)realloc(hist, (size_t) (analyzed+1)*sizeof(HIST)));  } */
+		thisHist = (PHIST)calloc(1,sizeof(HIST));
+		tstr[0]=0;
+		for(i=0;i<net->info->nsources;i++) {
+			if(i>0) strcat(tstr,",");
+			strcat(tstr,node[sources[i].SourceNodeIndex-1].info->id);
+		}
+		thisHist->simID = (char *)calloc(strlen(tstr)+1,sizeof(char));
+		strcpy(thisHist->simID,tstr);
+		if(prevHist==NULL) {
+			mem.hist = thisHist;
+		} else {
+			prevHist->next=thisHist;
+		}
+		prevHist = thisHist;
+		/** End NEW **/
+
+        /* Time-dependent cumulative expected dose and disease response */
+        resetDoseOverThreshold(&mem);
+        resetDoseBinData(&mem);
+        for(i=0;i<net->info->nnodes;i++) {
+			float pop=node[i].pop;
+            if(node[i].info->nz[0] && pop>0) {
+                Dose(ing->ingestionData[i],ing,&node[i],net,dtmin,u,mem.dot,i,mem.doseBins);
+                Response(ing->ingestionData[i],ing,dr,&node[i],u);
+                DiseaseRM(net,dr,u);
+            }
+			/** UPDATED **/
+			Accumulate(i,node[i].info->nz[0],net,dr,node[i].pop,u,&interimXA,ta,thisHist); /* RM 11/9/04 add scenario remove ta*/
+			/** End UPDATED **/
+        }
+
+		/** NEW **/
+		AccumulateFinal(net,dr,xa,&interimXA);
+		if(mem.dot) {
+			thisHist->dot=(int *)calloc(mem.dot->numThresh,sizeof(int));
+			for(i=0;i<mem.dot->numThresh;i++) {
+				thisHist->dot[i]=mem.dot->totOver[i];
+			}
+		}
+		if(mem.doseBins) {
+			thisHist->doseBins=(int *)calloc(mem.doseBins->numBins,sizeof(int));
+			for(i=0;i<mem.doseBins->numBins;i++) {
+				thisHist->doseBins[i]=mem.doseBins->data[i];
+			}
+		}
+		
+		/** End NEW **/
+		if (MOD(scenario,100)==0) {
+			time( &cpustop );
+			cpuelapsed = difftime(cpustop,cpustart);
+			printf("%5u %6.0fs\n",scenario,cpuelapsed);
+			fflush(stdout);
+		}
+    }  /* End of while */
+    net->nscenario=scenario;
+    printf("\n");
+
+    /* Simple ASCII Output          */
+    /* Ensemble Averages */
+    for(i=0;i<dr->maxsteps;i++) {
+        xa->dos[i]/=(float)net->nscenario;
+        xa->res[i]/=(float)net->nscenario;
+        xa->s[i]/=(float)net->nscenario;
+        xa->i[i]/=(float)net->nscenario;
+        xa->d[i]/=(float)net->nscenario;
+        xa->f[i]/=(float)net->nscenario;
+    }
+    for(i=0;i<net->info->nnodes;i++) {
+        ta->dos[i]/=(float)net->nscenario;
+        ta->res[i]/=(float)net->nscenario;
+        ta->s[i]/=(float)net->nscenario;
+        ta->i[i]/=(float)net->nscenario;
+        ta->d[i]/=(float)net->nscenario;
+        ta->f[i]/=(float)net->nscenario;
+    }
+	if(mem.sap->fn[0] != '\0') {
+		PHIST p;
+		int nscenarios=0;
+		float meanInfections=0,maxInfections=0;
+
+	    FILEOPEN(mem.sap->stream = fopen(mem.sap->fn, "wt"));
+		for(p=mem.hist;p!=NULL;p=p->next) {
+			float infections = p->fh/dr->frate;
+			nscenarios++;
+	        meanInfections += infections;
+			if(infections > maxInfections)
+				maxInfections = infections;
+		}
+		if(mem.sap->meanInfections)
+			fprintf(mem.sap->stream,"MeanInfections   %f\n",meanInfections/nscenarios);
+		if(mem.sap->maxInfections)
+			fprintf(mem.sap->stream,"MaxInfections    %f\n",maxInfections);
+		fclose(mem.sap->stream);
+	}
+	if(mem.io->taoname[0] != '\0') {
+		PHIST p;
+	    FILEOPEN(mem.io->taostream = fopen(mem.io->taoname, "wt"));
+	    fprintf(io->taostream,"%d\n",net->info->nnodes);
+		fprintf(io->taostream,"%d\n",dr->maxsteps);
+		fprintf(io->taostream,"%d\n",net->nscenario);
+
+		for(i=0;i<dr->maxsteps;i++) fprintf(io->taostream,"%e ",xa->s[i]);
+		fprintf(io->taostream,"\n");
+		for(i=0;i<dr->maxsteps;i++) fprintf(io->taostream,"%e ",xa->i[i]);
+		fprintf(io->taostream,"\n");
+		for(i=0;i<dr->maxsteps;i++) fprintf(io->taostream,"%e ",xa->d[i]);
+		fprintf(io->taostream,"\n");
+		for(i=0;i<dr->maxsteps;i++) fprintf(io->taostream,"%e ",xa->f[i]);
+		fprintf(io->taostream,"\n");
+		for(i=0;i<dr->maxsteps;i++) fprintf(io->taostream,"%e ",xa->dos[i]);
+		fprintf(io->taostream,"\n");
+		for(i=0;i<dr->maxsteps;i++) fprintf(io->taostream,"%e ",xa->res[i]);
+		fprintf(io->taostream,"\n");
+		/** MODIFIED **/
+		for(i=0;i<net->info->nnodes;i++) {
+			fprintf(io->taostream,"%d\t%s\t%e\t%e\t%e\t%e\t%e\t%e\n",
+				i,mem.node[i].info->id,ta->s[i],ta->i[i],ta->d[i],ta->f[i],ta->dos[i],ta->res[i]);
+		}
+		/** End MODIFIED **/
+		/** NEW **/
+		fprintf(io->taostream,"Scenario Results\n");
+
+		fprintf(io->taostream,"ID\tFatalities\tDosage\tResponse");
+		if(mem.dot) {
+			fprintf(io->taostream,"\t");
+			for(i=0;i<mem.dot->numThresh;i++){
+				fprintf(io->taostream,"\tDoseOver_%f",mem.dot->thresholds[i]);
+			}
+		}
+		fprintf(io->taostream,"\n");
+		for(p=mem.hist;p!=NULL;p=p->next) {
+			fprintf(io->taostream,"%s\t%f\t%f\t%f",p->simID,p->fh,p->dosh,p->resh);
+			if(mem.dot) {
+				fprintf(io->taostream,"\t");
+				for(i=0;i<mem.dot->numThresh;i++){
+					fprintf(io->taostream,"\t%d",p->dot[i]);
+				}
+			}
+			fprintf(io->taostream,"\n");
+		}
+		if(mem.doseBins) {
+			PDoseBinData db=mem.doseBins;
+			fprintf(io->taostream,"DoseHistogram\n");
+			fprintf(io->taostream,"ID\tResponse");
+			fprintf(io->taostream,"\t");
+			if(db->responseBins) {
+				for(i=1;i<db->numBins;i++) {
+					fprintf(io->taostream,"\t(%.3f,%.3f]",db->responseBins[i-1],db->responseBins[i]);
+				}
+				fprintf(io->taostream,"\t>%.3f\n",db->responseBins[i-1]);
+			}
+			fprintf(io->taostream,"\t\tMin Dosage");
+			for(i=0;i<db->numBins;i++) {
+				fprintf(io->taostream,"\t%f",db->doseBins[i]);
+			}
+			fprintf(io->taostream,"\n");
+			fprintf(io->taostream,"\t\tMax Dosage");
+			for(i=1;i<db->numBins;i++) {
+				fprintf(io->taostream,"\t%f",db->doseBins[i]);
+			}
+			fprintf(io->taostream,"\n");
+			for(p=mem.hist;p!=NULL;p=p->next) {
+				fprintf(io->taostream,"%s\t%f\t",p->simID,p->resh);
+				for(i=0;i<db->numBins;i++) {
+					fprintf(io->taostream,"\t%d",p->doseBins[i]);
+				}
+				fprintf(io->taostream,"\n");
+			}		
+		}
+		
+		fclose(io->taostream);
+		/** Wnd NEW **/
+	}
+	TSO_Close(&tso);
+    time( &cpustop );
+    cpuelapsed = difftime(cpustop,cpustart);
+    printf("\nElapsed time for sensor location / health impact analysis (seconds): %e\n",cpuelapsed);
+    printf("T E V A  Normal  Termnation\n");
+
+	freeXA(&interimXA,dr->maxsteps);
+	FreeAssessMemory(&mem);
+	freeHistogramData(mem.hist);
+	TSO_ReleaseNetworkData(&nodeinfo,&linkinfo,netinfo);
+	TSO_ReleaseNetworkInfo(&netinfo);
+    return(0);
+}
+
+void ApplyThreshold(PNode node,PNet net,float threshold)
+{
+	int nnodes = net->info->nnodes;
+	int i,t;
+    for(i=0;i<nnodes;i++) {
+		float *c = node[i].info->c[0];
+		int nz=0;
+		for(t=0;t<net->info->nsteps;t++) {
+			if(c[t] < threshold) c[t]=0;
+			if(c[t]>0) nz=1;
+		}
+		node[i].info->nz[0]=nz;
+    }
+}

@@ -1,0 +1,240 @@
+##
+## Root Makefile
+##
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+##
+## Customizations
+##
+PACKAGE_NAME=utilib
+
+
+##
+## install		cleanup and compile packages, libraries and examples
+## install_libraries	compile libraries in packages, and libraries
+## libraries		compile libraries
+##
+
+
+default: library_dir
+	if [ ! -r $(LIBDIR)/libutilib.a ] && [ ! -r $(LIBDIR)/utilib.lib ]; then \
+	   $(MAKE) install; \
+	else \
+	   $(MAKE) library; \
+	fi
+
+library_dir:
+	@(if [ ! -d $(LIBDIR) ]; then \
+	   mkdir -p $(LIBDIR); \
+	fi)
+	@cp -f config.summary $(LIBDIR)
+
+install:	clean scripts
+	@$(ECHO) "=================================="
+	@$(ECHO) "=================================="
+	@$(ECHO) "= Install $(PACKAGE_NAME) Package - BEGIN ="
+	@$(ECHO) "=================================="
+	@$(ECHO) "=================================="
+	@$(ECHO) "=========Start Time==============="
+	@date
+	@$(ECHO) "=================================="
+	@$(MAKE) library_dir
+	@$(RM) -f $(LIBDIR)/*
+	(cd src; $(MAKE) install);
+	@$(ECHO) "=================================="
+	@$(ECHO) "=================================="
+	@$(ECHO) "= Install $(PACKAGE_NAME) Package - END   ="
+	@$(ECHO) "=================================="
+	@$(ECHO) "=================================="
+	@$(ECHO) "=========Finish Time=============="
+	@date
+	@$(ECHO) "=================================="
+
+library:
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	@$(ECHO) "= Libraries $(PACKAGE_NAME) Package - BEGIN ="
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	@$(MAKE) library_dir
+	(cd src; $(MAKE) libraries)
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	@$(ECHO) "= Libraries $(PACKAGE_NAME) Package - END   ="
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+
+install_library:
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	@$(ECHO) "= Install Libraries $(PACKAGE_NAME) Package - BEGIN ="
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	@$(MAKE) library_dir
+	@$(RM) -f $(LIBDIR)/*
+	(cd src; $(MAKE) install_libraries)
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	@$(ECHO) "= Install Libraries $(PACKAGE_NAME) Package - END   ="
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+
+executables:
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	@$(ECHO) "= Checking $(PACKAGE_NAME) Package - BEGIN ="
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	(cd src;  $(MAKE) executables)
+	(cd test; $(MAKE) executables)
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	@$(ECHO) "= Install $(PACKAGE_NAME) Package - END   ="
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	
+test:
+	(cd test; $(MAKE) test)
+
+check:
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	@$(ECHO) "= Checking $(PACKAGE_NAME) Package - BEGIN ="
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	(cd test; $(MAKE) check)
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	@$(ECHO) "= Install $(PACKAGE_NAME) Package - END   ="
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	
+##
+## Create the utilib python module
+##
+python:
+	(cd src; $(MAKE) shared_libraries)
+	(cd src/python; $(MAKE) python_module)
+
+install_python:
+	$(MAKE) install
+	(cd src; $(MAKE) install_shared_libraries)
+	(cd src/python; $(MAKE) python_module)
+
+##
+## Create statically linked python executable
+##
+pyutilib:
+	$(MAKE) default
+	(cd src/python; $(MAKE) pyutilib)
+tar:
+	@$(ECHO) ""
+	@$(ECHO) "TAR'ing Source Directory -- $(ROOT_DIR)"
+	@$(ECHO) "------------------------"
+	$(RM) utilib.tar
+	if [ "$(TEMPDIR)" = "" ]; then \
+	   TMPDIR=/tmp; \
+	else \
+	   TMPDIR=$(TEMPDIR); \
+        fi;  \
+	$(RM) $${TMPDIR}/utilib.tar; \
+	(cd ${ROOT_DIR}/..; \
+	tmp=`ls utilib | grep -v "^lib" | grep -v "^archive" | awk '{print "utilib/"$$1}'`;\
+	tar cfo - $$tmp; ) | gzip > $${TMPDIR}/utilib.tar.gz; \
+	mv $${TMPDIR}/utilib.tar.gz utilib.tar.gz
+
+
+tape:
+	@$(ECHO) ""
+	@$(ECHO) "TAR'ing Source Directory -- $(ROOT_DIR)"
+	@$(ECHO) "------------------------"
+	$(RM) utilib.tar
+	if [ "$(TEMPDIR)" = "" ]; then \
+	   TMPDIR=/tmp; \
+	else \
+	   TMPDIR=$(TEMPDIR); \
+        fi;  \
+	$(RM) $${TMPDIR}/utilib.tar; \
+	(cd ${ROOT_DIR}/..; \
+	tmp=`ls utilib | grep -v "^lib" | grep -v "^archive" | awk '{print "utilib/"$$1}'`;\
+	tar cfo /dev/rst0 $$tmp; )
+
+
+##
+## Remove core files (assume libraries are removed at a lower level
+##
+clean:
+	@$(ECHO) "================================="
+	@$(ECHO) "================================="
+	@$(ECHO) "= Clean $(PACKAGE_NAME) Package - BEGIN  ="
+	@$(ECHO) "================================="
+	@$(ECHO) "================================="
+	- $(RM) -R core *.o tmp $(LIBDIR)/*.lib $(LIBDIR)/*.a $(LIBDIR)/*.so $(LIBDIR)-shared/* $(LIBDIR)/*.o $(INCDIR)/utilib
+	(cd src; $(MAKE) clean)
+	(cd test; $(MAKE) clean)
+	@$(ECHO) "================================="
+	@$(ECHO) "================================="
+	@$(ECHO) "= Clean $(PACKAGE_NAME) Package - END    ="
+	@$(ECHO) "================================="
+	@$(ECHO) "================================="
+
+##
+## Prepare the SGOpt library for tarring and/or storing into the
+## CVS repository
+##
+distclean:	
+	@$(ECHO) "============================================="
+	@$(ECHO) "============================================="
+	@$(ECHO) "= Distribution Clean $(PACKAGE_NAME) Package - BEGIN ="
+	@$(ECHO) "============================================="
+	@$(ECHO) "============================================="
+	(cd src; $(MAKE) distclean)
+	- $(RM) lib/* core *.o Templates.DB ptrepository tempinc \
+		config.status config/mf-* Makefile-* Makefile-${target_name}\
+		config
+	@$(ECHO) "============================================="
+	@$(ECHO) "============================================="
+	@$(ECHO) "= Distribution Clean $(PACKAGE_NAME) Package - END   ="
+	@$(ECHO) "============================================="
+	@$(ECHO) "============================================="
+
+##
+## Process t/csh scripts
+##
+scripts:
+	@if [ ! -x bin/doinstemp ] ; then\
+	   (cd bin; ./mkscripts) ; \
+	fi
+
+
+##
+## Recursively translate CRLF to LF in all files
+##
+dos2unix:
+	@(cd src; for FILE in `find . -name "*.[hHcCf]" -print ` `find . -name "*.cpp" -print`; do\
+	   dos2unix $${FILE} $${FILE};\
+	done) > /dev/null 2>&1
+
+
+##
+## Make PDF documentation
+##
+pdf:
+	@(cd src; $(MAKE) global_header)
+	@(cd doc; make pdf)
+	
+##
+## Make postscript documentation
+##
+ps:
+	@(cd src; $(MAKE) global_header)
+	@(cd doc; make ps)
+	
+##
+## Make html documentation
+##
+html:
+	@(cd src; $(MAKE) global_header)
+	@(cd doc; make web)
+	

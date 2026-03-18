@@ -1,0 +1,8 @@
+CC      =       cicc
+CXX     =       ciCC
+CPPFLAGS=       
+CXXFLAGS=       -O2 +p -rwstl -tlocal
+LDFLAGS =       -lm
+AR      =       xar
+ARFLAGS =       ruv
+RANLIB  =       xranlib

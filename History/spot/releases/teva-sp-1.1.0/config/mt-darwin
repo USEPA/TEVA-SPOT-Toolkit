@@ -1,0 +1,39 @@
+#-----------------------------------------------------#
+# Target ARCHitecture dependent definitions - DARWIN  #
+#-----------------------------------------------------#
+
+AR		= ar
+ARFLAGS		= ruv
+RANLIB		= ranlib -s
+ARCLEAN		= $(RM)
+
+CC              = gcc
+CWARNINGS       = -x c $(C++WARNINGS) -Wstrict-prototypes -Wmissing-prototypes
+CC_SHARED	= -shared
+ 
+CCC             = g++
+C++             = $(CCC)
+C++WARNINGS     = -Wall -fexceptions -Wno-long-double
+C++_SHARED	= -shared
+ 
+F77		= g77 #gfortran #f77
+FFLAGS		= -O4 #-libmil #-u
+F_SHARED	=
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= 
+LDFLAGS		=
+OPTIMIZATION	= -O
+
+ARCH_LIB_PATH	=
+ARCH_LIBS	= -L/sw/lib -lg2c #-ll
+ARCH_INCLUDES	= -I. -I/usr/include/X11R5
+ARCH_FLAGS	= -DUNIX -DDARWIN -DMULTITASK -DANSI_HDRS -DANSI_NAMESPACES
+XTRAFLAGS	= 
+PROFILE_FLAG	= -pg
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard

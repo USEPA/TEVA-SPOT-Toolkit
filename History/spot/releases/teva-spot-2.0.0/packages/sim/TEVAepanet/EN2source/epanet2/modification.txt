@@ -1,0 +1,53 @@
+Modification No. 1
+Date 02/10/2005
+file hydraulic.c
+function fcvcoeff()
+purpose: Numerical treatment to avoid singular Jacobian in Newton-raphson
+	 method which is used in hydraulic solver.
+
+Modification No. 2:
+Date 04/05/2005
+file: epanet.c 
+function: ENgetlinkvalue()
+purpose: Add the functionality to retrieve average link water quality.
+
+Modification No. 3:
+Date 04/05/2005
+file: toolkit.h 
+function: NA
+purpose: Define EN_LINKQUAL 14. EN_LINKQUAL is added so that average link water
+         quality can be read using function ENgetlinkvalue().
+
+Modification No. 4:
+Date 04/05/2005
+file: hash.c 
+function: hash()
+purpose: Allow the size of component IDs to be larger than 15 characters.
+
+Modification No. 5:
+Date 04/05/2005
+file: types.h 
+function: NA
+purpose: Change the maximum numer of characters of ID names from 15 to 31.
+
+Modification No. 6:
+Date 04/05/2005
+file: output.c 
+function: savenetdata()
+purpose: Although the maximum numer of characters of ID names is changed to 31, the format
+	 of outfile is kept unchanged. So ID names up to first 15 characters are written
+         to the outfile.
+
+Modification No. 7:
+Date 04/22/2005
+file: input3.c 
+function: valvecheck()
+purpose: Prevent the situations in which FCV is connected to the upstream of PSV
+	 or downstream of PRV.
+
+
+Modification No. 8:
+Date 07/?/2005
+file: quality.c 
+function: release()
+purpose:  Prevents infinite contaminant release when concentrations get low.

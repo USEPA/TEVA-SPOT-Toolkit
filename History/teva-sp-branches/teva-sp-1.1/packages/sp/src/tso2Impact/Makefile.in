@@ -1,0 +1,34 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+LIBRARY=libsp
+
+SRCS=Objectives.cpp impacts.cpp scenario.cpp SPProblem.cpp
+
+include ../MakeMacros
+
+
+LDLIBS = -lsp $(PACKAGE_LIBS) -lthreatassess -ltevautil -lepanet -lm
+EXECUTABLES= tso2Impact.exe evalsensor.exe setupIPData.exe
+
+all:	executables
+
+clean:
+	@$(RM) -Rf *.o *.ii *.ti SunWS_cache *.i
+	@$(RM) -Rf $(EXECUTABLES)
+	@$(RM) -Rf $(EXECUTABLES:.exe=)
+
+executables:
+	$(MAKE) $(EXECUTABLES:.exe=)
+	cp $(EXECUTABLES:.exe=) $(ROOT_DIR)/bin
+
+
+tso2Impact: tso2Impact.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+evalsensor: evalsensor.o 
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+
+setupIPData: setupIPData.o
+	$(LINK.cc) -o $@ $@.o $(LDLIBS)
+

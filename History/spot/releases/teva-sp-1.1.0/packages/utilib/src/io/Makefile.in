@@ -1,0 +1,18 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+LIBRARY=libutilib
+
+#
+# Define objects and headers
+#
+SRCS= sync_io.cpp PackBuf.cpp comments.cpp CommonIO.cpp mpiUtil.cpp logEvent.cpp paramTable.cpp nicePrint.cpp ParameterSet.cpp ParameterList.cpp
+
+#
+# Define compiler flags
+#
+#OPTIMIZATION= -g
+
+include ../MakeMacros
+include Makefile.dependencies
+

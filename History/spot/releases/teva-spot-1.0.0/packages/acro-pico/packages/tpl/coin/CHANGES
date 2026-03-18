@@ -1,0 +1,88 @@
+$Id: CHANGES,v 1.2 2006/09/22 16:28:18 lafisk Exp $
+
+COIN_2006Sep06
+
+We had to change 3 configure scripts, so that tests
+that compile code would link with libraries in the LIBS variable.
+The underlying macro that needs to be changed is COIN_HAS_USER_LIBRARY,
+but I couldn't run autoreconf on the directory, so I had to change
+the configure scripts themselves.
+
+I sent a message to Coin-discuss@list.coin-or.org to ask if they
+could change COIN_HAS_USER_LIBRARY to use the LIBS variable with
+compilations.
+
+===================================================================
+RCS file: /space/CVS-Acro/acro/packages/tpl/coin/COIN_2006Sep06/Osi/configure,v
+retrieving revision 1.1.1.1
+diff -r1.1.1.1 configure
+20595c20595
+<                     LIBS="$CPXLIB $ADDLIBS"
+---
+>                     LIBS="$CPXLIB $ADDLIBS $coin_save_LIBS"
+20752c20752
+<                     LIBS="$GLPKLIB $ADDLIBS"
+---
+>                     LIBS="$GLPKLIB $ADDLIBS $coin_save_LIBS"
+20980c20980
+<                     LIBS="$MSKLIB $ADDLIBS"
+---
+>                     LIBS="$MSKLIB $ADDLIBS $coin_save_LIBS"
+21137c21137
+<                     LIBS="$OSLLIB $ADDLIBS"
+---
+>                     LIBS="$OSLLIB $ADDLIBS $coin_save_LIBS"
+21391c21391
+<                     LIBS="$XPRLIB $ADDLIBS"
+---
+>                     LIBS="$XPRLIB $ADDLIBS $coin_save_LIBS"
+===================================================================
+RCS file: /space/CVS-Acro/acro/packages/tpl/coin/COIN_2006Sep06/Cgl/configure,v
+retrieving revision 1.1.1.1
+diff -r1.1.1.1 configure
+20592c20592
+<                     LIBS="$CPXLIB $ADDLIBS"
+---
+>                     LIBS="$CPXLIB $ADDLIBS $coin_save_LIBS"
+20749c20749
+<                     LIBS="$GLPKLIB $ADDLIBS"
+---
+>                     LIBS="$GLPKLIB $ADDLIBS $coin_save_LIBS"
+20977c20977
+<                     LIBS="$MSKLIB $ADDLIBS"
+---
+>                     LIBS="$MSKLIB $ADDLIBS $coin_save_LIBS"
+21134c21134
+<                     LIBS="$OSLLIB $ADDLIBS"
+---
+>                     LIBS="$OSLLIB $ADDLIBS $coin_save_LIBS"
+21388c21388
+<                     LIBS="$XPRLIB $ADDLIBS"
+---
+>                     LIBS="$XPRLIB $ADDLIBS $coin_save_LIBS"
+Index: Cbc/configure
+===================================================================
+RCS file: /space/CVS-Acro/acro/packages/tpl/coin/COIN_2006Sep06/Cbc/configure,v
+retrieving revision 1.1.1.1
+diff -r1.1.1.1 configure
+20638c20638
+<                     LIBS="$CPXLIB $ADDLIBS"
+---
+>                     LIBS="$CPXLIB $ADDLIBS $coin_save_LIBS"
+20795c20795
+<                     LIBS="$GLPKLIB $ADDLIBS"
+---
+>                     LIBS="$GLPKLIB $ADDLIBS $coin_save_LIBS"
+21023c21023
+<                     LIBS="$MSKLIB $ADDLIBS"
+---
+>                     LIBS="$MSKLIB $ADDLIBS $coin_save_LIBS"
+21180c21180
+<                     LIBS="$OSLLIB $ADDLIBS"
+---
+>                     LIBS="$OSLLIB $ADDLIBS $coin_save_LIBS"
+21434c21434
+<                     LIBS="$XPRLIB $ADDLIBS"
+---
+>                     LIBS="$XPRLIB $ADDLIBS $coin_save_LIBS"
+

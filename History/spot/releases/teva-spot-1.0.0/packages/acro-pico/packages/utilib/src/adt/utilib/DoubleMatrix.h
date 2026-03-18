@@ -1,0 +1,33 @@
+/*  _________________________________________________________________________
+ *
+ *  UTILIB: A utility library for developing portable C++ codes.
+ *  Copyright (c) 2001, Sandia National Laboratories.
+ *  This software is distributed under the GNU Lesser General Public License.
+ *  For more information, see the README file in the top UTILIB directory.
+ *  _________________________________________________________________________
+ */
+
+/**
+ * \file DoubleMatrix.h
+ *
+ * Defines the \c DoubleMatrix typedef
+ */
+
+#ifndef utilib_DoubleMatrix_h
+#define utilib_DoubleMatrix_h
+
+#include <utilib/utilib_config.h>
+#include <utilib/Num2DArray.h>
+
+namespace utilib {
+
+/**
+ * \typedef DoubleMatrix
+ *
+ * Type for Num2DArray<double> classes.
+ */
+typedef Num2DArray<double> DoubleMatrix;
+
+} // namespace utilib
+
+#endif

@@ -1,0 +1,23 @@
+To create the configure script and Makefiles:
+
+autoreconf -i -f -s
+
+For mingw builds use these configure flags:
+
+--target=-i686-pc-mingw32 --host=-686-pc-mingw32 --with-compiler=mingw
+
+For all builds use this configure flag (TODO: put in configure.ac):
+
+--with-cppflags="-I JNI_INCLUDE_PATHs"
+
+For builds resulting in shared libraries add this configure flag:
+
+--enable-shared
+
+If you are building shared libraries you should probably
+disable executables.  On cygwin/mingw systems, the executables
+are a complicated collection of libtool created stubs and
+scripts which only work if you run them in the directory
+in which they were created.
+
+--disable-executables

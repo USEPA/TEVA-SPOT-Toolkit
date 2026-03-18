@@ -1,0 +1,145 @@
+
+UTILIB 3.0
+
+A C++ software library that provides general, portable utilities for
+developing C++ codes.  UTILIB provides utilities for random number
+generation, abstract data types (including dense arrays and matrices),
+sorting routines, I/O (including parallel I/O), common numerical routines
+and for masking system-specific differences in operating systems.
+
+UTILIB has largely been developed to support the optimization 
+solver libraries.  UTILIB is managed within the Acro optimization repository.
+For further details, see:
+
+  http://software.sandia.gov/Acro/UTILIB
+
+
+------------------------------------------------------------------------------
+William E. Hart (lead developer)
+
+  Sandia National Laboratories
+  wehart@sandia.gov 
+
+------------------------------------------------------------------------------
+License.
+
+UTILIB is distributed under the GNU Lesser General Public License.  It is
+free software; you can redistribute it and/or modify it under the terms of
+the GNU Lesser General Public License as published by the Free Software
+Foundation; either version 1 of the License, or (at your option) any
+later version.  A copy of this license is included in the LICENSE file,
+and is also available online from http://www.gnu.org/copyleft/lesser.html.
+Also refer to the COPYRIGHT file for important U.S. Government legal
+notices.
+
+UTILIB contains software from the RANLIB library, which has been published
+by ACM Tran. Math. Software.   General permission  to copy and  distribute
+the algorithm without fee is granted provided that the copies  are not
+made  or   distributed for  direct   commercial  advantage.  See the Acro
+licensing web page for complete details:
+
+  http://software.sandia.gov/Acro/html/Documentation/LicenseInfo.html
+
+------------------------------------------------------------------------------
+The principle directories contained in this distribution are
+
+bin			Executables used to configure/compile UTILIB.
+
+doc			Documentation about UTILIB.  See below.
+
+include			A common directory where include files are copied
+			(to faciliate the use of UTILIB as a library).
+
+lib			Contains the compiled source archived in a library.
+
+src			The source directories:
+
+src/adt			Abstract data types (arrays, heaps, hash tables, etc)
+
+src/io			Misc I/O support utilities (esp. the CommonIO tool)
+
+src/math		Misc mathematical routines.
+
+src/ranlib		Random number generators.
+
+src/sys			Misc utilities for maintaining portability between
+			various systems.
+
+test			Test utilities for validating the functionality of
+			the UTILIB source.
+
+------------------------------------------------------------------------------
+Installation.
+
+The installation procedure is very similar to the GNU installation.
+If you have a tar file
+
+	utilib-3-0.tar.gz
+
+then you can extract the source files with
+
+	zcat | tar xvBf -
+
+You should be able to configure UTILIB for your particular system by
+typing
+
+	./configure
+        make
+
+in the top level directory.  See the file INSTALL for further details
+on how to install this software.
+
+------------------------------------------------------------------------------
+Dependencies.
+
+UTILIB is not dependent on any other software, but it can be 
+configured to work with MPI libraries.
+
+------------------------------------------------------------------------------
+Platforms.
+
+This package is quite generic and thus it should compile on a wide range
+of platforms.  UTILIB is actively being developed for the following platforms:
+
+        PC       Linux (32bit and 64bit)
+                 Cygwin
+                 MINGW
+        SUN      Solaris
+        SGI      IRIX
+
+------------------------------------------------------------------------------
+Release Changes
+
+Significant changes in this version are documented in the UTILIB User Manual.
+
+------------------------------------------------------------------------------
+Documentation.
+
+The UTILIB user manual is available online from the UTILIB home page:
+
+        http://software.sandia.gov/Acro/UTILIB
+
+Additionally, this documentation can be generated with the command:
+
+        make docs
+  
+A pdf version of the UTILIB User Manual is available at
+
+        utilib/doc/userman.pdf.gz
+
+------------------------------------------------------------------------------
+Further Help.
+
+This is a RESEARCH code and is the subject of continuing
+active development.  Bug reports, suggestions for improvement, and
+required changes for other machines/compilers are welcome, but these issues
+will be addressed as funding and time permit.
+
+The UTILIB help mailing list is
+
+        utilib-help@software.sandia.gov
+
+Additionally, bugs can be reported via Bugzilla, at
+
+	http://software.sandia.gov/bugzilla
+

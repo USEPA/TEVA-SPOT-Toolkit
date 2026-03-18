@@ -1,0 +1,20 @@
+#!/bin/csh -v
+
+mkdir test
+
+cvs.a -Q checkout acro-coliny
+cvs.ad -Q checkout autodock
+cd autodock
+#config_acro
+
+cd ../acro
+./setup  --name=acro-coliny-app-autodock configure --with-debugging
+make >&! test/build.out
+cd ../autodock
+
+pwd
+make COLINY=yes >>& ../acro/test/build.out
+../acro/packages/exact/src/testing/testdriver --o=../acro/test --I=../acro/packages/exact/src/testing --name=acro-coliny-app-autodock build --logfile=../acro/test/build.out
+
+mv ../acro/test/*out ../test
+mv ../acro/test/*xml ../test

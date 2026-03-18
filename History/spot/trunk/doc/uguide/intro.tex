@@ -1,0 +1,61 @@
+Drinking water distribution systems are inherently vulnerable to accidental or intentional contamination because of their distributed geography. Further, there are many challenges to detecting contaminants in drinking water systems: municipal distribution systems are large, consisting of hundreds or thousands of miles of pipe; flow patterns are driven by time-\/varying demands placed on the system by customers; and distribution systems are looped, resulting in mixing and dilution of contaminants. The use of on-\/line, real-\/time contaminant warning systems (CWSs) is a promising strategy for mitigating these risks. Online sensor data can be combined with public health surveillance systems, physical security monitoring, customer complaint surveillance, and routine sampling programs to effect a rapid response to contamination incidents \citep{EPA}.
+
+A variety of technical challenges need to be addressed to make CWSs a practical, reliable element of water security systems. A key aspect of CWS design is the strategic placement of sensors throughout the distribution network. Given a limited number of sensors, a desirable sensor placement minimizes the potential economic and public health impacts of a contaminant incident. There are a wide range of important design objectives for sensor placements (e.g., minimizing the cost of sensor installation and maintenance, the response time to a contamination incident, and the extent of contamination). In addition, flexible sensor placement tools are needed to analyze CWS designs in large scale networks.
+
+\section{What is TEVA-\/SPOT?}\label{intro_introTEVASPOT}
+The Threat Ensemble Vulnerability Assessment and Sensor Placement Optimization Tool (TEVA-\/SPOT) has been developed by the U. S. Environmental Protection Agency, Sandia National Laboratories, Argonne National Laboratory, and the University of Cincinnati. TEVA-\/SPOT has been used to develop sensor network designs for several large water   utilities~\cite{MorJanMurFox07},  including the pilot study for EPA's Water Security Initiative.
+
+TEVA-\/SPOT allows a user to specify a wide range of modeling inputs and performance objectives for contamination warning system design. Further, TEVA-\/SPOT supports a flexible decision framework for sensor placement that involves two major steps: a modeling process and a decision-\/making   process~\cite{MurBerHar06}.  The modeling process includes (1) describing sensor characteristics, (2) defining the design basis threat, (3) selecting impact measures for the CWS, (4) planning utility response to sensor detection, and (5) identifying feasible sensor locations.
+
+The design basis threat for a CWS is the ensemble of contamination incidents that a CWS should be designed to protect against. In the simplest case, a design basis threat is a contamination scenario with a single contaminant that is introduced at a specific time and place. Thus, a design basis threat consists of a set of contamination incidents that can be simulated with standard water distribution system  modeling software~\cite{EPANET}.  TEVA-\/SPOT provides a convenient interface for defining and computing the impacts of design basis threats. In particular, TEVA-\/SPOT can simulate many contamination incidents in parallel, which has reduced the computation of very large design basis threats from weeks to hours on EPA's high performance computing system.
+
+TEVA-\/SPOT was designed to model a wide range of sensor placement problems. For example, TEVA-\/SPOT supports a number of impact measures, including the number of people exposed to dangerous levels of a contaminant, the volume of contaminated water used by customers, the number of feet of contaminated pipe, and the time to detection. Response delays can also be specified to account for the time a water utility would need to verify a contamination incident before notifying the public. Finally, the user can specify the feasible locations for sensors and fix sensor locations during optimization. This flexibility allows a user to evaluate how different factors impact the CWS performance and to iteratively refine a CWS design.
+
+\section{About This Manual}\label{intro_introAbout}
+The capabilities of TEVA-\/SPOT can be accessed either with a GUI or from command-\/line tools. This user manual describes the TEVA-\/SPOT Toolkit, which contains these command-\/line tools. The TEVA-\/SPOT Toolkit can be used within either a MS Windows DOS shell or any standard Unix shell (e.g. the Bash shell).
+
+The following sections describe the TEVA-\/SPOT Toolkit, which is referred to as SPOT throughout this manual: 
+\begin{itemize}
+\item {\bfseries TEVA-\/SPOT Toolkit Basics} -\/ An introduction to the process of sensor placement, the use of SPOT command-\/line tools, and installation of the SPOT executables. 
+\item {\bfseries Sensor Placement Formulations} -\/ The mathematical formulations used by the SPOT solvers. 
+\item {\bfseries Contamination Incidents and Impact Measures} -\/ A description of how contamination incidents are computed, and the impact measures that can be used in SPOT to analyze them.
+
+
+\item {\bfseries Sensor Placement Solvers} -\/ A description of how to apply the SPOT sensor placement solvers. 
+\item {\bfseries File Formats} -\/ Descriptions of the formats of files used by the SPOT solvers. 
+\end{itemize}In addition, the appendices of this manual describe the syntax and usage of the SPOT command-\/line executables.
+
+ 
+\if 0
+
+The development of this tool has focused on
+ensuring that it can be applied to large drinking water systems on typical
+desktop computers with relatively low memory (2 gigabytes of RAM memory).
+
+
+This document describes the TEVA-SPOT Toolkit (SPOT), a sensor placement
+optimization tool for CWS design in water distribution systems. SPOT
+integrates a variety of solvers for sensor placement that have been
+developed by Sandia National Laboratories and the Environmental
+Protection Agency, along with many academic collaborators\latexonly
+\cite{MurUbeJan06,MurBerHar06,CarGreHarKonLauLinMorPhi06,HarBerMurPhiRieWat07,BerHarPhiUbeWat06,BerFleHarPhiWat05}
+SPOT includes (1) general-purpose heuristic solvers that consistently
+locate optimal solutions in minutes, (2) integer- and linear-programming
+heuristics that find solutions of provable quality, (3) exact solvers
+that find globally optimal solutions, and (4) bounding techniques that can
+evaluate solution optimality. SPOT also uses a generic solver formulation
+that allows a user to specify a wide range of performance objectives
+for CWS design, including population-based public health measures,
+time to detection, extent of contamination, volume consumed and number
+of failed detections.
+
+SPOT contains a number of command line executables that can be used to
+analyze the impact of contamination events and to identify optimal sensor
+placements. Subsequent sections in this document provide a complete
+reference for installing and using SPOT. Finally, we describe the use
+of the SPOT executables with simple examples.  Note that the file
+formats used within SPOT are documented
+in Section formats.
+
+\fi
+ 

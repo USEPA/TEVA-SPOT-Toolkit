@@ -1,0 +1,38 @@
+OBJ = sss.o tai.o hia.o ta_input.o ta_utils.o teva-assess.o
+OBJ_DLL = sss.o tai.o hia.o ta_input.o ta_utils.o 
+
+# needs to be set by configure:
+#assumes teva-ac checked out explicitly   (... TEVA/teva-ac)
+TEVA_AC_LIB = $(HOME)/code/teva-ac/trunk/teva-ac/lib
+TEVA_AC_INCLUDE = $(HOME)/code/teva-ac/trunk/teva-ac/include
+
+LFLAGS = -L$(TEVA_AC_LIB) -ltevautil -lepanet -lm
+
+.c.o:
+	gcc -c -O6 -I$(TEVA_AC_INCLUDE) $<
+
+libthreatassess.a: $(OBJ_DLL)
+	ar cr libthreatassess.a $(OBJ_DLL)
+	ranlib libthreatassess.a
+
+threat_assess: $(OBJ)
+	gcc -o $@ $(OBJ) -I$(TEVA_AC_INCLUDE) $(LFLAGS)
+
+install: threat_assess
+	cp threat_assess ../../bin/.
+	cp ta_input.h ../../include/.
+	cp ta_utils.h ../../include/.
+	cp teva-assess.h ../../include/.
+	cp sss.h ../../include/.
+	cp tai.h ../../include/.
+	cp libthreatassess.a ../../lib/.
+
+
+clean: 
+	rm -f *.o lib*.a threat_assess
+
+sss.c : sss.h tai.h ta_input.h ta_utils.h teva-assess.h
+tai.c : sss.h tai.h ta_input.h ta_utils.h teva-assess.h
+ta_input.c : sss.h tai.h ta_input.h ta_utils.h teva-assess.h
+ta_utils.c : sss.h tai.h ta_input.h ta_utils.h teva-assess.h
+teva-assess.c : sss.h tai.h ta_input.h ta_utils.h teva-assess.h

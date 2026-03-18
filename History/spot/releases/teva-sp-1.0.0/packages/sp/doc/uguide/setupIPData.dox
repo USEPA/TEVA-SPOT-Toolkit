@@ -1,0 +1,48 @@
+/*! 
+ * \page setupIPDataExecutable Executable setupIPData
+
+\section setupIPDataOverview Overview
+
+The <b>setupIPData</b> executable is used by the <b>sp</b> solver interface
+to setup an integer programming formulation for sensor placement.
+
+
+\section setupIPDataUsage Usage
+
+\verbatim
+   setupIPData <sp-config-file>
+\endverbatim
+
+
+\section Arguments
+
+\verbatim
+   <sp-config-file>
+	Contains all of the information needed to setup a sensor placement
+	problem.
+\endverbatim
+
+
+\section Description
+
+The \b setupIPData executable is used by \ref spExecutable "sp" to setup an
+integer programming problem for sensor placement that can be solved using
+the GeneralSP IP model.  The input file used by \b setupIPData is a
+\ref spConfigFile. The output of this executable is sent to standard
+out, and it is in a format that can be processed by \ref picoExecutable "PICO"
+and the AMPL solver interface.
+
+
+\section Example
+
+None.
+
+
+\section Notes
+
+This executable is not meant to be run interactively.
+
+The scalability of this solver has not been well-characterized for large
+datasets, even when using aggressive aggregation.
+
+*/

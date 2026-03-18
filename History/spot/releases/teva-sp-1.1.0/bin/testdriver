@@ -1,0 +1,981 @@
+#!/usr/bin/perl
+#
+#  This perl script determines if an error has occured within a
+#  src build. The script searches the output for specific keywords.
+#  This was adapted from Mario Alleva's grep_error.perl script.
+#
+#  See http://www.aptest.com/testtypes.html for a list of types of
+#  software testing.
+#
+#  William E. Hart
+#  September, 2004
+#
+################################################################
+
+local ($siteconfig, $pexec, $amplflag, $cplexflag);
+
+# probably a better way to do this... -schake
+my $sc="siteconfig.pl";
+if (-e "$sc") {
+  require "$sc";
+} elsif (-e "test/$sc") {
+  require "test/$sc";
+} elsif (-e "../test/$sc") {
+  require "../test/$sc";
+}
+my $dummy = "$siteconfig $pexec $amplflag $cplexflag";
+
+#print "siteconfig: $siteconfig\n";
+#print "pexec:      $pexec\n";
+#print "amplflag:   $amplflag\n";
+#print "cplexflag:  $cplexflag\n";
+
+
+# strip out bad xml characters in error messages
+# call with a string reference
+sub scrub {
+  my $unsafe='<>&"';
+  my $uri="use URI::Escape;";	# someone already wrote this package!
+  my $lineref = shift;
+
+  eval $uri;			# but it might not be installed
+  if ($@) {
+    eval "\$\$lineref =~ tr /$unsafe/+/;";	# not installed
+  } else {
+    $$lineref = uri_escape($$lineref, $unsafe);
+  }
+}
+
+
+sub my_signal_catcher {
+    die "Terminating testdriver due to external signal!\n";
+}
+
+$SIG{'INT'} = 'my_signal_catcher';
+$SIG{'HUP'} = 'my_signal_catcher';
+$SIG{'QUIT'} = 'my_signal_catcher';
+$SIG{'TERM'} = 'my_signal_catcher';
+
+##
+## GLOBAL DATA
+##
+#
+# Create global experiment key
+#
+$pwd = `pwd`;
+chomp($pwd);
+$software = ( split(/\//,$pwd) ) [-1];
+$host = `hostname`;
+chomp($host);
+$configinfo = "";
+#
+# Configure timing to be more accurate if possible
+#
+if ($host eq "bobo.mp.sandia.gov") {
+   require Time::HiRes;
+   }
+else {
+   require Time::Local;
+   }
+
+sub mytime {
+  if ($host eq "bobo.mp.sandia.gov") {
+     return [Time::HiRes::gettimeofday()];
+  } else {
+     return time;
+  }
+}
+
+
+sub time_diff {
+  my $t0 = shift @_;
+  my $t1 = shift @_;
+  if ($host eq "bobo.mp.sandia.gov") {
+     return Time::HiRes::tv_interval($t0,$t1);
+  } else {
+     return $t1-$t0;
+  }
+}
+#
+# List of test types
+#
+@tests = qw(regression performance unit memory application);
+#
+# List of test options
+#
+@testoptions = qw(param benchmark analysiscode software);
+#
+# List of test frequencies
+#
+@test_frequencies = qw(daily weekly monthly smoke all);
+#
+# Misc
+#
+$machinefile = "";
+$verbose = 0;
+
+
+##
+## get tokens from a string
+##
+sub get_tokens {
+  my $__tmp = shift @_;
+  local @__words = split(/\s+/, $__tmp, length($__tmp));
+  local $__lower = 0;
+  local $__upper = $#__words;
+  #print "TMP $__tmp\n";
+  #print "WORDS @__words\n";
+  #print "LOWER $__lower  UPPER $__upper\n";
+  #foreach $i (@__words) { print ":$i:\n"; }
+  if ($__words[0] eq "") {
+     $__lower = 1;
+     }
+  if ($__words[$__upper] eq "") {
+     $__upper = $__upper-1;
+     }
+  #print "LOWER $__lower  UPPER $__upper\n";
+  #print "WORDS @__words[$__lower .. $__upper]\n";
+  #foreach $i (@__words[$__lower .. $__upper]) { print ":$i:\n"; }
+  return @__words[$__lower .. $__upper];
+}
+
+
+##
+## List-of-strings membership test
+##
+sub is_string_member {
+  my $value = shift(@_);
+  my $set = shift(@_);
+  local $item;
+  foreach $item (@$set) {
+    if ($verbose) {
+       print "$value $item\n";
+       }
+    if ($value eq $item) { return 1; }
+    }
+  return 0;
+  }
+
+##
+## List-of-strings prefix test
+##
+sub is_string_prefix {
+  my $value = shift(@_);
+  my $set = shift(@_);
+  local $item;
+  foreach $item (@$set) {
+    if ($verbose) {
+       print "$value $item\n";
+       }
+    if ($value =~ /^$item/) { return 1; }
+    }
+  return 0;
+  }
+
+
+##
+## Update the configinfo variable
+##
+sub update_key_info {
+  if (!(-r "Makefile")) {
+     die "ERROR: Missing Makefile!\n";
+     }
+  local $tmp = `grep "target_canonical =" Makefile`;
+  if ($tmp eq "") { $configinfo = "unknown"; }
+  else            { $configinfo = ( get_tokens($tmp) ) [-1]; }
+  chomp($configinfo);
+  local $tmp = `grep "^CCC" Makefile`;
+  if ($tmp eq "") { $tmp = "unknown"; }
+  else { $tmp = ( get_tokens($tmp) ) [-1]; }
+  $configinfo = "$configinfo-$tmp";
+  chomp($configinfo);
+}
+
+
+
+##
+## Print experiment key
+##
+sub print_key {
+  my $OUTFILE = shift(@_);
+  print $OUTFILE "  <Key Software=\"$software\" Site=\"$host\">\n";
+  print $OUTFILE "    <BuildName>$configinfo</BuildName>\n";
+  print $OUTFILE "  </Key>\n";
+}
+
+
+##
+## Print xml date string for today
+##
+sub print_date {
+  my $OUTFILE = shift;
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+  printf $OUTFILE "  <Date>%4d/%02d/%02d</Date>\n",$year+1900,$mon + 1,$mday;
+}
+
+
+##
+## Scan a file
+##
+sub scan_file {
+  my $OUTFILE = shift(@_);
+  my $search = shift(@_);
+  my $warning = shift(@_);
+  my $ignore = shift(@_);
+  my $infile = shift(@_);
+  #
+  # Read input file until EOF
+  #
+  (open INPUT_FILE, $infile) || die "ERROR: $!! Cannot open file \"$infile\"\n" ;
+  @lines = <INPUT_FILE>;
+  close (INPUT_FILE);
+  $line = 0;
+  while ($line < $#lines) {
+    chomp($lines[$line]);
+    scrub(\$lines[$line]);
+    $line += 1;
+    }
+  $found = 0;
+  #
+  # read each line of file and scan for errors
+  #
+  $line = 0;
+  while ($line < $#lines) {
+    $line += 1;
+    if ($lines[$line-1] =~ m/$search/) {
+       #
+       # This is an error line
+       #
+      if ($lines[$line-1] =~ m/$ignore/) {
+        ; # Ignore an error
+      }
+      else { # actual build error
+        if ($found == 0) {
+           $found = 1;
+           print $OUTFILE "  <IntegrityStatus>Fail</IntegrityStatus>\n";
+           print $OUTFILE "  <FailureInfo>\n";
+        }
+        print $OUTFILE "    <Explanation line=\"$line\">\n";
+	print $OUTFILE "      <Text>";
+        print $OUTFILE $lines[$line-1];
+	print $OUTFILE "</Text>\n";
+        print $OUTFILE "      <PreContext>";
+        if (($line-6) >= 0) { print $OUTFILE "$lines[$line-6];\n" }
+        if (($line-5) >= 0) { print $OUTFILE "$lines[$line-5];\n" }
+        if (($line-4) >= 0) { print $OUTFILE "$lines[$line-4];\n" }
+        if (($line-3) >= 0) { print $OUTFILE "$lines[$line-3];\n" }
+        if (($line-2) >= 0) { print $OUTFILE "$lines[$line-2];\n" }
+        print $OUTFILE "</PreContext>\n";
+        print $OUTFILE "      <PostContext>";
+        if (($line+0) < $#lines) { print $OUTFILE "$lines[$line+0];\n" }
+        if (($line+1) < $#lines) { print $OUTFILE "$lines[$line+1];\n" }
+        if (($line+2) < $#lines) { print $OUTFILE "$lines[$line+2];\n" }
+        if (($line+3) < $#lines) { print $OUTFILE "$lines[$line+3];\n" }
+        if (($line+4) < $#lines) { print $OUTFILE "$lines[$line+4];\n" }
+        print $OUTFILE "</PostContext>\n";
+        print $OUTFILE "    </Explanation>\n";
+      }
+    }
+  }
+  if ($found == 1) {
+     print $OUTFILE "  </FailureInfo>\n";
+  } else {
+     print $OUTFILE "  <IntegrityStatus>Pass</IntegrityStatus>\n";
+  }
+  #
+  # read each line of file and scan for warnings
+  #
+  print $OUTFILE "  <Warnings>\n";
+  $line = 0;
+  $warnings = 0;
+  $warnings_total = 0;
+  $package = "packages";
+  my %warning_info;
+  while ($line < $#lines) {
+    $line += 1;
+    if ($lines[$line-1] =~ m/=== Running/) {
+       #
+       # We are starting to build another package
+       #
+       if ($package ne "packages") {
+	  $warning_info{$package} += $warnings;
+	  $warnings_total += $warnings;
+          }
+       $package = (split(/ /,$lines[$line-1]))[4];
+       $warnings = 0;
+       }
+    if ($lines[$line-1] =~ m/$warning/) {
+       #
+       # This is a warning line
+       #
+       $warnings += 1;
+       print $OUTFILE "    <Explanation line=\"$line\">\n";
+       print $OUTFILE "      <Text>";
+       print $OUTFILE $lines[$line-1];
+       print $OUTFILE "</Text>\n";
+       print $OUTFILE "      <PreContext>";
+       if (($line-6) >= 0) { print $OUTFILE "$lines[$line-6];\n" }
+       if (($line-5) >= 0) { print $OUTFILE "$lines[$line-5];\n" }
+       if (($line-4) >= 0) { print $OUTFILE "$lines[$line-4];\n" }
+       if (($line-3) >= 0) { print $OUTFILE "$lines[$line-3];\n" }
+       if (($line-2) >= 0) { print $OUTFILE "$lines[$line-2];\n" }
+       print $OUTFILE "</PreContext>\n";
+       print $OUTFILE "      <PostContext>";
+       if (($line+0) < $#lines) { print $OUTFILE "$lines[$line+0];\n" }
+       if (($line+1) < $#lines) { print $OUTFILE "$lines[$line+1];\n" }
+       if (($line+2) < $#lines) { print $OUTFILE "$lines[$line+2];\n" }
+       if (($line+3) < $#lines) { print $OUTFILE "$lines[$line+3];\n" }
+       if (($line+4) < $#lines) { print $OUTFILE "$lines[$line+4];\n" }
+       print $OUTFILE "</PostContext>\n";
+       print $OUTFILE "    </Explanation>\n";
+       }
+  }
+  print $OUTFILE "    <Total>$warnings_total</Total>\n";
+  $i = 0;
+  print $OUTFILE "    <Summary>\n";
+  while (($i, $j) = each(%warning_info)) {
+    print $OUTFILE "      <Package name=\"$i\">$j</Package>\n";
+    }
+  print $OUTFILE "    </Summary>\n";
+  print $OUTFILE "  </Warnings>\n";
+}
+
+##
+## Perform configuration
+##
+sub exec_configure {
+  $status = 0;
+  $logfile = "";
+  foreach $val (@_) {
+    if (substr($val,0,10) eq "--logfile=") {
+      $logfile = substr($val,10,length($val)-10);
+    }
+  }
+  $t0 = mytime();
+  if ($logfile eq "") {
+     unlink "test/config.out", "test/config.xml";
+     if (@_) {
+        $status = 0xffff & system("./configure $siteconfig @_ > test/config.out 2>&1");
+     } else {
+        $status = 0xffff & system("./configure $siteconfig > test/config.out 2>&1");
+     }
+     update_key_info();
+     open LOGFILE, ">test/config.tmp";
+     print LOGFILE "<html><h2>Acro Config Output</h2>\n";
+     print LOGFILE "$host ";
+     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+     printf LOGFILE "%4d/%02d/%02d",$year+1900,$mon + 1,$mday;
+     print LOGFILE " ($configinfo)<br>\n$software @_";
+     print LOGFILE "<hr><pre>\n";
+     close LOGFILE;
+     system("cat test/config.out >> test/config.tmp");
+     open LOGFILE, ">>test/config.tmp";
+     print LOGFILE "</pre></html>\n";
+     close LOGFILE;
+     system("mv test/config.tmp test/config.out");
+  }
+  else {
+     update_key_info();
+  }
+  $elapsed = time_diff($t0, mytime());
+  #
+  # See if configure executed properly
+  #
+  if ($status != 0) {
+     #
+     # Test failed to execute
+     #
+     $executionstatus   = "Fail";
+     $explanation 	= "Configure failed to execute";
+  } else {
+     $executionstatus   = "Pass";
+     $explanation 	= "";
+  }
+  (open OUTPUT_FILE, ">test/config.xml")
+	|| die "ERROR: cannot open file test/config.xml";
+  print OUTPUT_FILE "<Configure>\n";
+  print_key(\*OUTPUT_FILE);
+  print_date(\*OUTPUT_FILE);
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+  print OUTPUT_FILE "  <Flags>@_</Flags>\n";
+  print OUTPUT_FILE "  <LogFile>test/config.out</LogFile>\n";
+  $hourfrac = sprintf "%05.2f", $hour + ($min + $sec/60.0)/60.0;
+  print OUTPUT_FILE "  <StartTime>$hourfrac</StartTime>\n";
+  print OUTPUT_FILE "  <RunTime unit=\"seconds\">$elapsed</RunTime>\n";
+  if ($executionstatus eq "Fail") {
+     print OUTPUT_FILE "  <ExecutionStatus>$executionstatus</ExecutionStatus>\n";
+     print OUTPUT_FILE "  <FailureInfo>\n";
+     scrub(\$explanation);
+     print OUTPUT_FILE "    <Explanation>$explanation</Explanation>\n";
+     print OUTPUT_FILE "  </FailureInfo>\n";
+     }
+  else {
+     print OUTPUT_FILE "  <ExecutionStatus>$executionstatus</ExecutionStatus>\n";
+     #
+     # Define strings to search for
+     #
+     $search = "^\\*\\*\\*| No rule to make | No such file | Error:|configure: error:";
+     $warning = "WARNING";
+     #
+     # Define strings to ignore
+     #
+     $ignore = "ignored|^diff:";
+     #
+     # Process input file
+     #
+     scan_file(\*OUTPUT_FILE, $search, $warning, $ignore, "test/config.out")
+     }
+  print OUTPUT_FILE "</Configure>\n";
+  close (OUTPUT_FILE);
+}
+
+
+##
+## Perform build
+##
+sub exec_build {
+  $t0 = mytime();
+  $status = 0;
+  $clean = "";
+  $logfile = "";
+  foreach $val (@_) {
+    if ($val eq "--clean") { $clean = "make clean; "; }
+    elsif (substr($val,0,10) eq "--logfile=") { $logfile = substr($val,10,length($val)-10); }
+    else
+       { die "ERROR: Unknown build option: $val\n"; }
+    }
+  if ($logfile eq "") {
+     unlink "test/build.out", "test/build.xml";
+     open LOGFILE, ">test/build.out";
+     print LOGFILE "<html><h2>Acro Build Output</h2>\n";
+     print LOGFILE "$host ";
+     my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+     printf LOGFILE "%4d/%02d/%02d",$year+1900,$mon + 1,$mday;
+     print LOGFILE " ($configinfo)<br>\n$software @_";
+     print LOGFILE "<hr><pre>\n";
+     close LOGFILE;
+     $status = 0xffff & system("($clean make ; make executables) >> test/build.out 2>&1");
+     $logfile = "test/build.out";
+     open LOGFILE, ">>test/build.out";
+     print LOGFILE "</pre></html>\n";
+     close LOGFILE;
+     }
+  $elapsed = time_diff($t0, mytime());
+  #
+  # See if make executed properly
+  # 
+  if ($status != 0) {
+     #
+     # Test failed to execute
+     #
+     $executionstatus   = "Fail";
+     $explanation 	= "Make failed to execute";
+  } else {
+     $executionstatus   = "Pass";
+     $explanation 	= "";
+  }
+  (open OUTPUT_FILE, ">test/build.xml") || die "ERROR: cannot open file test/build.xml";
+  print OUTPUT_FILE "<Build>\n";
+  print_key(\*OUTPUT_FILE);
+  print_date(\*OUTPUT_FILE);
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+  print OUTPUT_FILE "  <Flags>@_</Flags>\n";
+  print OUTPUT_FILE "  <LogFile>$logfile</LogFile>\n";
+  $hourfrac = sprintf "%05.2f", $hour + ($min + $sec/60.0)/60.0;
+  print OUTPUT_FILE "  <StartTime>$hourfrac</StartTime>\n";
+  print OUTPUT_FILE "  <RunTime unit=\"seconds\">$elapsed</RunTime>\n";
+  if ($executionstatus eq "Fail") {
+     print OUTPUT_FILE "  <ExecutionStatus>$executionstatus</ExecutionStatus>\n";
+     print OUTPUT_FILE "  <FailureInfo>\n";
+     scrub(\$explanation);
+     print OUTPUT_FILE "    <Explanation>$explanation</Explanation>\n";
+     print OUTPUT_FILE "  </FailureInfo>\n";
+  } else {
+     print OUTPUT_FILE "  <ExecutionStatus>$executionstatus</ExecutionStatus>\n";
+     #
+     # Define strings to search for
+     #
+     $search = "\\*\\*\\*| ERROR |\tERROR| Error |\tError| Error:| error:";
+     $warning = " warning:| Warning:";
+     #
+     # Define strings to ignore
+     #
+     $ignore = "ignored";
+     #
+     # Process input file
+     #
+     scan_file(\*OUTPUT_FILE, $search, $warning, $ignore, $logfile)
+  }
+  print OUTPUT_FILE "</Build>\n";
+  close (OUTPUT_FILE);
+}
+
+
+##
+## Perform tests
+##
+## NOTE: we might want to re-architect this to distribute jobs on 
+## other machines.  For now, I'm assuming that all jobs run on the
+## current machine.
+##
+sub exec_tests {
+  my $testtype = shift(@_);
+  #
+  # Process test arguements
+  #
+  $daily=0;
+  $weekly=0;
+  $monthly=0;
+  @categories = ("any");
+  $coverage=0;
+  while (@_) {
+    $arg = shift @_;
+    if ($arg eq "--daily")      { $daily=1; }
+    elsif ($arg eq "--weekly")  { $weekly=1; }
+    elsif ($arg eq "--monthly") { $monthly=1; }
+    elsif (substr($arg,0,5) eq "--cat") {
+       @categories = split(/,/, (split(/=/,$arg,2))[1], $#arg);
+    } elsif (substr($arg,0,5) eq "--cov") {
+       $coverage=1;
+       mkdir "test/lcov";
+       unlink "test/lcov/acro.info";
+    } else {
+      die "ERROR: Bad test argument: \"$arg\"\n";
+    }
+  }
+  if (($daily == 0) && ($weekly == 0) && ($monthly == 0)) {
+    $daily=1;
+  }
+  #
+  # Find *.tests files
+  #
+  $result = `find packages -name '*.tests' 2>&1`; 
+  chomp($result);
+  foreach $testfile (get_tokens($result)) {
+    local @tmp = split(/\//,$testfile);
+    $category = $tmp[-1];
+    $category = substr($category,0,$#category-5);
+    print "      DEBUG: Considering category \"$category\"\n" if ($verbose);
+    if (is_string_member("any",\@categories) || 
+				is_string_prefix($category,\@categories)) {
+      local $dir = join( '/', @tmp[0 .. ($#tmp - 1)]);
+      chdir $dir or die "ERROR: Cannot move to directory $dir!\n";
+      process_testfile($tmp[-1],$testtype,$daily,$weekly,$monthly);
+      system("cp $tmp[-1].xml $pwd/test/$testtype.$tmp[-1].xml");
+      chdir $pwd;
+    }
+  }
+  if ($coverage) {
+    my @dirs = `find . -name '*.da' | xargs -n1 dirname | sort | uniq`;
+    print "Generating coverage data\n";
+    for my $d (@dirs) {
+      chomp $d;
+      print "  $d\n";
+      system("lcov -d $d -c -f >> test/lcov/acro.info 2>> test/lcov/lcov.out");
+    }
+    print "Generating coverage html\n";
+    system("cd test/lcov; genhtml -o ~/public_html/lcov/ -k acro.info > genhtml.out 2>&1");
+  }
+}
+
+sub process_testfile {
+  my $testfile = shift @_;
+  my $testtype = shift @_;
+  my $daily    = shift @_;
+  my $weekly   = shift @_;
+  my $monthly  = shift @_;
+  #
+  # Get test category from test filename
+  #
+  $category = substr($testfile,0,length($testfile)-6);
+  print "      Checking $category tests\n";
+  #
+  # Remove old test output files
+  #
+  system("rm -f $category.xml $category.*.out $category.*.diff");
+  #
+  # Run tests
+  #
+  open (TESTFILE, $testfile) || die "ERROR: cannot open file \"$testfile\"!\n";
+  open (XMLFILE, ">$category.tests.xml")
+  		|| die "ERROR: cannot open file \"$category.tests.xml\"!\n";
+  print XMLFILE  "<TestResults Category=\"$category\">\n";
+  print_key(\*XMLFILE);
+  $lineno = 0;
+  while (<TESTFILE>) {
+    $lineno++;
+    #
+    # Ignore comment lines
+    #
+    if (/^[\t ]*#.*/) { next; }
+    $line = $_;
+    chomp($line);
+    @words = get_tokens($line);
+
+    $executeflag = 0;
+    $name = shift @words;
+    $localtesttype = $testtype;
+    $benchmark = "";
+    $analysiscode = "";
+    #print "$line\n";
+    #print "$name\n";
+
+    while (@words) {
+      local $tmp = shift @words;
+      if (substr($tmp,0,2) ne "--") {
+         die "ERROR: bad test option \"$tmp\" at line $lineno in file $testfile. (1)\n";
+         }
+      #
+      # Parse an option and validate it
+      #
+      $option = (split(/=/,$tmp))[0];
+      $option = substr($option,2,length($option));
+      $value  = (split(/=/,$tmp))[1];
+      #print "$option $value\n";
+      if ((is_string_member($option,\@tests) == 0) &&
+          (is_string_member($option,\@testoptions) == 0)) {
+         die "ERROR: bad test option \"$tmp\" at line $lineno in file $testfile. (2)\n";
+         }
+      #
+      # Process option
+      #
+      if (($option eq $testtype) || 
+          (($executeflag==0) && ($testtype eq "smoke") && (is_string_member($option,\@tests)==1))) {
+         #
+         # The option is the type of command we're executing
+         #                        OR
+         # The we're processing smoke tests ... so we consider all
+         # command options
+         #
+         local @tmp = split /,/, $value;
+	 foreach $val (@tmp) {
+           #print "VAL: $val @tmp $value\n";
+	   if (is_string_member($val,\@test_frequencies) == 0)
+              { die "ERROR: bad test frequency: $val\n"; }
+	   if (($testtype eq "smoke") && ($val eq "smoke")) {
+		$localtesttype = $option;
+		$executeflag = 1; last;
+	   } elsif (($testtype ne "smoke") &&
+	  		 (($val eq "all")
+			 || ($daily && ($val eq "daily"))
+			 || ($weekly && ($val eq "weekly"))
+			 || ($monthly && ($val eq "monthly")))) {
+		$executeflag = 1; last;
+	   }
+	 }
+      }
+      if ($option eq "benchmark") {
+	 $benchmark = $value;
+      } elsif ($option eq "analysiscode") {
+	 $analysiscode = $value;
+      } elsif ($option eq "software") {
+         $flag = 0;
+         local @tmp = split /,/, $value;
+	 foreach $val (@tmp) {
+           if ($software eq $val) {
+	      $flag = 1;
+	      last;
+	      }
+           }
+	 if ($flag == 0) {
+            $executeflag = 0;
+	    goto NEXTLINE;
+            }
+      }
+    }
+    #
+    # Make sure we have what we need to execute the command
+    #
+    if (($localtesttype eq "regression") && ($benchmark eq "")) {
+       die "ERROR: missing benchmark for test \"$name\"\n";
+    } elsif (($localtesttype eq "performance") && ($analysiscode eq "")) {
+       die "ERROR: missing analysiscode for test \"$name\"\n";
+    }
+    NEXTLINE:
+    $line = <TESTFILE>;
+    $lineno++;
+    #
+    # Execute the command
+    #
+    if ($executeflag == 1) {
+       run_test(\*XMLFILE,$category, $name, $line, $localtesttype,
+						$benchmark, $analysiscode);
+    }
+  }
+  print XMLFILE "</TestResults>\n";
+}
+
+
+sub run_test {
+  my $XMLFILE = shift @_;
+  my $category = shift @_;
+  my $name = shift @_;
+  my $line = shift @_;
+  my $testtype = shift @_;
+  my $benchmark = shift @_;
+  my $analysiscode = shift @_;
+
+  print "        $name\n";
+  $t0 = mytime();
+  $status = 0xffff & system("( $line ) > $name.out 2>&1");
+  $elapsed = time_diff($t0, mytime());
+  #
+  # See if make executed properly
+  #
+  if ($status != 0) {
+     #
+     # Test failed to execute
+     #
+     $executionstatus   = "Fail";
+     $explanation 	= "Failed execution";
+  } else {
+     #
+     # Test executed properly
+     #
+     $executionstatus = "Pass";
+     $teststatus = "Pass";
+     if (! (-e "$name.out")) {
+        #
+        # The test output file appears to be missing
+        #
+        $teststatus      = "Fail";
+        $explanation = "Missing output file $name.out";
+     } elsif ((get_tokens(`wc $name.out`))[1] eq "0") {
+        #
+        # Check for an empty file
+        #
+        $teststatus      = "Fail";
+        $explanation = "Empty output file";
+     }
+     #
+     # Process a regression test
+     #
+     elsif ($testtype eq "regression") {
+        if (! (-e "$benchmark")) {
+           #
+           # The test benchmark file appears to be missing
+           #
+           $teststatus      = "Fail";
+           $explanation = "Missing benchmark file $benchmark";
+           }
+           ##
+           ## TODO - enable version-specific QA benchmarks
+           ##
+        elsif (system("diff $name.out $benchmark > $name.diff")) {
+           #
+           # Failure because of difference with the benchmark
+           #
+           $teststatus      = "Fail";
+           $explanation = "Differences with benchmark";
+           }
+     }
+  #
+  # Process a performance test
+  #
+     elsif ($testtype eq "performance") {
+	$teststatus      = "Unknown";
+	if ($benchmark eq "") {
+	   $analysis = `./$analysiscode $name.out $name.qa 2>&1`;
+	} else {
+	   $analysis = `./$analysiscode $name.out $benchmark 2>&1`;
+	}
+     }
+  #
+  # TODO process other tests here!
+  #
+  }
+
+  ##
+  ## Print out results
+  ##
+  print $XMLFILE "<Test type=\"$testtype\" LogFile=\"$name.out\">\n";
+  print $XMLFILE "  <Category>$category</Category>\n";
+  print $XMLFILE "  <Name>$name</Name>\n";
+  print_date(\*$XMLFILE);
+  ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+  $hourfrac = sprintf "%05.2f", $hour + ($min + $sec/60.0)/60.0;
+  print $XMLFILE "  <StartTime>$hourfrac</StartTime>\n";
+  print $XMLFILE "  <RunTime unit=\"seconds\">$elapsed</RunTime>\n";
+  if ($executionstatus eq "Fail") {
+     print $XMLFILE "  <ExecutionStatus>$executionstatus</ExecutionStatus>\n";
+     print $XMLFILE "  <FailureInfo>\n";
+     scrub(\$explanation);
+     print $XMLFILE "    <Explanation>$explanation</Explanation>\n";
+     print $XMLFILE "  </FailureInfo>\n";
+  } else {
+     print $XMLFILE "  <ExecutionStatus>$executionstatus</ExecutionStatus>\n";
+     if ($testtype eq "regression") {
+        print $XMLFILE "  <IntegrityStatus>$teststatus</IntegrityStatus>\n";
+        if ($teststatus eq "Fail") {
+           print $XMLFILE "  <FailureInfo>\n";
+	   scrub(\$explanation);
+           print $XMLFILE "    <Explanation>$explanation</Explanation>\n";
+           print $XMLFILE "  </FailureInfo>\n";
+	}
+     } elsif ($testtype eq "performance") {
+        print $XMLFILE "$analysis";
+     } else {
+        print $XMLFILE "  <IntegrityStatus>Unknown</IntegrityStatus>\n";
+     }
+     #
+     # TODO: print other test outputs here
+     #
+  }
+  print $XMLFILE "</Test>\n";
+}
+
+
+##
+## Execute a command
+##
+sub exec_command {
+  my $command = shift(@_);
+  if ("$command" ne "configure") {
+    update_key_info();
+  }
+  #
+  # Call subroutines to process different tests
+  #
+  if ("$command" eq "configure") {
+    print "   Performing configure\n";
+    exec_configure(@_);
+  } elsif ("$command" eq "build") {
+    print "   Performing build\n";
+    exec_build(@_);
+  } elsif ("$command" eq "smoke") {
+    print "   Performing smoke tests\n";
+    exec_tests($command,@_);
+  } elsif (is_string_member($command,\@tests) == 1) {
+    print "   Performing $command tests\n";
+    exec_tests($command,@_);
+  } else {
+    die "ERROR: Bad command \"$command\"\n";
+    }
+}
+
+
+###
+### MAIN ROUTINE
+###
+
+#
+# Check command line arguments
+#
+if ((! @ARGV) || (@ARGV && (($ARGV[0] eq "-h") || ($ARGV[0] eq "--help")))) {
+   die "testdriver [--name=<exp-name>] [--machines=<mach-file>] <command> [option-list] ...\
+\t--help       This message\
+\t--rm         Remove the *.xml files in the acro/test directory before\
+\t               executing tests\
+\t--name       Define the name of the software test\
+\t               Default: the current directory name\
+\t--machines   Provide an mpi_machines filename\
+\t--v          Work in verbose mode\
+\
+testdriver commands:
+\tconfigure    Configure Acro\
+\t               Accepts standard configuration options\
+\t               (e.g. --with-optimization=-O3)\
+\t               --logfile=<file> (analyze a config output file)\
+\
+\tbuild        Build library and executables\
+\t               --clean   (perform 'make clean' before building)\
+\t               --logfile=<file> (analyze an existing build output file)\
+\
+\tsmoke        Perform quick-and-easy tests for basic functionality\
+\t               (these are usually a subset of the regression tests)\
+\t               --cat=<category> (limit tests to list of categories\
+\t               --cov (generate coverage summary info)\
+\
+\tregression   Perform regression tests\
+\t               --cat=<category> (limit tests to list of categories\
+\t               --daily   (perform nightly tests [default])\
+\t               --weekly  (perform weekly tests)\
+\t               --monthly (perform monthly tests)\
+\t               --cov (generate coverage summary info)\
+\
+\tperformance  Perform regression tests\
+\t               --cat=<category> (limit tests to list of categories\
+\t               --daily   (perform nightly tests [default])\
+\t               --weekly  (perform weekly tests)\
+\t               --monthly (perform monthly tests)\
+\t               --cov (generate coverage summary info)\
+\
+\tunit         Perform unit tests (not supported)\
+\t               --cat=<category> (limit tests to list of categories\
+\t               --daily   (perform nightly tests [default])\
+\t               --weekly  (perform weekly tests)\
+\t               --monthly (perform monthly tests)\
+\t               --cov (generate coverage summary info)\
+\
+\tmemory       Perform memory tests (not supported)\
+\t               --cat=<category> (limit tests to list of categories\
+\t               --daily   (perform nightly tests [default])\
+\t               --weekly  (perform weekly tests)\
+\t               --monthly (perform monthly tests)\
+\t               --cov (generate coverage summary info)\
+\
+\tapplication  Perform memory tests (not supported)\
+\t               --cat=<category> (limit tests to list of categories\
+\t               --daily   (perform nightly tests [default])\
+\t               --weekly  (perform weekly tests)\
+\t               --monthly (perform monthly tests)\
+\t               --cov (generate coverage summary info)\n";
+   }
+
+#
+# Process command line options
+#
+$tmp = shift @ARGV;
+while (substr($tmp,0,2) eq "--") {
+  if (substr($tmp,0,3) eq "--v") {
+    $verbose=1;
+  } elsif (substr($tmp,0,7) eq "--rm") {
+    system("rm -f test/*.xml");
+  } elsif (substr($tmp,0,7) eq "--name=") {
+    $software=substr($tmp,7,length($tmp)-7);
+  } elsif (substr($tmp,0,11) eq "--machines=") {
+    $machinefile=substr($tmp,11,length($tmp)-11);
+  } else {
+    die "ERROR: Bad command line option: \"$tmp\"\n";
+  }
+  if (!(@ARGV)) {
+    die "ERROR: No commands specified!\n";
+  }
+  $tmp = shift @ARGV;
+}
+$command = $tmp;
+
+if ($host eq "bobo.mp.sandia.gov") {
+     use autouse TIME::HiRes; # => qw( gettimeofday() tv_interval() );
+  } else {
+     use autouse TIME::Local; # => qw( gettimeofday() localtime() );
+  }
+
+while ($command ne "") {
+  #
+  # Get command arguments
+  #
+  @arglist = ();
+  while (@ARGV && (substr($ARGV[0],0,2) eq "--")) {
+    $arg = shift @ARGV;
+    #print "$arg\n";
+    if (($command eq "configure") && (substr($arg,0,7) eq "--site=")) {
+       $siteconfig = $arg;
+    } else {
+       push @arglist, $arg;
+    }
+  }
+  #
+  # Execute the command
+  #
+  exec_command($command,@arglist);
+  #
+  # Get driver command
+  #
+  if (@ARGV) {
+     $command = shift @ARGV;
+  } else {
+     $command = "";
+  }
+}
+ 

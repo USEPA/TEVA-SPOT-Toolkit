@@ -1,0 +1,46 @@
+
+\section{Overview}\label{filter_impactsExecutable_filter_impactsOverview}
+
+The {\bfseries filter\_\-impacts} script filters out the low-\/impact incidents from an impact file.
+
+\section{Usage}\label{filter_impactsExecutable_filter_impactsUsage}
+
+\begin{verb}
+   filter_impacts [options...] <impact-file> <out-file>
+\end{verb}
+
+\section{Options}\label{filter_impactsExecutable_filter_impactsOptions}
+\begin{verbatim} 
+     --threshold=<val>
+     Keep only the incidents whose undetected impact is above a 
+     specified threshold.
+     
+     --percent=<num>
+     Keep the <num> percent of the incidents with the worst  
+     undetected impact.
+     
+     --num=<num>    
+     Keep the <num> incidents with the worst  
+     undetected impact.
+
+     --rescale
+     Rescale the impacts using a log10 scale.
+     
+     --round
+     Round input values to the nearest integer.
+\end{verbatim}
+\section{Arguments}\label{filter_impactsExecutable_filter_impactsArguments}
+\begin{verbatim} 
+     <impact-file>
+     The input impact file.
+     
+     <out-file>
+     The output impact file.
+\end{verbatim}
+\section{Description}\label{filter_impactsExecutable_filter_impactsDescription}
+
+The {\bfseries filter\_\-impacts} command reads an impact file, filters out the low-\/impact incidents, rescales the impact values, and writes out another impact file.
+
+\section{Notes}\label{filter_impactsExecutable_filter_Notes}
+
+None. 

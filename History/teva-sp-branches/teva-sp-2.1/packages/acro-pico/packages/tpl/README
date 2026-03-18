@@ -1,0 +1,9 @@
+Third Party Library Version Information
+---------------------------------------
+AMPL		20060422 (see the ampl/ampl/asldate.c file)
+3PO
+COIN		Snapshot 20060202
+GLPK		v. 4.8
+MTL		v. 2.1
+SOPLEX		v. 1.3.0
+TRILINOS	v. 6.0

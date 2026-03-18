@@ -1,0 +1,30 @@
+{\small
+\begin{verbatim}
+template <class FunctionT>
+class parallelLipshitzianNode : public parallelBranchSub, public serialLipshitzianNode<FunctionT>
+{
+public:
+
+  /// Return a pointer to the global branching object
+  parallelLipshitzian<FunctionT>* global() const;
+
+  /// Return a pointer to the base class of the global branching object
+  pico::parallelBranching* pGlobal() const;
+
+  /// Initialize a subproblem using a branching object
+  void initialize(parallelLipshitzian<FunctionT>* master);
+
+  /// Initialize a subproblem as a child of a parent subproblem.
+  void initialize(parallelLipshitzianNode<FunctionT>* parent,int whichChild);
+
+  /// Pack the information in this subproblem into a buffer
+  void pack(utilib::PackBuffer& outBuffer);
+
+  /// Unpack the information for this subproblem from a buffer
+  void unpack(utilib::UnPackBuffer& inBuffer);
+
+  /// Create a child subproblem of the current subproblem
+  parallelBranchSub* makeParallelChild(int whichChild);
+};
+\end{verbatim}
+}

@@ -1,0 +1,55 @@
+TESTCXXFLAGS := $(filter-out $(compilerOptFlags), $(CXXFLAGS))
+TESTFFFLAGS := $(filter-out $(compilerOptFlags), $(FFFLAGS))
+
+###############################################################################
+
+$(TARGETDIR)/%.o : %.cpp ${DEPDIR}/%.d
+	@echo ""
+	@echo Compiling $*.cpp
+	@mkdir -p $(TARGETDIR)
+	@$(CXX) $(CXXFLAGS) -c $< -o $@
+
+${DEPDIR}/%.d : %.cpp
+	@echo ""
+	@echo Creating dependency $*.d
+	@mkdir -p ${DEPDIR}
+	@rm -f $*.d
+	@set -e; $(DEPCXX) $(CXXFLAGS) $< \
+		| sed 's|\($(notdir $*)\)\.o[ :]*|$(TARGETDIR)/\1.o $@ : |g' \
+		> $@; [ -s $@ ] || rm -f $@
+
+###############################################################################
+
+$(TARGETDIR)/%.o : %.f ${DEPDIR}/%.d
+	@echo ""
+	@echo Compiling $*.f
+	@mkdir -p $(TARGETDIR)
+	@$(FF) $(FFFLAGS) -c $< -o $@
+
+
+${DEPDIR}/%.d : %.f
+	@echo ""
+	@echo Creating dependency $*.d
+	@mkdir -p ${DEPDIR}
+	@rm -f $*.d
+	@set -e; $(DEPFF) $(FFFLAGS) $< \
+		| sed 's|\($(notdir $*)\)\.o[ :]*|$(TARGETDIR)/\1.o $@ : |g' \
+		> $@ #; [ -s $@ ] || rm -f $@
+
+###############################################################################
+
+$(TARGETDIR)/%.o : %.c ${DEPDIR}/%.d
+	@echo ""
+	@echo Compiling $*.c
+	@mkdir -p $(TARGETDIR)
+	@$(CC) $(CXXFLAGS) -c $< -o $@
+
+${DEPDIR}/%.d : %.c
+	@echo ""
+	@echo Creating dependency $*.d
+	@mkdir -p ${DEPDIR}
+	@rm -f $*.d
+	@set -e; $(DEPCC) $(CXXFLAGS) $< \
+		| sed 's|\($(notdir $*)\)\.o[ :]*|$(TARGETDIR)/\1.o $@ : |g' \
+		> $@ ; [ -s $@ ] || rm -f $@
+

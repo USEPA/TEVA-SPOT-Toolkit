@@ -1,0 +1,143 @@
+/*!
+ * \page install
+
+\section install Software Installation
+
+
+PICO is incorporated into the 
+\latexonly
+Acro software repository,
+\endlatexonly
+\htmlonly
+<a href="http://software.sandia.gov/Acro">Acro software repository</a>,
+\endhtmlonly
+which supports
+the integration of PICO with a variety of related software packages
+(particularly for the PICO MIP solver).  This section summarizes how
+PICO can be downloaded and installed.  See the 
+\latexonly
+Acro User Guide~\cite{ACRO}
+\endlatexonly
+\htmlonly
+<a href="http://software.sandia.gov/Acro/acro/doc/uguide/html/index.html">Acro User Guide</a>
+\endhtmlonly
+for a more complete description of this process.
+
+
+\subsection installDownload Downloading PICO
+
+The Acro CVS repository is organized into different
+modules that include different subsets of the Acro packages.
+The Acro module that only contains PICO is <b>acro-pico</b>,
+which can be downloaded as a compressed tarfile from <a
+href="http://software.sandia.gov/Acro/">http://software.sandia.gov/Acro/</a>.
+
+Alternatively, the <b>acro-pico</b> module can be checked out from the
+Acro CVS (Concurrent Version System) repository.  The CVS respository
+for Acro can be accessed by executing
+\verbatim
+    cvs -d :ext:${userid}@software.sandia.gov:/space/CVS-Acro checkout acro-pico
+\endverbatim
+This requires the use of an account (userid) on \b software.sandia.gov.
+Accounts on this machine are generally restricted to Sandians
+and academic collaborators working with Sandians.  The scripts \b
+cvs.a and \b ssh.cvs can be used to encapsulate the access to this
+repository in a convenient manner; these scripts can be downloaded from
+<a href="http://software.sandia.gov/Acro/">http://software.sandia.gov/Acro/</a>.
+
+
+\subsection installBuild Building PICO
+
+After the Acro software has been downloaded, it must be configured
+for building on specific hosts for specific target platforms.  Installation
+on UNIX systems is performed by the following steps:
+\verbatim
+    cd acro
+    ./configure
+    make
+    make executables
+\endverbatim
+This will configure the software for your machine and compile the
+Acro library (see the 
+\latexonly
+Acro User Guide~\cite{ACRO}
+\endlatexonly
+\htmlonly
+<a href="http://software.sandia.gov/Acro/acro/doc/uguide/html/index.html">Acro User Guide</a>
+\endhtmlonly
+for more details concerning
+configuration options and the details of the configuration process).
+
+Acro can also be built with the following custom configure/build process:
+\verbatim
+    cd acro
+    ./setup configure build
+\endverbatim
+The \b setup command performs the following actions:
+<ol>
+<li> Pipe the configuration output into acro/test/config.out and generate a
+     test/config.xml summary file;
+
+<li> Pipe the build output into acro/test/build.out and generate a 
+     test/build.xml summary file (this includes builds of Acro
+     executables and test executables).
+</ol>
+The XML files generated in the acro/test directory provide a quick 
+reference to confirm that the software was configured and built properly.
+The use of \b setup can be extended to include configuration options and to 
+perform tests.  For example, the following configures using MPI and performs
+tests of various Acro packages:
+\verbatim
+    cd acro
+    ./setup configure --with-mpi  build  smoke
+\endverbatim
+
+
+
+\subsection installResources Online Resources
+
+The development of PICO is supported by a variety of online software 
+development tools, which may be of use in setting up and executing
+PICO software:
+<ol>
+
+<li> <a href="http://software.sandia.gov/bugzilla/">Bugzilla</a> - online bug reporting
+
+<li> <a href="http://software.sandia.gov/mailman/listinfo/">Mailman</a> - mailing list management
+
+<li> <a href="http://software.sandia.gov/bonsai/cvsqueryform.cgi">Bonsai</a> - a query interface to CVS
+</ol> \latexonly These tools are available at http://software.sandia.gov.  \endlatexonly
+
+The following mailing lists are used to manage Acro:
+<ol>
+
+<li><a href="http://software.sandia.gov/mailman/private/acro-announce/">acro-announce@software.sandia.gov</a> - general announcements
+
+<li><a href="http://software.sandia.gov/mailman/private/acro-bugs/">acro-bugs@software.sandia.gov</a> - bug reports
+
+<li><a href="http://software.sandia.gov/mailman/private/acro-checkins/">acro-checkins@software.sandia.gov</a> - CVS checking reports
+
+<li><a href="http://software.sandia.gov/mailman/private/acro-developers/">acro-developers@software.sandia.gov</a> - a developers mailing list
+
+<li><a href="http://software.sandia.gov/mailman/private/acro-help/">acro-help@software.sandia.gov</a> - a help list
+
+<li><a href="http://software.sandia.gov/mailman/private/acro-misc-checkins/">acro-misc-checkins@software.sandia.gov</a> - CVS checking reports for miscellaneous
+ acro components
+
+<li><a href="http://software.sandia.gov/mailman/private/acro-users/">acro-users@software.sandia.gov</a> - a general users' mailing list
+
+</ol>
+The mailman server also includes the following PICO-specific mailing lists:
+<ol>
+
+<li><a href="http://software.sandia.gov/mailman/private/PICO-announce/">PICO-announce@software.sandia.gov</a> - general announcements
+
+<li><a href="http://software.sandia.gov/mailman/private/PICO-checkins/">PICO-checkins@software.sandia.gov</a> - CVS checking reports
+
+<li><a href="http://software.sandia.gov/mailman/private/PICO-developers/">PICO-developers@software.sandia.gov</a> - a developers mailing list
+
+<li><a href="http://software.sandia.gov/mailman/private/PICO-users/">PICO-users@software.sandia.gov</a> - a general users' mailing list
+
+</ol>
+
+*/

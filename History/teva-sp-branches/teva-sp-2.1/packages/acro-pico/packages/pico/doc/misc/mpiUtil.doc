@@ -1,0 +1,76 @@
+The uMPI Class
+==============
+
+Jonathan Eckstein, June 1997
+
+
+The class uMPI provides some simple helper functions to make calling
+MPI from C++ a little less verbose.  Specifically, they make the
+argument for the MPI Communicator group implicit, 
+automatically check that the error
+codes returned by MPI are zero, and provide an quick global way to
+access process rank and other common constants.  The MPI Communicator group,
+comm, defaults to MPI_COMM_WORLD
+
+To use, #include "mpiUtil.H"
+
+At present, all functions are inlined.  
+
+I have only defined the functions I need so far, but I suspect I will
+add quite a few more.
+
+
+Members:
+-------
+
+static int rank;
+
+The rank of the current process in comm.  Only meaningful
+after calling uMPI::init.
+
+
+static int size;
+
+The number of processes in comm.  Only meaningful after
+calling uMPI::init.
+
+
+static int ioProc;
+
+The rank of a unique processor certified to perform I/O for
+comm.  Only meaningful after calling uMPI::init.
+
+
+static int iDoIO;
+
+Set to (uMPI::rank == uMPI::ioProc).  Only meaningful after calling
+uMPI::init.
+
+
+static int running()
+
+Returns 1 if MPI has been started, otherwise 0.
+  
+
+static void init(int* argcP,char*** argvP)
+
+Calls MPI_Init and initializes size, rank, etc. above.
+
+
+static void done()
+
+Calls MPI_Finalize(). 
+  
+
+static void reduce(void* sendbuf,void* recvbuf,int count,
+		   MPI_Datatype datatype,MPI_Op op,int root)
+
+Calls MPI_Reduce in comm with the arguments supplied.
+Checks the error code returned and aborts if it is not 0.
+
+
+static void broadcast(void* buffer,int count,MPI_Datatype datatype,int root)
+
+Calls MPI_Bcast in comm with the arguments supplied.
+Checks the error code returned and aborts if it is not 0.
+

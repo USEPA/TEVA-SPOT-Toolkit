@@ -1,0 +1,40 @@
+OSNAME=linux
+CC=gcc
+#DEBUG=-g
+# variables for use with cc compiler
+####PIC=-Kpic
+OPTIMIZE = -O3
+##include directories
+INCLUDES =  -I.
+
+# libraries we generate
+LIBS = libepanet.a
+
+# what files go in which libraries
+EPANET_OBJS=epanet.o hash.o hydraul.o inpfile.o input1.o input2.o \
+	    input3.o mempool.o output.o quality.o report.o \
+	    rules.o smatrix.o
+
+# compiler flags specific to each dialect
+
+###CFLAGS = -Xa -xCC $(DEBUG) $(OPTIMIZE) $(THREADS) $(UNSAFE) $(INCLUDES)
+CFLAGS = $(DEBUG) $(OPTIMIZE) $(THREADS) $(UNSAFE) $(INCLUDES)
+LDFLAGS = $(LIBRARIES)
+
+libepanet.so: $(EPANET_OBJS)
+	gcc -shared -o $@ $(EPANET_OBJS)
+
+.c.o: 
+	$(PURIFY) $(CC) $(PIC) $(CFLAGS) -c $<
+
+
+lint: 
+	lint -b $(INCLUDES) *.c
+
+clean:
+	/bin/rm *.o *.so *~
+
+.KEEP_STATE:
+.PRECIOUS: $(LIBS)
+
+

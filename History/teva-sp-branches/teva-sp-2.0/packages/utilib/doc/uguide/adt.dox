@@ -1,0 +1,225 @@
+/*!
+ * \page adt
+
+\section adt Abstract Data Types
+
+The \c utilib/src/adt directory contains definitions for the following abstract
+datatypes:
+
+<ul>
+<li> Arrays
+<ul>
+<li> 1D Array
+<li> 2D Array
+<li> 3D Array
+<li> Bit Array
+<li> Sparse Matrix
+</ul>
+<li> Character String
+<li> Dynamic Data Types
+<ul>
+<li> Hash Table
+<li> Linked List
+<li> Heap
+<li> Ordered List
+<li> Queue
+<li> Stack
+<li> Splay Tree
+</ul>
+</ul>
+
+These data types are defined as templates. 
+
+\subsection arrayadt Arrays
+
+The array classes provide a nice level of encapsulation for array
+data types.  The main distinction between the Basic, Simple and Num
+array types is that the Basic array types do not include I/O operations,
+the Simple arrays add I/O operations, and the Num arrays add numerical
+vector operations.  The following is a brief tutorial on how to use
+array-type classes in utilib.  This is just what you need to get up
+and running.  I'll touch on implementation where necessary to explain
+behavior and where useful for debugging.  The primary advantage of using
+these classes is extra safety features such as runtime bounds checking
+and reference counting.  Also bit arrays can save a lot of space.
+
+
+\latexonly\subsection{\endlatexonly\htmlonly<b>\endhtmlonly
+One-Dimensional Arrays \latexonly}\endlatexonly\htmlonly</b>\endhtmlonly
+
+The most commonly used 1D arrays are BitArray's, ::IntVector's and
+::RealVector's. The syntax for doubles and ints is the same, so we
+only include examples for IntVector's, indicating where BitArray
+syntax differs.  To use these arrays, you need to include the appropriate
+header files:
+\verbatim
+   #include "BitArray.H"
+   #include "DoubleVector.H"
+   #include "IntVector.H"
+\endverbatim
+You can then declare variables as usual:
+\verbatim
+   IntVector IntTester;
+   BitArray BitTester;
+\endverbatim
+All of these ArrayData classes have a pointer to the data in the field
+\htmlonly Data \endhtmlonly\latexonly {\tt Data} \endlatexonly.  You can
+get this pointer using the data() function.
+\verbatim
+   int *intarray = IntTester.data();
+\endverbatim
+Ordinarily, you will not need to do this, but it can be useful for
+debugging.  Inside a debugger like dbx, typing
+\verbatim
+   print *IntTester
+\endverbatim
+will return useful information like the data location, size, etc, and
+\verbatim
+   print IntTester.Data[i]
+\endverbatim
+allows you to view the ith entry in the ::IntVector.
+
+\par
+The declarations above (no arguments) construct an object with a NULL
+data pointer.  One can also specify the initial content of the ::IntVector:
+\verbatim
+   int array-of-ints[20];
+   IntVector IntTester(20, array-of-ints);
+\endverbatim
+The first argument is the length of the array and the second is a pointer
+to an array of the appropriate type.  The data field in the ::IntVector
+will point to this array.  One can also construct a copy of an existing
+::IntVector:
+\verbatim
+   IntVector CopiedVector(IntTester);
+\endverbatim
+This will allocate a new integer vector and initialize it with the
+contents of \c IntTester.  The Data field in \c CopiedVector points to
+the new copy.
+
+\par
+Frequently, one will need to use an empty constructor (i.e. start with a
+size-zero vector) and then put in the true data.  More generally, you may
+want to grow and shrink the vector dynamically:
+\verbatim
+   IntTester.resize(100);
+\endverbatim
+This will allocate a new array of 100 integers and copy the old data
+(if any) into the beginning of the array.  For example, if a 30-element
+array is resized to 70, the first 30 elements of the new array will be
+the values from the old array.  For BasicArray and SimpleArray
+objects, you cannot assume anything about the next 40 values (initialize
+or set them yourself), but for NumArray objects these array elements
+will be initialized to zero.  If an array of size 70 is resized to 30,
+then the last 40 elements are truncated.
+\verbatim
+   IntTester.size() 
+\endverbatim
+returns the length of IntTester (in integers [more
+generally, array elements], not bytes).
+
+\par
+The equals (=) operator allocates new space. Thus
+\verbatim
+   CopiedVector = IntTester;
+\endverbatim
+creates a new integer array and copies the contents of IntTester into that
+array.  The Data field of \c CopiedVector points to the new space.  If the
+vector already exists and you want to reuse the already-allocated space,
+use the \htmlonly << \endhtmlonly\latexonly {\tt <<} \endlatexonly
+operator:
+\verbatim
+   ExistingIntVector << IntTester;
+\endverbatim
+This copies the contents of the Data array from \c IntTester into the
+array for \c ExistingIntVector.  The allocated arrays must be of the same
+size or you will get an error.
+To copy by reference, use the \htmlonly &= \endhtmlonly\latexonly {\tt \&=}
+\endlatexonly operator.  Thus
+\verbatim
+   Intvector SharedVector &= IntTester;
+\endverbatim
+will have the data of \c SharedVector point to the same array that
+the data of \c IntTester points to (reference counts are properly
+updated).
+
+\par
+The equals (<<) operator is overloaded to allow (re)initialization of a
+vector that has already been created.
+\verbatim
+   intTester << 15;
+\endverbatim
+This sets every element of \c IntTester to 15 (or obviously some other integer).
+
+\par
+Getting array elements works looks like normal array references (at least 
+for 1D arrays):
+\verbatim
+   int index, newvalue;
+   IntTester[index] = newvalue;
+   newvalue = IntTester[index];
+\endverbatim
+Here's where BitArray syntax varies slightly.  Instead of typing
+\verbatim
+   BitTester[index] = 1;  // wrong
+\endverbatim
+you should use
+\verbatim
+   BitTester.set(index);  // turns the (index)th bit on
+   BitTester.reset(index); // turns the (index)th bit off
+\endverbatim
+There are ways to manipulate consecutive subvectors.  I haven't needed
+them, so I'm omitting them for now.
+
+\par
+Finally, note that the BitArray class is derived from BitArrayBase.
+This class can be used to define compact representations for user-defined
+enumeration types.  For example, see the TwoBitArray and
+EnumBitArray classes.
+
+\subsection dynaadt Dynamic Abstract Data Types
+
+\par
+Two different classes of templates have been defined for hash tables,
+heaps and splay trees.  The first is a \em simple template, which uses
+a simple data type to define the key used by these data structures.
+The second is a \em generic template, which uses a generic class to
+define the key.  These two classes are derived from from an abstract
+datatype class that defines the basic operations of the class using
+abstract operations on the keys.
+
+\latexonly \subsection{ \endlatexonly \htmlonly <b> \endhtmlonly Splay Trees
+\latexonly } \endlatexonly \htmlonly </b> \endhtmlonly
+
+Splay trees, or self-adjusting search trees, are a simple and efficient
+data structure for storing an ordered set.  The data structure consists
+of a binary tree, with no additional fields.  It allows searching,
+insertion, deletion, deletemin, deletemax, splitting, joining, and
+many other operations, all with amortized logarithmic performance.
+Since the trees adapt to the sequence of requests, their performance
+on real access patterns is typically even better.  Splay trees are
+described in a number of texts and 
+\if GeneratingLaTeX \latexonly papers~\cite{LewDen91,SleTar85,Wei92,Woo93}. 
+\endlatexonly \endif 
+\if GeneratingHTML papers [LewDen91, SleTar85, Wei92, Woo93]. \endif
+
+\htmlonly <b>Heaps</b> \endhtmlonly
+
+\latexonly \subsection{ Heaps  } \endlatexonly 
+
+See \if GeneratingLaTeX \latexonly Cormen, Leiserson and
+Rivest~\cite{CorLeiRiv96} \endlatexonly \endif \if GeneratingHTML
+[CorLeiRiv96] \endif for more details about heaps.
+The design of the UTILIB heap classes is similar to the heap classes
+developed for the PICO software library.
+
+
+\htmlonly <b> Hash Tables </b> \endhtmlonly
+\latexonly \subsection{ Hash Tables } \endlatexonly
+
+See 
+\if GeneratingLaTeX \latexonly Cormen, Leiserson and Rivest~\cite{CorLeiRiv96} \endlatexonly \endif \if GeneratingHTML Cormen, Leiserson and Rivest [CorLeiRiv96] \endif 
+for more details about hash tables.  UTILIB provides several default
+hash functions.
+
+*/

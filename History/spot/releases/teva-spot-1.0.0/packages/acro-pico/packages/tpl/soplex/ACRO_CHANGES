@@ -1,0 +1,14 @@
+$Id: ACRO_CHANGES,v 1.1 2006/09/18 16:43:24 lafisk Exp $
+
+Current and past versions of SOPLEX may be obtained here:
+http://www.zib.de/Optimization/Software/Soplex/
+
+The SOPLEX files in this directory have been modified by
+the Acro developers.  Some changes include:
+
+.  Eliminated the acronistic use of 'len()' in arrays, etc
+.  Removed pragmas from SOPLEX code, to eliminate compile warnings
+
+In addition, it is possible that some files from the original 
+distribution were omitted in our distribution.
+

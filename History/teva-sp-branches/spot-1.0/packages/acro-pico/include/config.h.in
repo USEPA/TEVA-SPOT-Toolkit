@@ -1,0 +1,260 @@
+/* include/config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* software build cpu is sparc */
+#undef BUILD_CPU_SPARC
+
+/* software build cpu is x86 */
+#undef BUILD_CPU_X86
+
+/* software build cpu is 64 bit x86 */
+#undef BUILD_CPU_X86_64
+
+/* software build os is cygwin */
+#undef BUILD_CYGWIN
+
+/* software build os is linux */
+#undef BUILD_LINUX
+
+/* software build os is solaris */
+#undef BUILD_SOLARIS
+
+/* Define to dummy `main' function (if any) required to link to the Fortran
+   libraries. */
+#undef F77_DUMMY_MAIN
+
+/* Define to a macro mangling the given C identifier (in lower and upper
+   case), which must not contain underscores, for linking with Fortran. */
+#undef F77_FUNC
+
+/* As F77_FUNC, but for C identifiers containing underscores. */
+#undef F77_FUNC_
+
+/* Define if F77 and FC dummy `main' functions are identical. */
+#undef FC_DUMMY_MAIN_EQ_F77
+
+/* Define if you have a BLAS library. */
+#undef HAVE_BLAS
+
+/* Define if you have CPLEX library. */
+#undef HAVE_CPLEX
+
+/* Define if you have the dlopen function. */
+#undef HAVE_DLOPEN
+
+/* define if the compiler supports exceptions */
+#undef HAVE_EXCEPTIONS
+
+/* define if the compiler supports the explicit keyword */
+#undef HAVE_EXPLICIT
+
+/* Define to 1 if you have the `getrusage' function. */
+#undef HAVE_GETRUSAGE
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define if you have LAPACK library. */
+#undef HAVE_LAPACK
+
+/* define if the compiler supports member templates */
+#undef HAVE_MEMBER_TEMPLATES
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* define that mpi is being used */
+#undef HAVE_MPI
+
+/* define if the compiler implements namespaces */
+#undef HAVE_NAMESPACES
+
+/* Define if you have NPSOL library. */
+#undef HAVE_NPSOL
+
+/* define if the compiler has stringstream */
+#undef HAVE_SSTREAM
+
+/* define if the compiler supports ISO C++ standard library */
+#undef HAVE_STD
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the `strerror' function. */
+#undef HAVE_STRERROR
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Define to 1 if you have the <values.h> header file. */
+#undef HAVE_VALUES_H
+
+/* software host will be cygwin */
+#undef HOST_CYGWIN
+
+/* software host is GNU */
+#undef HOST_GNU
+
+/* software host will be linux */
+#undef HOST_LINUX
+
+/* software host will be mingw */
+#undef HOST_MINGW
+
+/* software host will be solaris */
+#undef HOST_SOLARIS
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* software target will be cygwin */
+#undef TARGET_CYGWIN
+
+/* software target will be linux */
+#undef TARGET_LINUX
+
+/* software target will be mingw */
+#undef TARGET_MINGW
+
+/* software target will be solaris */
+#undef TARGET_SOLARIS
+
+/* Define if want to build with ampl enabled */
+#undef USING_AMPL
+
+/* Define if want to build with appspack enabled */
+#undef USING_APPSPACK
+
+/* define that clp is being used */
+#undef USING_CLP
+
+/* define that cobyla is being used */
+#undef USING_COBYLA
+
+/* Define if want to build with coin enabled */
+#undef USING_COIN
+
+/* Define if want to build with colin enabled */
+#undef USING_COLIN
+
+/* Define if want to build with coliny enabled */
+#undef USING_COLINY
+
+/* Define if want to build with dscpack enabled */
+#undef USING_DSCPACK
+
+/* Define if want to build with exact enabled */
+#undef USING_EXACT
+
+/* Define if want to build with filib enabled */
+#undef USING_FILIB
+
+/* Define if want to build with glpk enabled */
+#undef USING_GLPK
+
+/* Define if want to build with gnlp enabled */
+#undef USING_GNLP
+
+/* Define if want to build with ipopt enabled */
+#undef USING_IPOPT
+
+/* Define if want to build with mtl enabled */
+#undef USING_MTL
+
+/* Define if want to build with optpp enabled */
+#undef USING_OPTPP
+
+/* Define if want to build with parpcx enabled */
+#undef USING_PARPCX
+
+/* Define if want to build with pebbl enabled */
+#undef USING_PEBBL
+
+/* Define if want to build with pico enabled */
+#undef USING_PICO
+
+/* define that plgo is being used */
+#undef USING_PLGO
+
+/* Define if want to build with soplex enabled */
+#undef USING_SOPLEX
+
+/* Define if want to build with 3po enabled */
+#undef USING_THREEPO
+
+/* Define if want to build with tmf enabled */
+#undef USING_TMF
+
+/* Define if want to build with tracecache enabled */
+#undef USING_TRACECACHE
+
+/* Define if want to build with trilinos enabled */
+#undef USING_TRILINOS
+
+/* Define if want to build with utilib enabled */
+#undef USING_UTILIB
+
+/* turn on code validation tests */
+#undef VALIDATING
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to 1 if your processor stores words with the most significant byte
+   first (like Motorola and SPARC, unlike Intel and VAX). */
+#undef WORDS_BIGENDIAN
+
+/* define whether checksum function is included in utilib */
+#undef YES_CHECKSUM
+
+/* define whether CommonIO is included in utilib */
+#undef YES_COMMONIO
+
+/* define whether memdebug is included in utilib */
+#undef YES_MEMDEBUG
+
+/* Define to `unsigned' if <sys/types.h> does not define. */
+#undef size_t
+
+#ifndef ACRO_HAVE_EXPLICIT
+#ifndef explicit
+#define explicit
+#endif
+#endif
+#ifdef ACRO_USING_UTILIB
+#include <utilib/utilib_config.h>
+#endif
+

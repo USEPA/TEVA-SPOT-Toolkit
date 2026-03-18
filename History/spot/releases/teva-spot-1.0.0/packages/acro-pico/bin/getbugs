@@ -1,0 +1,8 @@
+#! /bin/sh
+#
+# Get a comma-separated list of bugs for a given Bugzilla product
+#
+
+product=`echo "$1" | sed 's/+/%2B/g'`
+cd /var/www/html/bugzilla;
+./buglist.cgi bug_status=UNCONFIRMED bug_status=NEW bug_status=ASSIGNED bug_status=REOPENED field-1-0-0=bug_status field-1-1-0=product field0-0-0=content field0-0-1=short_desc product=$product query_format=specific type-1-0-0=anyexact type-1-1-0=anyexact type0-0-0=matches type0-0-1=allwords value-1-0-0=UNCONFIRMED,NEW,ASSIGNED,REOPENED value-1-1-0=$product ctype=csv 2>&1

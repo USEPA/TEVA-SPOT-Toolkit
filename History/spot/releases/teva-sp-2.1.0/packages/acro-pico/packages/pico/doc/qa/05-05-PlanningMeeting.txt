@@ -1,0 +1,170 @@
+
+What: Notes from an internal planning meeting
+Goal: Prioritize future PICO development, particularly as it pertains to 
+	the upcoming PICO release
+Location: 5/24/2005, SNL
+Attendees: W. Hart, C. Phillips, J.-P. Watson, J. Berry, V. Leung, B. Carr
+
+
+
+Funding/Customers of current PICO capabilities
+
+1. CSRF Robust Optimization
+   POC: C. Phillips
+   Needs research development focused on robust computing and verification
+		of solutions; will support testing
+   Funding through FY06
+
+2. CSRF Global Optimization
+   POC: W. Hart
+   Needs core PICO B&B solver plus LP interfaces
+   Funding through FY07
+
+3. LM JSF logistics
+   POC: JP Watson
+   Needs PC MIP solver running in serial.  Solvers must approximate performance
+	of CPLEX (within an order of magnitude), and work robustly (few
+	user errors)
+   Funding through FY06, possibly beyond
+
+4. FCS Logistics
+   POC: JP Watson
+   Same as JSF logistics
+   Funding through FY05
+
+5. EPA
+   POC: W. Hart
+   Needs serial MIP solver for Linux/PC.  May also need parallel solvers.
+   	Needs Acro support for parallel LP.  Could support branch-and-price
+   	development
+   Funding through FY06, and probably beyond.
+
+6. MICS
+   POC: W. Hart, C. Phillips
+   Basic research funding
+   Funding through FY06, and probably beyond.
+
+7. TRIPS/OST
+   POC: V. Leung
+   Needs parallel branch-and-cut and heuristic MIP solvers
+   Funding through FY05, and possibly beyond.
+
+8. DAKOTA
+   POC: W. Hart
+   Needs heuristic MINLP solver using the PICO core.  Needs testing and QA
+	facilities in Acro, which are being funded through FY05.
+   Funding through FY06.
+
+Possible/unfunded customer interactions
+
+1. Tech Refresh
+   POC: J. Watson
+   Needs support for branch-and-price and other decomposition methods
+   Possible funding in FY06.
+
+2. Eldorado
+   POC: J. Berry
+   Needs an application driver for multithreaded computing.
+   Possible funding in FY06.
+
+3. Combinatorial docking
+   POC: W. Hart
+   Needs support for PICO core for an existing capability.
+   No funding is likely.
+
+
+
+Task Categories for PICO Support
+
+
+1. Testing/Report Generation
+   HIGH
+   Activities
+	a. performance profiling
+	b. setting up DART dashboard
+	c. broad suite of tests
+	d. parallel tests
+	e. profiling and memory checking
+	f. bug/test summaries
+   S. Chakerian is supporting (b), (e) and (f) with DAKOTA funding for Acro.
+
+2. MIP Development
+   HIGH
+   Activities
+	a. fixing preprocessor
+	b. setting up parallel B&C
+	c. documenting ampl-pico interface for B&C
+   C. Phillips, J. Berry and J. Eckstein are working on these.
+
+3. Bug Management/Performance Refinement
+   HIGH
+   Activities:
+	a. setup Bugzilla reports
+	b. integrate bugzilla into bug report generation
+   All team members are working on making the use of Bugzilla a standard
+	practice
+
+4. COIN Interfacing
+   HIGH
+   Activities:
+	a. resolve differences with the latest version of COIN
+	b. resolve legal issues w.r.t. integrating SNL changes into COIN
+	c. setup nightly tests of the head COIN release (on tofu)
+
+5. Release Management
+   HIGH (until the PICO release)
+   Activities:
+	a. remove Pantex application code from PICO
+	b. split PICO package into PICO core and PICO MIP
+	c. resolve remaining legal issues within SNL
+	d. setup PICO download link at SNL
+   C. Phillips and W. Hart are working on these
+
+6. Porting
+   MEDIUM
+   Activities:
+	a. Linux
+	b. Cygwin
+	c. Mac
+	d. VC++
+	e. reddish
+	f. icc
+   Porting issues for reddish and icc are not currently a focus.  Bill is
+   working on the VC++ port.  Bill will remove PICO from the Acro tests that
+   are performed nightly, except for a few local platforms.
+
+7. Documentation
+   MEDIUM
+   Activities:
+	a. prepare user-level documentation for the PICO release
+	b. prepare journal publications of the PICO IP solver
+   All team members will contribute to this, but this activity will be led
+   by J. Eckstein.
+
+8. Configuration Management
+   LOW
+   Activities:
+	a. add hooks for using local library installations (e.g. CPLEX)
+	b. support LAM MPI more cleanly
+	c. rework to use autoconf/automake
+	d. use external COIN installation
+	e. rework AMPL configuration
+   This is not an active area of PICO development.  W. Hart will support this
+   at a minimal level as part of general support for DAKOTA.
+
+9. Core Development
+   LOW
+   Activities:
+	There are no active development activities for the core.
+   J. Eckstein is leading core development.
+
+10. Managing Third-Party Software
+   LOW
+   Activities:
+	a. glpk
+	b. soplex
+	c. COIN
+	d. ampl
+   This is not an active area, except for updates to COIN that are described in
+   task (4) above.
+

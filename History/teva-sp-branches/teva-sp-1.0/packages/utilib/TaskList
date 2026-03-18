@@ -1,0 +1,85 @@
+This task list shows a list of TODOs for future development of UTILIB
+
+o Remove references to 'cout' in AbstractHashTable, MultiLL and 
+	SimpleHashTable.  These files should use the functions in errmsg.h 
+	and use arguments passed in by the user to define a generic 
+	stream for I/O.
+
+o Remove or update the src/io/sync_io.cpp commands.
+
+o Implement queueLL and stackLL functionality in LinkedList
+
+o Validate the BasicArray.set_data methods
+
+o Is the BasicArray.at method necessary???
+
+o Document the PackBuffer/UnPackBuffer functions.
+
+o Document the I/O stream functions.
+
+o Validate the SimpleArray::operator< and Simple2DArray::operator< methods.
+
+o Eliminate 256 character limit on the CharString::read method.
+
+o Move MultiLL into the TABU search code.
+
+o Remove Boyd's old Triangular code to an 'archive' directory.
+
+o Remove src/io/sync_io functionality.
+
+o Document logEvent and parameter classes.
+
+o Rename stdlibmpi.h to utilib_mpi.h
+
+o Add support for 'make html' and 'make pdf' for documentation
+
+o Add documentation for inlined operator functions (e.g. operator<<).
+
+o Figure out why #defines in logEvent aren't documented.
+
+o Figure out how to use Discretize s.t. you return size_type's and regular
+	integers seperately...
+
+o Check out the QueueArray functionality.
+
+o Resolve coercion issues regarding the use of size_type in SparseMatrix.
+
+o Add 'status' flag to the 'remove' methods for LinkedList and OrderedList 's
+
+o Add configuration option for memdebug.
+
+o Move definition of ADT order sense to a central location.
+
+o Create sorting utilities that take natural comparison functions:
+	int compare(TYPE& arg1, TYPE& arg2)
+
+o Should the order arrays used for sorting be required to be unsigned 
+	integer arrays?
+
+o Optimize the CharString constructor when given a pointer to a string.
+	Right now, it creates a shared object, which is overkill.
+
+o Remove Boolean.h
+
+o Remove 'freeze' features from BasicArray
+
+o Create iterators for src/adt classes.
+
+o Catch errors in the --with-compiler=FOO configuration flag, when FOO does not exist.
+
+o Add UnPackBuffer 'bounds checking' for unpacking beyond the end of the actual
+  packed message length.
+
+o add --with-mappedIO to the documentation.
+
+o Validate whether the _math.h header can be used within *.c files. Confirm whether the methods in cov.c and math.c should be compiled using c++ to put them in the utilib namespace.
+
+o Assess how the comparison classes in compare.h are related to STL comparison objects.
+
+o Rework the SparseMatrix convert methods.
+  Can use hashing or sorting to improve the time complexity for this operation.
+
+o Augment the uMPI::init() code to test the environment before calling 
+MPI_Init on platforms that do not support direct serial execution of 
+MPI-compiled executables (AIX).
+

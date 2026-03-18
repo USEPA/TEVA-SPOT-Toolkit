@@ -1,0 +1,43 @@
+
+	A Brief Explanation of the COIN Makefile Structure
+
+	This note gives a brief overview of the COIN makefile boilerplate. If
+you're writing makefiles and are serious about using the COIN boilerplate,
+you'll want to actually read the various Makefiles for details. You'll also
+want to consult the makefiles for a few of the existing COIN components to see
+how the various authors have used the boilerplate.
+
+	Most of the makefiles require a fairly good understanding of the
+capabilities of Gnu make.  Failing that, print yourself a copy of the Gnu
+make manual and look on this as a learning opportunity.
+
+	The COIN makefiles can be separated into two groups.  Makefile.coin,
+Makefile.location, and the various Makefile.{OStype} files handle
+configuration. Makefile.lib and Makefile.rules define rules for building
+things.
+
+	To use the configuration files, include Makefile.coin somewhere
+toward the beginning of the makefile for your program. Makefile.coin does
+some initialisation, then includes one of the Makefile.{OStype} files, where
+OStype will be the string returned by executing uname. This sets up an
+appropriate build environment. Next, Makefile.coin includes Makefile.location,
+which defines what will be built and where it's located. At the end of all
+this, you'll have reasonable defaults for the standard make variables that
+control compilation and linking, and you'll have a set of variables that define
+the location of the various COIN components.
+
+	Turning to the rules files, Makefile.rules defines the basic
+compilation rules for C++, C, and Fortran, and for automatically building
+dependencies. Makefile.lib defines the rules for constructing libraries.
+Note that Makefile.lib expects C++ files; you need to preempt it and set
+LIBOBJ and LIBDEP ahead of time for C or Fortran.
+
+	The COIN makefiles are set up to maintain binaries for multiple
+operating systems, and multiple compiler optimisation levels. Binaries are
+placed in a subdirectory of the build directory, defined as
+    TARGETDIR ?= $(UNAME)$(OptVersion)
+where UNAME is the output of uname (as mentioned above) and OptVersion is
+constructed from OptLevel by replacing spaces with `_'. OptLevel is typically
+left exposed to the user, at the beginning of the makefile for a component.
+It should be set before including Makefile.coin.
+

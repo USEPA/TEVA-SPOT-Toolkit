@@ -1,0 +1,15 @@
+#--------------------------------------------------#
+# Host ARCHitecture dependent definitions - CYGWIN #
+#--------------------------------------------------#
+
+ECHO		= /bin/echo
+LN		= ln -s
+LND		= ln -s #winln
+MYMAKE		= make
+MAKE		= $(MYMAKE) -f Makefile-$(TARGET_NAME)
+PWD		= pwd
+RM		= rm -rf
+SHELL		= /bin/sh
+SYMBTEST	= -L
+YACC		= byacc
+LEX		= flex -l

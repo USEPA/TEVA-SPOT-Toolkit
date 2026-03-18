@@ -1,0 +1,3 @@
+../../../bin/sp-tracer --path=../../.. --inp=Net3_mod.inp River_source.txt
+../../../bin/sp-tracer --path=../../.. --ages=River_age.txt River_source.txt --objective=awd --ub=ns,10 --solver=pico --ub=nfd,0.1 --runtime=60
+../../../bin/sp-tracer --path=../../.. --ages=River_age.txt River_source.txt --objective=awd --ub=ns,10 --solver=cplexamp --ub=nfd,0.3 --runtime=300.0

@@ -1,0 +1,6 @@
+; injection at all nonzero demands
+; injection type MASS
+; inject 1.45E10 (mass per minute)
+; 24-hour incident starting at 12 am
+
+NZD    MASS 1.45E10               0                86400

@@ -1,0 +1,536 @@
+Microsoft Developer Studio Workspace File, Format Version 6.00
+# WARNING: DO NOT EDIT OR DELETE THIS WORKSPACE FILE!
+
+###############################################################################
+
+Project: "CbcSamplesSample2"=.\CbcSamplesSample2\CbcSamplesSample2.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cbcLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cglLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiClpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "CbcSamplesSudoku"=.\CbcSamplesSudoku\CbcSamplesSudoku.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cbcLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cglLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiClpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ClpSamplesMinimum"=.\ClpSamplesMinimum\ClpSamplesMinimum.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ClpSamplesTestBarrier"=.\ClpSamplesTestBarrier\ClpSamplesTestBarrier.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "ClpSamplesTestQP"=.\ClpSamplesTestQP\ClpSamplesTestQP.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "SmiUnitTest"=.\SmiUnitTest\SmiUnitTest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiClpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name smiLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "cbcLib"=.\cbcLib\cbcLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "cglLib"=.\cglLib\cglLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "cglUnitTest"=.\cglUnitTest\cglUnitTest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cglLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiClpLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "clpExecutable"=.\clpExecutable\clpExecutable.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cbcLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiCbcLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name cglLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiClpLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "clpLib"=.\clpLib\clpLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "clpUnitTest"=.\clpUnitTest\clpUnitTest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "coinLib"=.\coinLib\coinLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "coinUnitTest"=.\coinUnitTest\coinUnitTest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "exampleCgl1"=.\exampleCgl1\exampleCgl1.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name cglLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiClpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name sbbLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiOslLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "osiCbcLib"=.\osiCbcLib\osiCbcLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiClpLib"=.\osiClpLib\osiClpLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiCpxLib"=.\osiCpxLib\osiCpxLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiDylpLib"=..\Clp\Samples\osiDylpLib\osiDylpLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiFmpLib"=.\osiFmpLib\osiFmpLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiGlpkLib"=.\osiGlpkLib\osiGlpkLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiLib"=.\osiLib\osiLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiOslLib"=.\osiOslLib\osiOslLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiSpxLib"=.\osiSpxLib\osiSpxLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiUnitTest"=.\osiUnitTest\osiUnitTest.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name clpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name coinLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiClpLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiVolLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name volLib
+    End Project Dependency
+    Begin Project Dependency
+    Project_Dep_Name osiDylpLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Project: "osiVolLib"=.\osiVolLib\osiVolLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "osiXprLib"=.\osiXprLib\osiXprLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "smiLib"=.\smiLib\smiLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "volLib"=.\volLib\volLib.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+}}}
+
+###############################################################################
+
+Project: "volUfl"=.\volUfl\volUfl.dsp - Package Owner=<4>
+
+Package=<5>
+{{{
+}}}
+
+Package=<4>
+{{{
+    Begin Project Dependency
+    Project_Dep_Name volLib
+    End Project Dependency
+}}}
+
+###############################################################################
+
+Global:
+
+Package=<5>
+{{{
+}}}
+
+Package=<3>
+{{{
+}}}
+
+###############################################################################
+

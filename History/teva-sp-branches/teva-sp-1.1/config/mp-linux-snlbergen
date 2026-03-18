@@ -1,0 +1,12 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for host=linux at site=SNLbergen
+#-----------------------------------------------------------------------#
+
+MPI_DIR=
+MPI_INCLUDES=
+MPI_LIBS= -llammpi++ -llammpio -llamf77mpi -lmpi -llam -lpthread -ldl
+MPI_LDFLAGS= 
+ 
+BLAS_LIBS=-lblas
+LAPACK_LIBS=-llapack
+

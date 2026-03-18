@@ -1,0 +1,48 @@
+any		--regression=all,smoke --benchmark=any.qa
+./any
+array		--regression=all,smoke --benchmark=array.qa
+./array
+bitarray	--regression=all,smoke --benchmark=bitarray.qa
+./bitarray
+class_options	--regression=all,smoke --benchmark=class_options.qa
+./class_options
+commonio	--regression=all,smoke --benchmark=commonio.qa
+./commonio
+commonio_debug	--regression=all,smoke --benchmark=commonio_debug.qa
+./commonio_debug
+ereal		--regression=all,smoke --benchmark=ereal.qa
+./ereal
+exception_test	--regression=all,smoke --benchmark=exception_test.qa
+./exception_test
+heap		--regression=all,smoke --benchmark=heap.qa
+./heap
+iotest		--regression=all,smoke --benchmark=iotest.qa
+./iotest
+iotest_debug	--regression=all,smoke --benchmark=iotest_debug.qa
+./iotest_debug
+listtest	--regression=all,smoke --benchmark=listtest.qa
+./listtest
+lphash		--regression=all,smoke --benchmark=lphash.qa
+./lphash
+malloc		--regression=all,smoke --benchmark=malloc.qa
+./malloc
+multibitarray	--regression=all,smoke --benchmark=multibitarray.qa
+./multibitarray
+olist		--regression=all,smoke --benchmark=olist.qa
+./olist
+pvector		--regression=all,smoke --benchmark=pvector.qa
+./pvector
+smartptr	--regression=all,smoke --benchmark=smartptr.qa
+./smartptr
+sort_test	--regression=all,smoke --benchmark=sort_test.qa
+./sort_test
+splay		--regression=all,smoke --benchmark=splay.qa
+./splay
+stltest		--regression=all,smoke --benchmark=stltest.qa
+./stltest
+stringtest	--regression=all,smoke --benchmark=stringtest.qa
+./stringtest
+tuple		--regression=all,smoke --benchmark=tuple.qa
+./tuple
+vectest		--regression=all,smoke --benchmark=vectest.qa
+./vectest

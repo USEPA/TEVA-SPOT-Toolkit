@@ -1,0 +1,22 @@
+\section{Overview}\label{skelExecutable_skelOverview}
+The TEVA-SPOT skeletonizer, {\bfseries spotSkeleton}, reduces the size of a network  model by grouping neighboring nodes based on the topology of the network and pipe diameter threshold.  {\bfseries spotSkeleton} requires an EPANET inp network file and a pipe diameter threshold along with output file names for the skeletonized EPANET inp network file and map file.  {\bfseries spotSkeleton} contracts connected pieces of the network into a single node; this node is call a supernode.  The map file defines the nodes that belong to each supernode.
+
+\section{Usage}\label{skelExecutable_skelUsage}
+\begin{verb}
+   spotSkeleton <input inp file> <pipe diameter threshold> <output inp file> <output map file>
+\end{verb}
+
+\section{Description}\label{skelExecutable_skelDescription}
+{\bfseries spotSkeleton} includes branch trimming, series pipe merging, and parallel pipe merging.  A pipe diameter threshold determines candidate pipes for skeleton steps.  {\bfseries spotSkeleton} maintains pipes and nodes with hydraulic controls as it creates the skeletonized network.  It performs series and parallel pipe merges if both pipes are below the pipe diameter threshold, calculating hydraulic equivalency for each merge based on the average pipe roughness of the joining pipes.  For all merge steps, the larger diameter pipe is retained.  For a series pipe merge, demands (and associated demand patterns) are redistributed to the nearest node.   Branch trimming removes deadend pipes smaller than the pipe diameter threshold and redistributes demands (and associated demand patterns) to the remaining junction.  {\bfseries spotSkeleton} repeats these steps until no further pipes can be removed from the network.   {\bfseries spotSkeleton} creates an EPANET-compatible skeletonized network inp file and a 'map file' that contains the mapping of original network model nodes into skeletonized supernodes. 
+
+Under the skeletonization steps described above, there is a limit to how much a network can be reduced based on its topology, e.g., number of deadend pipes, or pipes in series and parallel.  For example, sections of the network with a loop, or grid, structure will not reduce under these skeleton steps.  Additionally, the number of hydraulic controls influences skeletonization, as all pipes and nodes associated with these features are preserved.
+
+\section{Notes}\label{skelExecutable_picoNotes}
+
+\begin{itemize}
+\item Commercial skeletonization codes include Haestad Skelebrator, MWHSoft H2OMAP, and MWHSoft InfoWater.  Two-tiered sensor placement requires mapping between the skeletonized and original network (map file).  Commercial skeletonizers do not provide this information directly.  The MWHSoft Infowater/H2OMAP history log file provides it indirectly in a history log file.  The history log file tracks sequential skeleton steps and records merge and trim operations on a pipe-by-pipe basis.    
+\end{itemize} 
+
+\begin{itemize}
+\item To validate {\bfseries spotSkeleton}, we compared its output to that of MWHSoft H2OMAP and Infowater.  Input parameters were chosen to match {\bfseries spotSkeleton} options.  Pipe diameter thresholds of 8 inches, 12 inches, and 16 inches were tested using two large networks.  MWHSoft and TEVA-SPOT skeletonizers were compared using the Jaccard index (Jaccard, 1901).  The Jaccard index measures similarity between two sets by dividing the intersection of the two sets by the union of the two sets.  In this case, the intersection is the number of pipes that are either both removed or not removed by the two skeletonizers, the union is the number of all pipes in the original network.  If the two skeletonizers define the same supernodes, the Jaccard index equals 1.  Skeletonized networks from the MWHSoft and TEVA-SPOT skeletonizers result in a Jaccard index between 0.93 and 0.95.  Thus, we believe the {\bfseries spotSkeleton} is a good substitute for commercial skeletonizers.  
+\end{itemize}

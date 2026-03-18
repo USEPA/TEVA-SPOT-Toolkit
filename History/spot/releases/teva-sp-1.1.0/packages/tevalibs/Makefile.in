@@ -1,0 +1,120 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+INCLUDES += -I$(ROOT_DIR)/packages/tevalibs/include
+LDFLAGS += -L.
+
+#
+# Define objects and headers
+#
+
+EPANETSRCS = \
+TEVAEpanet/EN2source/epanet2/epanet.c\
+TEVAEpanet/EN2source/epanet2/hash.c\
+TEVAEpanet/EN2source/epanet2/hydraul.c\
+TEVAEpanet/EN2source/epanet2/inpfile.c\
+TEVAEpanet/EN2source/epanet2/input1.c\
+TEVAEpanet/EN2source/epanet2/input2.c\
+TEVAEpanet/EN2source/epanet2/input3.c\
+TEVAEpanet/EN2source/epanet2/mempool.c\
+TEVAEpanet/EN2source/epanet2/output.c\
+TEVAEpanet/EN2source/epanet2/quality.c\
+TEVAEpanet/EN2source/epanet2/report.c\
+TEVAEpanet/EN2source/epanet2/rules.c\
+TEVAEpanet/EN2source/epanet2/smatrix.c
+EPANETOBJS=$(EPANETSRCS:.c=.o)
+
+UTILSSRCS=\
+TEVAUtils/tso.c\
+TEVAUtils/enutil.c
+UTILSOBJS=$(UTILSSRCS:.c=.o)
+
+ASSESSSRCS=\
+./TEVAThreatAssess/hia.c\
+./TEVAThreatAssess/nrutil.c\
+./TEVAThreatAssess/sss.c\
+./TEVAThreatAssess/tai.c\
+./TEVAThreatAssess/ta_input.c\
+./TEVAThreatAssess/ta_utils.c\
+./TEVADCDFlib/dcdflib.c
+ASSESSOBJS=$(ASSESSSRCS:.c=.o)
+
+#./TEVAEpanet/EN2source/epanet2ms/odesolve.c
+
+SRCS = $(EPANETSRCS) $(UTILSSRCS) $(ASSESSSRCS)
+OBJS = $(EPANETOBJS) $(UTILSOBJS) $(ASSESSOBJS)
+
+EXECUTABLES=epanet.exe tso2text.exe threat_assess.exe threat_sim.exe
+LIBRARIES= libthreatassess.a libepanet.a libtevautil.a
+
+all: update_includes library executables
+
+executables:
+	$(MAKE) $(EXECUTABLES:.exe=)
+	@cp $(EXECUTABLES:.exe=) $(ROOT_DIR)/bin
+
+install:
+	$(MAKE) clean
+	$(MAKE) library
+	$(MAKE) executables
+
+update_includes:
+	@(if [ ! -d include ]; then \
+	   mkdir -p include; \
+	fi)
+	$(RM) -f include/*h include/*hpp
+	@(for FILE in `find $(SRCDIRS) -name '*.[hH]' -print | cut -c 1-` ; do\
+	   fname=`$(ECHO) "$${FILE}" | sed 's#\(.*\)\/\([a-zA-Z0-9]*\)$ #\2#'`;\
+	   if [ ! -f include/$${fname} ] ; then                   \
+	      $(ECHO) "Linking file $${FILE}";                      \
+	      $(LN) $(ROOT_DIR)/packages/tevalibs/$${FILE} include/$${fname} ;          \
+	   fi;                                                      \
+	done) #2> /dev/null
+
+objs: $(OBJS)
+
+#
+# EXECUTABLES
+#
+
+epanet: libepanet.a
+	cp TEVAEpanet/EN2source/epanet2/epanet.c epamain.c
+	$(CC) -c $(CFLAGS) $(INCLUDES) -DEXECUTABLE epamain.c
+	$(CC) $(CFLAGS) $(ARCH_FLAGS) -o $@ epamain.o -L. -lepanet -lm
+
+tso2text: TEVAUtils/tso2text.o libtevautil.a
+	$(CC) $(CFLAGS) $(ARCH_FLAGS) -o tso2text TEVAUtils/tso2text.o -L. -ltevautil
+
+threat_assess: TEVAThreatAssess/teva-assess.o libthreatassess.a libtevautil.a libepanet.a
+	$(CC) $(CFLAGS) $(ARCH_FLAGS) -o $@ TEVAThreatAssess/teva-assess.o -L. -lthreatassess -ltevautil -lepanet -lm
+
+threat_sim: TEVAThreatSim/teva.o libtevautil.a libepanet.a
+	$(CC) $(CFLAGS) $(ARCH_FLAGS) -o $@ TEVAThreatSim/teva.o -L. -ltevautil -lepanet -lm
+
+#
+# LIBRARIES
+#
+
+library: $(LIBRARIES)
+
+install_library:
+	$(MAKE) clean
+	$(MAKE) library
+
+libthreatassess.a: libthreatassess.a($(ASSESSOBJS))
+	$(RANLIB) $@
+
+libepanet.a: libepanet.a($(EPANETOBJS))
+	$(RANLIB) $@
+
+libtevautil.a: libtevautil.a($(UTILSOBJS))
+	$(RANLIB) $@
+
+#
+# MISC
+#
+
+clean:
+	@$(RM) -f $(LIBRARIES) $(EXECUTABLES) $(OBJS) *.exe *.o
+
+distclean: clean

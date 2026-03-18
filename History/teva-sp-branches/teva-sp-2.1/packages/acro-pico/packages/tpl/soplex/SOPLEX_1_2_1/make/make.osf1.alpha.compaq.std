@@ -1,0 +1,7 @@
+#--- $Id: make.osf1.alpha.compaq.std,v 1.2 2002/09/27 16:45:47 DEVspx Exp $
+CXX	=	cxx
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-std strict_ansi -O2 -arch host -noexceptions -nortti \
+		-ansi_alias -inline speed -assume accuracy_sensitive -ieee -g -tlocal
+LDFLAGS	=	-non_shared -om -lm
+ARFLAGS	=	crs

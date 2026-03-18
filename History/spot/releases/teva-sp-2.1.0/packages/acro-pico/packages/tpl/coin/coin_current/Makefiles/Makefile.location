@@ -1,0 +1,397 @@
+###############################################################################
+#                                                                             #
+# Above the ### Locations ### line comment out everything that you dont want  #
+# to build/use (or in case of a system lib, like zlib).                       #
+#                                                                             #
+# If any of the libraries/headers is at a non-standard location (i.e., not    #
+# in COIN/{lib,include} or in /usr/{lib,include}) then specify below the      #
+# ### Locations ### line where could it be found.                             #
+#                                                                             #
+###############################################################################
+
+CoinDir ?= ${HOME}/COIN
+
+CoinLibsDefined :=
+
+CoinLibsDefined += COIN_libCoin
+CoinLibsDefined += COIN_libOsi
+CoinLibsDefined += COIN_libCgl
+
+# CoinLibsDefined += COIN_libVol
+# CoinLibsDefined += COIN_libOsiVol
+
+CoinLibsDefined += COIN_libClp
+CoinLibsDefined += COIN_libOsiClp
+
+CoinLibsDefined += COIN_libCbc
+# CoinLibsDefined += COIN_libOsiCbc
+
+
+# CoinLibsDefined += COIN_libSym
+# CoinLibsDefined += COIN_libOsiSym
+
+# CoinLibsDefined += COIN_libCpx
+# CoinLibsDefined += COIN_libOsiCpx
+
+# CoinLibsDefined += COIN_libDylp
+# CoinLibsDefined += COIN_libOsiDylp
+
+# CoinLibsDefined += COIN_libFmp
+# CoinLibsDefined += COIN_libOsiFmp
+
+# CoinLibsDefined += COIN_libGlpk
+# CoinLibsDefined += COIN_libOsiGlpk
+
+# CoinLibsDefined += COIN_libMsk
+# CoinLibsDefined += COIN_libOsiMsk
+
+# CoinLibsDefined += COIN_libOsl
+# CoinLibsDefined += COIN_libOsiOsl
+
+# CoinLibsDefined += COIN_libOslSe
+CoinLibsDefined += COIN_libSmi
+
+# CoinLibsDefined += COIN_libSpx
+# CoinLibsDefined += COIN_libOsiSpx
+
+# CoinLibsDefined += COIN_libXpr
+# CoinLibsDefined += COIN_libOsiXpr
+
+#   uncomment COIN_libz and/or COIN_libbz if you want to build the Coin MPS
+#   reader to be able to read compressed files. If you do enable any of
+#   these libraries then you must have them installed before building
+#   COIN. If they are installed in a location your compiler does not
+#   automatically search (as a rule of thumb you should assume only
+#   /usr/{include,lib}) then you have to specify their location near the end
+#   of this file.
+#
+#   For details on zlib look at http://www.gzip.org/zlib/
+#   zlib is due to Jean-loup Gailly and Mark Adler
+#   It is not under CPL but zlib.h has the following
+#   Permission is granted to anyone to use this software for any purpose,
+#   including commercial applications, and to alter it and redistribute it
+
+# CoinLibsDefined += COIN_libz
+# CoinLibsDefined += COIN_libbz
+
+#   uncomment COIN_lapack if you want CoinFactorization to use dense
+#   coding. lapack blas and g2c libraries must be installed.  If you
+#   have other equivalent libraries (e.g. essl on AIX) then modify
+#   library names at end of this file
+
+# CoinLibsDefined += COIN_lapack
+
+#   uncomment COIN_readline if you want front-ends on unix-style
+#   platforms to be built with readline support. Note that the
+#   readline library is under the GPL, which may or may not affect
+#   distribution of your code.
+
+# CoinLibsDefined += COIN_readline
+
+#   uncomment COIN_ufl_ordering if you want ClpCholesky to be able
+#   to use University of Florida ordering code.  You may need to modify 
+#   location of AMD directory
+
+# CoinLibsDefined += COIN_ufl_ordering
+
+
+#   uncomment COIN_ampl if you want to be able to use CBC's solver
+#   with AMPL.  You may need to modify the location of AMPL directory
+#   You will need to download solvers.tar from
+#   http://netlib.bell-labs.com/netlib/ampl/index.html
+#   It is assumed that solvers.tar was downloaded to your home directory
+#   untarred to $(HOME)/solvers, all files in solvers gunzipped and
+#   make -f makefile.u executed
+#   Note - if using cygwin with -mno-cygwin then edit makefile.u to have
+#   CFLAGS  = -O -mno-cygwin -DNON_STDIO -DNo_Control87 -DNO_RUSAGE
+#   Note - you may get warning messages from compilation of Cbc_ampl.c
+#   See COIN/Cbc/README for use
+
+# CoinLibsDefined += COIN_ampl
+
+#   uncomment COIN_opbdp if you want to be able
+#   to use the implicit enumeration code opbdp
+#   The package is available from
+#   http://www.mpi-sb.mpg.de/units/ag2/software/opbdp/
+#   There is code in OsiOpbdpsolve.?pp to take an OsiSolverInterface
+#   (use make libpbcs.a)
+#   and solve it using opbdp.  It will only work for pure 0-1 models
+#   where coefficients can be made integral.
+#   I (JJF) have put it in as it can be useful to solve small subproblems.
+#   It can also be used to obtain ALL feasible solutions to a small IP.
+#   This has not been much tested and needs a small change to opbdp code
+#   see comment in OsiOpbdpsolve.hpp
+#   you may need to modify location of opbdp directory further on
+
+# CoinLibsDefined += COIN_opbdp
+
+
+
+
+###############################################################################
+
+ifneq ($(filter COIN_libCoin,$(CoinLibsDefined)),)
+    export CoinIncDir  := ${CoinDir}/include
+    export CoinLibDir  := ${CoinDir}/lib
+    export CoinLibName := libCoin$(SHARED_LIBEXT)
+    export CoinDefine  := COIN_HAS_COIN
+endif
+
+ifneq ($(filter COIN_libOsi,$(CoinLibsDefined)),)
+    export OsiIncDir  := ${CoinIncDir}
+    export OsiLibDir  := ${CoinLibDir}
+    export OsiLibName := libOsi$(SHARED_LIBEXT)
+    export OsiDefine  := COIN_HAS_OSI
+endif
+    
+ifneq ($(filter COIN_libCgl,$(CoinLibsDefined)),)
+    export CglIncDir  := ${CoinIncDir}
+    export CglLibDir  := ${CoinLibDir}
+    export CglLibName := libCgl$(SHARED_LIBEXT)
+    export CglDefine  := COIN_HAS_CGL
+endif
+
+################################################
+
+ifneq ($(filter COIN_libVol,$(CoinLibsDefined)),)
+    export VolIncDir  := ${CoinIncDir}
+    export VolLibDir  := ${CoinLibDir}
+    export VolLibName := libVol$(SHARED_LIBEXT)
+    # if you want to let Clp use Volume set to COIN_HAS_VOL
+    export VolDefine  := COIN_HAS_VOL
+endif
+ifneq ($(filter COIN_libOsiVol,$(CoinLibsDefined)),)
+    export OsiVolIncDir  := ${CoinIncDir}
+    export OsiVolLibDir  := ${CoinLibDir}
+    export OsiVolLibName := libOsiVol$(SHARED_LIBEXT)
+    export OsiVolDefine  := COIN_HAS_OSIVOL
+endif
+
+################################################
+
+ifneq ($(filter COIN_libClp,$(CoinLibsDefined)),)
+    export ClpIncDir  := ${CoinDir}/Clp/include
+    export ClpLibDir  := ${CoinDir}/lib
+    export ClpLibName := libClp$(SHARED_LIBEXT)
+    export ClpDefine  := COIN_HAS_CLP
+endif
+ifneq ($(filter COIN_libOsiClp,$(CoinLibsDefined)),)
+    export OsiClpIncDir  := ${CoinIncDir}
+    export OsiClpLibDir  := ${CoinLibDir}
+    export OsiClpLibName := libOsiClp$(SHARED_LIBEXT)
+    export OsiClpDefine  := COIN_HAS_OSICLP
+endif
+    
+################################################
+
+ifneq ($(filter COIN_libCbc,$(CoinLibsDefined)),)
+    export CbcIncDir  := ${CoinDir}/Cbc/include
+    export CbcLibDir  := ${CoinDir}/lib
+    export CbcLibName := libCbc$(SHARED_LIBEXT)
+    export CbcDefine  := COIN_HAS_CBC
+endif
+ifneq ($(filter COIN_libOsiCbc,$(CoinLibsDefined)),)
+    export OsiCbcIncDir  := ${CoinIncDir}
+    export OsiCbcLibDir  := ${CoinLibDir}
+    export OsiCbcLibName := libOsiCbc$(SHARED_LIBEXT)
+    export OsiCbcDefine  := COIN_HAS_OSICBC
+endif
+
+
+################################################
+ifneq ($(filter COIN_libCpx,$(CoinLibsDefined)),)
+    export CpxIncDir  :=
+    export CpxLibDir  :=
+    export CpxLibName :=
+    export CpxDefine  := COIN_HAS_CPX
+endif
+ifneq ($(filter COIN_libOsiCpx,$(CoinLibsDefined)),)
+    export OsiCpxIncDir  := ${CoinIncDir}
+    export OsiCpxLibDir  := ${CoinLibDir}
+    export OsiCpxLibName := libOsiCpx$(SHARED_LIBEXT)
+    export OsiCpxDefine  := COIN_HAS_OSI_CPX
+endif
+
+################################################
+
+# The first set of variables is used when building the Dylp solver.
+# Both sets are used when building the OsiDylp OSI interface layer.
+
+ifneq ($(filter COIN_libDylp,$(CoinLibsDefined)),)
+    export DylpHome := $(CoinDir)/Dylp
+    export DylpIncDir  := $(DylpHome)/Dylp $(DylpHome)/Lib
+    export DylpLibDir  := $(CoinLibDir)
+    export DylpLibName := libDylp$(SHARED_LIBEXT)
+    export DylpDefine  := DYLP_ERRMSGDIR="\"$(DylpHome)/Dylp\"" COIN_HAS_DYLP
+endif
+ifneq ($(filter COIN_libOsiDylp,$(CoinLibsDefined)),)
+    export OsiDylpIncDir  := ${CoinIncDir}
+    export OsiDylpLibDir  := ${CoinLibDir}
+    export OsiDylpLibName := libOsiDylp$(SHARED_LIBEXT)
+    export OsiDylpDefine  := COIN_HAS_OSIDYLP
+endif
+    
+################################################
+
+GlpkHome = ${HOME}/glpk-4.7
+
+ifneq ($(filter COIN_libGlpk,$(CoinLibsDefined)),)
+    export GlpkIncDir  := ${GlpkHome}/include
+    export GlpkLibDir  := ${GlpkHome}/src
+    export GlpkLibName := libglpk.a
+    export GlpkDefine  := COIN_HAS_GLPK
+endif
+ifneq ($(filter COIN_libOsiGlpk,$(CoinLibsDefined)),)
+    export OsiGlpkIncDir  := ${CoinIncDir}
+    export OsiGlpkLibDir  := ${CoinLibDir}
+    export OsiGlpkLibName := libOsiGlpk$(SHARED_LIBEXT)
+    export OsiGlpkDefine  := COIN_HAS_OSIGLPK
+endif
+    
+################################################
+
+ifneq ($(filter COIN_libMsk,$(CoinLibsDefined)),)  
+    export MskIncDir  := /usr/share/mosek/mosekdist/4/tools/platform/linux64x86/h
+    export MskDefine  :=
+    export MskLibDir  := /usr/share/mosek/4/tools/platform/linux64x86/bin   
+    # For 32 bit machines  
+    #export MskLibName := libmosek libOsiMsk$(SHARED_LIBEXT)      
+
+    # For 64 bit machines  
+    export MskLibName := libmosek64.so libOsiMsk$(SHARED_LIBEXT)      
+endif
+ifneq ($(filter COIN_libOsiMsk,$(CoinLibsDefined)),)
+    export OsiMskIncDir  := ${CoinIncDir}
+    export OsiMskLibDir  := ${CoinLibDir}
+    export OsiMskLibName := libOsiMsk$(SHARED_LIBEXT)
+    export OsiMskDefine  := COIN_HAS_OSIMSK
+endif
+
+
+################################################
+
+ifneq ($(filter COIN_libOsl,$(CoinLibsDefined)),)
+    export OslIncDir  := ${HOME}/osl/include
+    export OslLibDir  := ${HOME}/osl/lib
+    export OslLibName := libosl$(SHARED_LIBEXT)
+    export OslDefine  := COIN_HAS_OSL
+endif
+ifneq ($(filter COIN_libOsiOsl,$(CoinLibsDefined)),)
+    export OsiOslIncDir  := ${CoinIncDir}
+    export OsiOslLibDir  := ${CoinLibDir}
+    export OsiOslLibName := libOsiOsl$(SHARED_LIBEXT)
+    export OsiOslDefine  := COIN_HAS_OSIOSL
+endif
+    
+################################################
+
+ifneq ($(filter COIN_libOslSe,$(CoinLibsDefined)),)
+    export OslSeIncDir  := ${HOME}/oslse/include
+    export OslSeLibDir  := ${HOME}/oslse/lib
+    export OslSeLibName := liboslse$(SHARED_LIBEXT)
+    export OslSeDefine  := COIN_HAS_OSLSE
+endif
+ifneq ($(filter COIN_libSmi,$(CoinLibsDefined)),)
+    export SmiIncDir  := ${CoinIncDir}
+    export SmiLibDir  := ${CoinLibDir}
+    export SmiLibName := libSmi$(SHARED_LIBEXT)
+    export SmiDefine  := COIN_HAS_SMI
+endif
+    
+
+################################################
+
+ifneq ($(filter COIN_libSpx,$(CoinLibsDefined)),)
+    export SpxIncDir  :=
+    export SpxLibDir  :=
+    export SpxLibName :=
+    export SpxDefine  := COIN_HAS_SPX
+endif
+ifneq ($(filter COIN_libOsiSpx,$(CoinLibsDefined)),)
+    export OsiSpxIncDir  := ${CoinIncDir}
+    export OsiSpxLibDir  := ${CoinLibDir}
+    export OsiSpxLibName := libOsiSpx$(SHARED_LIBEXT)
+    export OsiSpxDefine  := COIN_HAS_OSISPX
+endif
+
+################################################
+
+ifneq ($(filter COIN_libSym,$(CoinLibsDefined)),)
+    export SymIncDir  := ${CoinDir}/SYMPHONY/include
+    export SymLibDir  := ${CoinDir}/SYMPHONY/lib
+    export SymLibName := libsym$(SHARED_LIBEXT)
+    export SymDefine  := COIN_HAS_SYM
+endif
+ifneq ($(filter COIN_libOsiSym,$(CoinLibsDefined)),)
+    export OsiSymIncDir  := ${CoinDir}/Osi/OsiSym/include
+    export OsiSymLibDir  := ${CoinLibDir}
+    export OsiSymLibName := libOsiSym$(SHARED_LIBEXT)
+    export OsiSymDefine  := COIN_HAS_OSISYM
+endif
+
+################################################
+
+ifneq ($(filter COIN_libXpr,$(CoinLibsDefined)),)
+    export XprIncDir  :=
+    export XprLibDir  :=
+    export XprLibName :=
+    export XprDefine  := COIN_HAS_XPR
+endif
+ifneq ($(filter COIN_libOsiXpr,$(CoinLibsDefined)),)
+    export OsiXprIncDir  := ${CoinIncDir}
+    export OsiXprLibDir  := ${CoinLibDir}
+    export OsiXprLibName := libOsiXpr$(SHARED_LIBEXT)
+    export OsiXprDefine  := COIN_HAS_OSIXPR
+endif
+    
+################################################
+
+ifneq ($(filter COIN_libz,$(CoinLibsDefined)),)
+    export zlibIncDir  :=
+    export zlibLibDir  :=
+    export zlibLibName := libz$(SHARED_LIBEXT)
+    export zlibDefine  := COIN_USE_ZLIB
+endif
+    
+ifneq ($(filter COIN_libbz,$(CoinLibsDefined)),)
+    export bzlibIncDir  :=
+    export bzlibLibDir  :=
+    export bzlibLibName := libbz2$(SHARED_LIBEXT)
+    export bzlibDefine  := COIN_USE_BZLIB
+endif
+
+ifneq ($(filter COIN_lapack,$(CoinLibsDefined)),)
+    export lapackIncDir  :=
+    export lapackLibDir  :=
+    export lapackLibName := liblapack$(SHARED_LIBEXT) libblas$(SHARED_LIBEXT) libg2c$(SHARED_LIBEXT)
+    export lapackDefine  := COIN_USE_DENSE
+endif
+    
+ifneq ($(filter COIN_readline,$(CoinLibsDefined)),)
+    export readlineIncDir  :=
+    export readlineLibDir  :=
+    export readlineLibName := libhistory$(SHARED_LIBEXT) libreadline$(SHARED_LIBEXT) libcurses$(SHARED_LIBEXT)
+    export readlineDefine  := COIN_USE_READLINE
+endif
+
+ifneq ($(filter COIN_ufl_ordering,$(CoinLibsDefined)),)
+    export CoinIncDir  += $(HOME)/ordering/AMD/Include
+    export CoinLibDir  += $(HOME)/ordering/AMD/Lib
+    export CoinLibName += libamd.a
+    export CoinDefine  += UFL_BARRIER
+endif
+
+ifneq ($(filter COIN_ampl,$(CoinLibsDefined)),)
+    export CoinIncDir  += $(HOME)/solvers
+    export CoinObjAmpl := $(HOME)/solvers/funcadd0.o $(HOME)/solvers/amplsolver.a
+    export CoinDefine  += CBC_AMPL
+endif
+
+ifneq ($(filter COIN_opbdp,$(CoinLibsDefined)),)
+    export CoinIncDir  += $(HOME)/opbdp
+    export CoinLibDir  += $(HOME)/opbdp
+    export CoinLibName += libpbcs.a
+    export CoinDefine  += COIN_OPBDP
+#   for size of values
+    export CoinDefine  += COEFFICIENT_int
+endif

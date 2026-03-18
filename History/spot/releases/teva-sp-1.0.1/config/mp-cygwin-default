@@ -1,0 +1,16 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=CYGWIN  at site=DAKOTA.STD       #
+#-----------------------------------------------------------------------#
+
+MPI_DIR=
+MPI_INCLUDES=-I/cygdrive/c/Program\ Files/MPICH/SDK.gcc/include
+MPI_LIBS= -lmpich
+MPI_LDFLAGS=-L/cygdrive/c/Program\ Files/MPICH/SDK.gcc/lib
+
+SOPLEX_DIR=$(ROOT_DIR)/../soplex
+SOPLEX_INCLUDES=-I$(SOPLEX_DIR)/src
+SOPLEX_LIBS=-lsoplex
+SOPLEX_LDFLAGS=-L$(SOPLEX_DIR)/lib
+
+NPSOL_LIBS=-lnpsol
+NPSOL_LDFLAGS=-L/usr/local/lib

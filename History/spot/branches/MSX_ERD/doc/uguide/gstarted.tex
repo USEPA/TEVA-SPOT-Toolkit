@@ -1,0 +1,61 @@
+ 
+\section*{Installing SPOT}
+
+
+ 
+\subsection*{Windows}
+
+
+NOTE: these instructions will likely change once we have an automated installer. In fact, these instructions may not be necessary at all!
+
+The SPOT distribution for MS Windows is a gzip'd archive with executables and scripts. Although this can be extracted anywhere, it's convenient to extract it in a standard place, such as the root disk, or in \char`\"{}C:$\backslash$Program Files\char`\"{}. Native MS Windows executables can be used in the DOS shell by configuring the MS Windows environment. For Windows NT, 2000 and XP, you will need to add a string such as
+\begin{verbatim}
+    ;C:\teva-spot_2.0\bin
+\end{verbatim}
+to the current setting for the PATH environment variable, which you will find in the properties window of \char`\"{}My Computer\char`\"{} under the \char`\"{}Advanced\char`\"{} tab. If you don't find a properties window at \char`\"{}My Computer\char`\"{}, the same tool may be found on the \char`\"{}Control Panel\char`\"{} at \char`\"{}System Properties\char`\"{}.
+
+Note that if you have sufficient privilege you might get a choice of installing the settings either for the Current User or for System. The latter is preferred if you want everybody to be able to run SPOT on the machine. At this stage you may need to reboot your system to have the new setting take effect; you probably will not need to reboot for XP.
+
+Using SPOT in a DOS shell requires the additional installation of Python. The latest Python release can be obtained at   
+\c http://www.python.org
+ . Python is installed with a MSI installer that is easy to use. To employ Python from a DOS shell requires an additional step: the PATH environmental variable needs to be edited to specify the location of the Python executable. This is the same process used to configure SPOT, but the Python MS Windows FAQ provides further details:   
+http://www.python.org/doc/faq/windows.html .
+
+
+ 
+\subsection*{Unix}
+
+
+In Unix, a user can install SPOT executables from the tarball distribution. The command
+\begin{verbatim}
+    gzcat teva-spot.tar.gz | tar xf -
+\end{verbatim}
+extracts the files from the tarball into a local subdirectory, such as {\ttfamily teva-\/spot\_\-2.0/bin}. A user can setup the {\ttfamily PATH} environment variable to configure the command shell to use these executables. The details of this depend on the command shell. For example, if the SPOT files were extracted in the user's home directory, then a BASH shell would be configured by adding the lines
+\begin{verbatim}
+    PATH=$PATH:$HOME/teva-spot_2.0/bin
+    export PATH
+\end{verbatim}
+to the {\ttfamily $\sim$/}.bashrc file.
+
+ 
+\section*{SPOT Executables}
+
+
+The following executables included in SPOT can be used from a command line: 
+\begin{itemize}
+\item \doxyref{tevasim}{p.}{tevasimExecutable} -\/ A command to execute an ensemble of contamination incidents, using EPANET. This command builds a {\ttfamily TSO} file that summarizes these simulation results in a compact manner.
+
+
+\item \doxyref{tso2Impact}{p.}{tso2ImpactExecutable} -\/ A command that reads a {\ttfamily TSO} file and creates one or more {\ttfamily IMPACT} files that are used to formulate sensor placement problems.
+
+
+\item \doxyref{scenarioAggr}{p.}{scenarioAggrExecutable} -\/ A command that reads an {\ttfamily IMPACT} file and creates an {\ttfamily IMPACT} file with fewer events, along with a file of event probabilities.
+
+
+\item \doxyref{sp}{p.}{spExecutable} -\/ The SPOT solver interface for performing sensor placement, which uses data from {\ttfamily IMPACT} files.
+
+
+\item \doxyref{evalsensor}{p.}{evalsensorExecutable} -\/ A command that reads in one or more sensor placements and summarizes their performance according to various metrics.
+
+
+\end{itemize}A variety of other executables are provided with SPOT, many of which are used by \doxyref{sp}{p.}{spExecutable} to perform sensor placement. 

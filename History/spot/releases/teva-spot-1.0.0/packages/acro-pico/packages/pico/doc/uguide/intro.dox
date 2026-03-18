@@ -1,0 +1,73 @@
+/*! 
+ * \page intro
+
+
+\section intro Introduction
+
+This document provides a user guide for the PICO software library.
+PICO (Parallel Integer and Combinatorial Optimizer) is an object-oriented
+framework for parallel implementation of branch-and-bound algorithms.
+Using object-oriented techniques, PICO's parallel search engine is cleanly
+separated from the details of the application and computing platform. This
+approach allows the same underlying parallel search code to be used
+on a wide variety of branch-and-bound applications, while allowing for
+application specific customization. The PICO search engine has a
+large number of run-time parameters that allow the user to control the
+quantity and pattern of interprocessor communication. On systems with
+relatively slow, unsophisticated communication abilities, such as networks
+of workstations, these parameters can be tuned so that the code attempts
+a relatively low level of interprocessor communication. For massively
+parallel processor (MPP) supercomputers with efficient hardware and
+software communication support, the parameters can be adjusted to make
+full use of the available communication bandwidth.
+
+This user guide describes how PICO can be applied to solve various
+types of optimization applications. PICO's branch-and-bound framework
+can be extended to develop a user-defined solver library.  Because PICO
+is written in C++, any derived application automatically inherits all
+parallel search management.  Consequently, a developer need only
+develop a serial application that customizes the search to exploit
+problem-specific structure.  Then, to develop a parallel solver, a developer 
+need only implement methods to pack and unpack problem-specific data.
+
+PICO also provides a stand-alone solver for linear programming (LP)
+and mixed-integer programming (MIP) applications.  This solver can be
+launched within the 
+\latexonly
+AMPL~\cite{AMPL}
+\endlatexonly
+\htmlonly
+<a href="http://www.ampl.com">AMPL</a>
+\endhtmlonly
+mathematical programming language
+interface.  Modelling languages like AMPL allow application modelers
+to express LP and MIP problems using natural (multidimensional) variables.
+For example, AMPL provides broad support for sets and set operators,
+which can be used to easily define large classes of constraints using index sets.
+PICO's LP and MIP solver can also be launched independently, using input
+files in standard formats (e.g. the 
+\latexonly
+MPS format).
+\endlatexonly
+\htmlonly
+<a href="http://miplib.zib.de/miplib3/mps_format.txt">MPS format</a>).
+\endhtmlonly
+
+Finally, PICO provides scripts that assist a user in customizing the
+existing MIP solver engine.  These scripts accept an AMPL MIP model
+and automatically generate derived PICO classes that are aware of the
+AMPL names and sets.  A developer can then customize the MIP solver
+to exploit specific structure in their application.  For example, you
+can write incumbent heuristics and cut separation algorithms using the
+natural problem variables.
+
+This document provides case studies that illustrate each of these 
+approaches.  Additionally, we describe the configuration parameters that
+can be used with PICO, and discuss how they manage PICO's parallel search.
+
+<B>Editorial Note:</b> This user manual remains somewhat incomplete.
+In particular, two key elements of PICO remain undocumented: (a)
+customization of PICO's MIP solver with the \b gen_milp_app utility,
+and (b) command-line parameters that control PICO's search.
+
+*/

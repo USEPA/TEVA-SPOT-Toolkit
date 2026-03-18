@@ -1,0 +1,10 @@
+
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+LIBRARY=libutilib
+
+SRCS = misc.c ncube.c paragon.c seconds.cpp errmsg.c cppMessage.cpp cppSignalErr.cpp signalError.c memdebug.cpp malloc.c exception_mngr.cpp
+
+include ../MakeMacros
+ 

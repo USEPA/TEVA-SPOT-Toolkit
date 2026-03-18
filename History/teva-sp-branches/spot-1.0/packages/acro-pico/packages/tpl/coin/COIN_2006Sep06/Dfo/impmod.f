@@ -1,0 +1,763 @@
+      SUBROUTINE IMPMOD( POLY  , PNTINT, VALINT, POINTS, VALUES, OBFVAL,
+     +                   CONVAL, SP2IN , IN2SP , N, M  ,   
+     +                   NQ    , NIND  , BASE  , PIVTHR, XCHTHR, PIVVAL,
+     +                   DIST  , DELTA , X     , A     , LDA   , NCLIN ,  
+     +                   NCNLN , LB    , UB    , SCALE , SCAL  , NF    ,   
+     +                   MAXNF , IMPR  , PP    , NEQCON, WRK   , LWRK  , 
+     +                   IWRK  , LIWRK , DELMIN, METHOD)
+
+
+C
+C  *********************************************************************
+C  THIS SUBROUTINE ATTEMPTS TO IMPROVE THE MODEL BY:
+C      1. ADDING A NEW POINT TO THE INTERPOLATION SET, POSSIBLY
+C         DROPPING ANOTHER POINT FROM THERE, SO THAT THE SET
+C         IS BETTER POISED
+C      2. RECOMPUTING THE WHOLE INTERPOLATION SET FROM SCRATCH,
+C         CHOOSING POSSIBLY LESS AND POSSIBLY DIFFERENT POINTS
+C         THE SET. THE BASE POINT IS ALWAYS GUARANTEED TO BE INCLUDED
+C         IN THE NEW INTERPOLATION SET
+C  PARAMETERS
+C
+C    POLY    (INPUT/OUTPUT) THE ARRAY OF NEWTON POLYNOMIALS
+C    
+C    PNTINT  (INPUT/OUTPUT) THE INTERPOLATION SET
+C
+C    VALINT  (INPUT/OUTPUT) THE VALUES OF THE FUNCTION AT POINTS  IN 'PNTINT'
+C
+C    POINTS  (INPUT/OUTPUT) SET OF ALL 'POINTS' WITH FUNCTION VALUES
+C
+C    VALUES  (INPUT/OUTPUT) VALUES AT POINTS IN 'POINTS'
+C
+C    SP2IN   (INPUT/OUTPUT) ARRAY OF 0/1 INDICATING FOR EVERY POINT IN
+C                          'POINTS' IF IT BELONGS TO 'PNTINT' OR NOT
+C    IN2SP   (INPUT/OUTPUT) ARRAY OF INDICES INDICATING FOR EVERY POINT IN
+C                          'PNTINT' ITS POSITION IN 'POINTS'
+C    NIND    (INPUT/OUTPUT) CARDINALITY OF INTERPOLATION SET
+C
+C    DIST    (INPUT/OUTPUT) DISTANCE OF ALL POINT IN 'POINTS' TO THE  BASE
+C
+C    NQ      (INPUT/OUTPUT) NUMBER OF POINTS IN 'POINTS'
+C
+C    PIVVAL  (INPUT/OUTPUT) ARRAY OF THE PIVOT VALUES ASSOCIATED WITH  EVERY
+C                           POINT IN 'PNTINT'
+C    X       (INPUT/OUTPUT) CUMULATIVE SHIFT OF THE INTERPOLATION CENTER
+C
+C    NF      (INPUT/OUTPUT) TOTAL NUMBER OF FUNCTION CALLS
+C
+C    MAXNF   (INPUT)        MAXIMUM  NUMBER OF FUNCTION CALLS
+C
+C    N       (INPUT)        PROBLEM DIMENSION
+C
+C    BASE    (INPUT)        THE INDEX OF THE BASE POINT IN 'PNTINT'
+C
+C    DELTA   (INPUT)        TRUST REGION RADIUS
+C  
+C    A       (INPUT)        MATRIX OF LINEAR CONSTRAINTS OF THE PROBLEM
+C
+C    NCLIN   (INPUT)        NUMBER OF LINEAR CONSTRAINTS
+C   
+C    NCNLN   (INPUT)        NUMBER OF NONLINEAR CONSTRAINTS
+C
+C    SCALE   (INPUT)        FLAG, INDICATING IF THE PROBLEM IS SCALED
+C
+C    SCAL    (INPUT)        ARRAY OF N SCALING FACTORS
+C
+C    LB      (INPUT/OUTPUT) LOWER BOUNDS OF THE PROBLEM
+C
+C    UB      (INPUT/OUTPUT) UPPER BOUNDS OF THE PROBLEM
+C
+C    IMPR    (INPUT/OUTPUT) ON INPUT
+C              <0          THEN THE POINT WITH SMALLEST VALUE IS NOT IN
+C                           IN THE INTERPOLATION SET, IMPR=-NQ, WHERE 
+C                           NQ IS THE INDEX OF THE GOOD POINT IN "POINTS"
+C
+C                           THE OUTPUT INFORMATION
+C               1           A POINT WAS ADDED TO THE INTERPOLATION SET
+C               2           A POINT WAS REPLACED  IN THE INTERP. SET
+C               3           WHOLE INTERPOLATION WAS RECOMPUTED, SINCE TOO OLD
+C               4           WHOLE INTERPOLATION WAS RECOMPUTED SINCE
+C                           NOTHING ELSE WORKED
+C               0           NO CHANGE/IMPROVEMENT CAN BE MADE
+C
+C    WRK                    WORKING REAL SPACE
+C  **************************************************************************
+C
+
+C
+C  SUBROUTINE PARAMETERS
+C
+
+      DOUBLE PRECISION  POLY(LPOLY)      , PNTINT(LPTINT)  , 
+     +                  VALINT(LVLINT)   , POINTS(LPNTS+N ), 
+     +                  VALUES( NQ+1)    , A(LDA*N)        , PP    ,
+     +                  PIVVAL(LVLINT)   , DIST(NQ+1)      , X(N)  ,
+     +                  LB(*), WRK(LWRK) , DELTA ,
+     +                  UB(*), PIVTHR    , XCHTHR,
+     +                  CONVAL(LCONVL+M) , OBFVAL(NQ+1)    , SCAL(N),
+     +                  DELMIN
+
+      INTEGER           SP2IN(NQ+1), IN2SP(LVLINT), N, NQ, NIND , BASE , 
+     +                  IWRK(LIWRK), NCLIN        , NCNLN, LDA  , IMPR ,   
+     +                  NF         , LIWRK        , LWRK , SCALE, MAXNF,
+     +                  M          , NEQCON       , METHOD
+
+
+C
+C  COMMON VARIABLES
+C
+                  
+
+C
+C  PRINTOUT PARAMETERS
+C 
+      INTEGER           IOUT  , IPRINT
+      DOUBLE PRECISION  MCHEPS, CNSTOL
+      COMMON / DFOCM /  IOUT  , IPRINT, MCHEPS, CNSTOL
+      SAVE / DFOCM /
+
+C
+C  INTERPOLATION CONTROL PARAMETERS
+C
+      INTEGER           NPMIN, LAYER, EFFORT 
+      COMMON / OPTI  /  NPMIN, LAYER, EFFORT
+      SAVE / OPTI  /
+C
+C  LENGTHS OF ARRAYS
+C
+
+      INTEGER           LPOLY, LPNTS, LVALUE, LPTINT, LVLINT, LCONVL
+      COMMON / RPART /  LPOLY, LPNTS, LVALUE, LPTINT, LVLINT, LCONVL
+      SAVE / RPART /
+
+
+C
+C  LOCAL VARIABLES
+C
+
+      INTEGER          IXG, J, NP1, DD, INFORM, JPOLY, 
+     +                 MINMAX, IXGNEW , ICURW , LENW 
+
+      LOGICAL          FAIL, IFERR
+     
+      DOUBLE PRECISION VNEW, DEL
+
+ 
+      DOUBLE PRECISION DNRMNF
+      EXTERNAL         DNRMNF
+
+
+C
+C  SUBROUTINES AND FUNCTIONS CALLED:
+C
+C    APPLICATION:       PTNEW , PTREPL, NBUILD, FUN, GETDIS,
+C                       UNSCL , UNSHFT, SHIFT , SCL, SWAPNP,
+C                       DNRMNF
+C    BLAS:              DCOPY
+C
+
+
+C
+C  SET THE POINTER TO SPACE FOR POINT 'XGNEW' - NEW POINT COMPUTED
+C  TO IMPROVE GEOMETRY
+C
+      IXGNEW = 1
+
+C
+C  CHECK IF REMAINING REAL SPACE IS SUFFICIENT
+C
+      ICURW  = IXGNEW + N
+      LENW   = LWRK - ICURW + 1
+      IF ( LENW .LT. 0 ) THEN
+        WRITE( IOUT, 1000 ) - LENW 
+        STOP
+      ENDIF
+C
+C  INITIALIZATION
+C
+      NP1   = N + 1 
+      DD    = NP1*(N+2)/2
+      FAIL  =.TRUE.
+      IFERR =.FALSE.
+      DEL   = DELTA
+      JPOLY = NIND + 1
+      MINMAX= 0
+C
+C  IF NO MODEL IMPROVEMENT IS NEEDED BUT THE LEVEL OF EFFORT
+C  REQUIRES THE INTERPOLATION SET TO BE RECOMPUTED, PROCEED
+C  DIRECTLY TO THE NBUILD PROCEDURE
+C
+
+      IF ( IMPR .EQ. 10 ) GOTO 25
+
+C
+C  IF THE MODEL IS NOT TOO OLD AND IMPR IS >= -1, THEN WE FIRST TRY TO 
+C  FIND A "GEOMETRY" POINT WHICH CAN BE INCLUDED IN THE INTERPOLATION
+C  TO IMPROVE MODEL/GEOMETRY.
+C  WE SAY THAT THE MODEL IS OLD IF THE FIRST INTERPOLATION POINT
+C  IS FURTHER THAN LAYER*DELTA AWAY FROM THE BASE; I.E. SHOULD
+C  BE EXCLUDED FROM THE INTERPOLATION
+C  IF THERE ARE NOT MORE THAT "NPMIN" POINTS IN THE MODEL WE 
+C  NEED TO INCLUDE ANOTHER  POINT, EVEN IF THE MODEL IS "OLD".
+C
+
+ 10   IF ( ( DIST(IN2SP(1)) .LE. LAYER*DELTA .OR. NIND .LE. NPMIN  )
+     +      .AND. IMPR .GE. -1 ) THEN
+        IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8000 )
+        CALL PTNEW( WRK(IXGNEW), IXG  , VNEW , PNTINT, LPTINT, N     , 
+     +              POLY ,LPOLY, NIND , BASE , DEL   , LB    , UB    ,   
+     +              A    , LDA , NCLIN, NCNLN, PIVVAL, PIVTHR, XCHTHR, 
+     +              WRK(ICURW) , LENW , IWRK , LIWRK , FAIL  , INFORM,
+     +              MINMAX     , X    )
+C
+C  IF A NEW POINT WAS NOT FOUND AND THE INTERPOLATION IF SUBLINEAR,
+C  THEN WE MUST HAVE LESS DEGREES OF FREEDOM THAN WE THINK,
+C  WE RETURN AND STOP OPTIMIZATION, OTHERWISE WE MAY GO INTO
+C  LOOP
+C      
+        IF ( FAIL .AND. NIND .LT. N + 1 - NEQCON ) THEN
+          IMPR = 0
+          GOTO 25
+        ENDIF
+      ENDIF 
+C
+C  IF IFERR=.TRUE. IS MEANS THAT A NEW GEOMETRY POINT WAS FOUND
+C  BUT A FUNCTION COMPUTATION FAILED. NOW ANOTHER POINT WAS TRIED
+C  FAIL=.TRUE. MEANS THAT THE NEW POINT DOES NOT SATISFY
+C  PIVOT THRESHOLD
+C  IF  MINMAX = 0, THIS MEANS THAT WE CALLED PTNEW SECOND TIME
+C  FOR THE SAME POLYNOMIAL. THUS, FIRST TIME WAS SUCCESSFUL AND
+C  FUNCTION VALUE FAILED. SO, IF SEARCH FAILED NOW, DO NOT GIVE
+C  UP AND CALL PTNEW AGAIN WITH A NEW POLYNOMIAL OR WITH A SMALLER
+C  RADIUS.
+C
+
+      IF ( FAIL .AND. IFERR .AND. MINMAX .EQ. 0 ) THEN
+        IF ( JPOLY .LT. N+1 ) THEN
+C
+C  IF WE STILL HAVE NOT TRIED ALL POLYNOMIALS  IN THE LINEAR BLOCK, 
+C  PICK THE NEXT POLYNOMIAL, PUT IT IN APPROPRIATE PLACE  AND GO BACK TO 'PTNEW'
+C
+          JPOLY = JPOLY+1
+          CALL SWAPNP( N, JPOLY, NIND+1, POLY, LPOLY )
+          IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8020 ) JPOLY
+          MINMAX = 0
+          GOTO 10
+        ELSE
+C
+C  IF ALL POLYNOMIALS IN THIS BLOCK WERE TRIED, REDUCE RADIUS OF SEARCH
+C  BY HALF AND REPEAT
+C
+          DEL   = DEL/2.0D0
+          IF ( DEL .GT. DELMIN ) THEN
+            JPOLY = NIND + 1
+            MINMAX = 0
+            GOTO 10
+          ELSE
+            GOTO 25
+          ENDIF
+        ENDIF
+      ENDIF
+
+C
+C  IF A "GEOMETRY" POINT WAS FOUND SUCCESSFULLY THEN 'IXG' IS THE
+C  POSITION WHERE THE POINT SHOULD BE PLACED IN THE INTERPOLATION.
+C
+
+
+      IF ( .NOT. FAIL ) THEN 
+
+
+C
+C  COMPUTE THE FUNCTION VALUE AT THE NEW "GEOMETRY" POINT AND
+C  IF THE FUNCTION EVALUATION FAILS, REDUCE RADIUS TO HALF
+C  OF THE DISTANCE BETWEEN "GEOMETRY" POINT AND THE BASE AND
+C  TRY TO COMPUTE ANOTHER "GEOMETRY" POINT.
+C
+        FAIL = .TRUE.
+        NF = NF + 1
+        IF ( NF .GT. MAXNF ) RETURN
+        CALL UNSHFT(N, X, WRK(IXGNEW))
+        IF ( SCALE .NE. 0 ) CALL UNSCL( N, WRK(IXGNEW), SCAL )
+        CALL FUN( N, M, WRK(IXGNEW), OBFVAL(NQ+1), CONVAL(NQ*M+1),
+     +            IFERR)
+        IF ( SCALE .NE. 0 ) CALL SCL( N, WRK(IXGNEW), SCAL )
+        CALL SHIFT(N, X, WRK(IXGNEW))
+        IF (IFERR) THEN
+          IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8010 )
+C
+C  IF FUNCTION VALUE COULD NOT BE COMPUTED AT THE NEW GEOMETRY POINT
+C  WE TRY TO FIND ANOTHER POINT
+C
+          IF ( NIND .LT. N + 1 - NEQCON ) THEN
+C
+C  IF WE DO NOT HAVE A FULLY LINEAR MODEL, THEN WE DO A BIT MORE WORK
+C  TO GET A GEOMETRY POINT: 
+C     MINMAX = 1 (-1) INDICATES THAT THE GEOMETRY POINT WAS FOUND BY
+C     MAXIMIZING (-MINIMIZING) THE NEXT PIVOT.
+C     IF FUNCTION COMPUTATION FAILS AT 'XGNEW', WE RETURN TO 'PTNEW' TO GET 
+C     ANOTHER POINT: MINIMIZER IF 'XGNEW' WAS A MAXIMIZER (MINMAX=1)
+C                    MAXIMIZER OF 'XGNEW' WAS A MINIMIZER (MINMAX=-1) 
+C     MINMAX = 0 INDICATES THAT BOTH MINIMIZER AND MAXIMIZER WERE TRIED
+C     SO THE SEARCH SHOULD BE REPEATED FOR A DIFFERENT POLYNOMIAL
+
+            IF ( MINMAX .NE. 0 ) THEN
+              MINMAX = - MINMAX
+              GOTO 10
+            ELSE IF ( JPOLY .LT. N + 1 - NEQCON ) THEN
+C
+C  IF WE STILL HAVE NOT TRIED ALL POLYNOMIALS  IN THE LINEAR BLOCK, 
+C  PICK THE NEXT POLYNOMIAL, PUT IT IN APPROPRIATE PLACE  AND GO BACK TO 'PTNEW'
+C
+              JPOLY = JPOLY+1
+              CALL SWAPNP( N, JPOLY, NIND+1, POLY, LPOLY )
+              IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8020 ) JPOLY
+              MINMAX = 0
+              GOTO 10
+            ELSE
+              IMPR = 0
+              GOTO 25
+            ENDIF 
+C
+C  IF ALL POLYNOMIALS IN THIS BLOCK WERE TRIED, REDUCE RADIUS OF SEARCH
+C  BY HALF AND REPEAT
+C
+C              DEL   = DEL/2.0D0
+C              IF ( DEL .GT. DELMIN ) THEN
+C                JPOLY = NIND + 1
+C                MINMAX = 0
+C                GOTO 10
+C              ELSE
+C                GOTO 25
+C              ENDIF
+C            ENDIF
+C          ELSE IF ( NIND .LT. DD ) THEN
+          ELSE
+            IMPR = 4
+            GOTO 25
+C
+C  IF ALL POLYNOMIALS IN THIS BLOCK WERE TRIED, REDUCE RADIUS OF SEARCH
+C  BY HALF AND REPEAT
+C
+C              DEL    = DEL/2.0D0
+C              IF ( DEL .GT. DELMIN ) THEN
+C                JPOLY = NIND + 1
+C                MINMAX = 0
+C                GOTO 10
+C              ELSE
+C                GOTO 25
+C              ENDIF
+
+C            ENDIF
+C          ELSE  
+C            
+C            CALL DCOPY( N, WRK(IXGNEW), 1, POINTS(NQ*N+1), 1 )
+C            CALL GETDIS( N, NQ+1, NQ+1, POINTS, IN2SP(BASE), DIST, 
+C     +                   WRK(ICURW), LENW )
+C            DEL         = DIST( NQ+1 )/2.0D0
+C            IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8030 )
+C            GOTO 10
+          ENDIF
+        ENDIF
+
+
+C
+C  DO  BOOKKEEPING RELATED WITH ADDING "XGNEW" TO "POINTS"
+C
+        CALL FMERIT( M, VALUES(NQ+1), OBFVAL(NQ+1), CONVAL(NQ*M+1),
+     +               UB(N+NCLIN+NCNLN+1), LB(N+NCLIN+NCNLN+1),PP,METHOD)
+        CALL DCOPY( N, WRK(IXGNEW), 1, POINTS(NQ*N+1), 1 )
+        NQ          = NQ + 1
+        LPNTS       = LPNTS + N
+        LVALUE      = LVALUE + 1
+        LCONVL      = LCONVL + M
+        CALL GETDIS( N  , NQ  , NQ, POINTS, IN2SP(BASE), DIST, 
+     +               WRK(ICURW), LENW )
+C
+C  IF THE LEVEL OF EFFORT DOES NOT REQUIRE RECOMPUTING THE NEWTON
+C  POLYNOMIALS FROM SCRATCH THEN  UPDATE THE NEWTON POLYNOMIALS TO
+C  ACCOUNT FOR INCLUDING THE NEW POINT. 
+C  THERE ARE TWO CASES: IXG=NIND+1 - THE NEW POINT IS ADDED TO 
+C                                    INCOMPLETE INTERPOLATION SET
+C                       IXG<NIND   - THE NEW POINT IS REPLACING 
+C                                    INTERPOLATION POINT WITH INDEX IXG. 
+C
+        IF ( IXG .EQ. NIND+1 ) THEN
+          IMPR        = 1
+        ELSE
+          IMPR        = 2
+        ENDIF
+        IF  ( EFFORT.LE.1 .OR. 
+     +      ( EFFORT.LE.2 .AND. IXG.EQ.NIND+1)) THEN
+
+          CALL PTREPL( WRK(IXGNEW), IXG   , VNEW, PNTINT, POLY, NIND, N, 
+     +                 LPOLY      , LPTINT)
+          IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8040 ) IXG, VNEW
+C
+C  DO  BOOKKEEPING RELATED WITH ADDING "XGNEW" TO THE INTERP. SET
+C
+          FAIL = .FALSE.
+          IF ( IMPR .EQ. 1 ) THEN
+            PIVVAL(IXG) = VNEW
+            NIND        = NIND+1
+          ELSE
+            SP2IN(IN2SP(IXG)) = 0
+            PIVVAL(IXG)       = PIVVAL(IXG)*VNEW
+          ENDIF
+          CALL DCOPY( N, WRK(IXGNEW), 1, PNTINT((IXG-1)*N+1), 1 )
+          VALINT(IXG)     = VALUES(NQ)
+          SP2IN( NQ ) = 1
+          IN2SP(IXG)  = NQ
+        ENDIF 
+      ENDIF
+
+C
+C  IF THE MODEL IS OLD OR WE COULD NOT FIND A GOOD "GEOMETRY" POINT THEN
+C  WE RECOMPUTE THE INTERPOLATION SET (AND BASIS OF NEWTON POLYNOMIALS)
+C  FROM SCRATCH. 
+C
+ 25   IF ( FAIL ) THEN
+        IF ( IMPR .EQ. 0 ) GOTO 28
+C
+C  IF THE POINT FROM TRUST REGION MINIMIZATION HAS A GOOD VALUE, BUT
+C  WAS NOT ADDED TO INTERPOLATION YET, THEN COPY IT AS SECOND POINT IN
+C  INTERPOLATION SET (NOT THE FIRST, SINCE WE WANT TO INDICATE THAT
+C  THE BASE HAD CHANGED) AND SET BASE=2 (-IMPR IS THE INDEX OF THE POINT) 
+C
+        IF ( IMPR .LT. 0 ) THEN
+          IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8050 )
+          CALL DCOPY(N, POINTS((-IMPR-1)*N+1), 1, PNTINT(N+1), 1)
+          BASE     = 2
+          IN2SP(2) = -IMPR
+          CALL GETDIS( N, NQ, 0, POINTS, IN2SP(BASE), DIST, 
+     +                 WRK(ICURW), LENW )
+        ENDIF
+C
+C  SET APPROPRIATE VALUE FOR IMPR
+C
+        IF (DIST(IN2SP(1)).GT. LAYER*DELTA ) THEN
+          IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8060 ) DIST(IN2SP(1))
+          IMPR = 3
+        ELSEIF ( IMPR .NE. 10 .AND. IMPR .NE. 1 .AND. IMPR .NE. 2 ) THEN
+          IMPR = 4
+        ENDIF
+
+C
+C  SHIFT THE CURRENT BASE TO THE ORIGIN (BASE=1 MEANS IT IS AT THE
+C                                        ORIGIN ALREADY)
+C
+ 28     IF ( BASE .NE. 1 ) THEN
+          CALL UNSHFT(N, PNTINT((BASE-1)*N+1), X)
+          DO 30 J=1, NQ
+            CALL SHIFT(N, PNTINT((BASE-1)*N+1), POINTS((J-1)*N+1))
+ 30       CONTINUE
+        ENDIF
+        IF ( IPRINT .GE. 2 ) WRITE( IOUT, 8070 )
+        CALL NBUILD( POLY  , POINTS, VALUES, PNTINT, VALINT, SP2IN, 
+     +               IN2SP , NIND  , N     , BASE  , DIST  , DELTA, 
+     +               PIVTHR, PIVVAL, NEQCON)
+        IF (( IMPR .EQ. 1 .OR. IMPR .EQ. 2 ) .AND. ( SP2IN(NQ) .EQ. 0 ))
+     +        IMPR = 0
+      ENDIF 
+
+      RETURN
+1000  FORMAT( ' IMPMOD: *** ERROR: LWRK IS TOO SMALL!' /
+     +        '                    IT SHOULD BE AT LEAST ',I10,/ )
+8000  FORMAT( ' IMPMOD: Compute a new point which improves geometry ',/)
+8010  FORMAT( ' IMPMOD: Function computation failed at the new point',/)
+8020  FORMAT( ' IMPMOD: Try to get a new point by  maximizing ',I4,
+     +                  '-th polynomial',/ )
+8030  FORMAT( ' IMPMOD: Try to get a new point by reducing the radius ')
+8040  FORMAT( ' IMPMOD: The new point is added as ', I4,
+     +                  '-th interpolation point, pivot=', D14.7,/)
+8050  FORMAT( ' IMPMOD: The best point was not added to the ', 
+     +         'interpolation yet',/ , 'It should be done here',/ )
+8060  FORMAT( ' IMPMOD: The model is old, the base had moved=', D14.7 /)
+8070  FORMAT( ' IMPMOD: Recompute the model ' )
+      END
+
+
+
+
+
+********************************************************************************
+
+*    NEXT SUBROUTINE
+
+********************************************************************************
+
+
+      SUBROUTINE GETDIS( N, NQ, IDX, POINTS, BASE, DIST, WRK, LWRK )
+
+C
+C  ****************************************************************
+C  THIS SUBROUTINE COMPUTES THE DISTANCE FROM THE BASE POINT TO
+C  THE POINT WITH INDEX IDX. IF IDX IS 0 THEN DISTANCE TO ALL
+C  POINTS IN 'POINTS' IS COMPUTED. THE DISTANCES ARE STORED
+C  IN ARRAY 'DIST'
+C
+C  PARAMETERS
+C  
+C    N      (INPUT)  PROBLEM DIMENSION
+C
+C    NQ     (INPUT)  NUMBER OF POINTS IN 'POINTS'
+C
+C    IDX    (INPUT)  INDEX OF THE POINT FOR WHICH THE DISTANCE IS COMPUTED
+C                    IF IDX=0 THEN DISTANCE IS COMPUTED FOR ALL POINTS
+C    POINTS (INPUT)  ARRAY OF POINTS
+C
+C    BASE   (INPUT)  INDEX OF THE BASE POINT (FROM WHICH WE COMPUTE THE
+C                    DISTANCES)
+C    DIST   (OUTPUT) THE ARRAY OF DISTANCES
+C  *****************************************************************
+C
+
+C
+C  SUBROUTINE PARAMETERS 
+C
+
+      INTEGER          N, NQ, BASE, LWRK, IDX 
+      DOUBLE PRECISION POINTS( LPNTS+N ), DIST( LVALUE+1 ), WRK( LWRK )
+
+
+
+C
+C  COMMON VARIABLES
+C
+
+C
+C  ARRAY LENGTHS
+C
+      INTEGER          LPOLY, LPNTS, LVALUE, LPTINT, LVLINT, LCONVL
+      COMMON /RPART/   LPOLY, LPNTS, LVALUE, LPTINT, LVLINT, LCONVL
+      SAVE /RPART/
+
+C
+C  PRINTOUT PARAMETERS
+C
+      INTEGER          IOUT  , IPRINT
+      DOUBLE PRECISION MCHEPS, CNSTOL
+      COMMON / DFOCM / IOUT  , IPRINT, MCHEPS, CNSTOL
+      SAVE / DFOCM /
+
+
+
+C
+C  LOCAL VARIABLES
+C
+      DOUBLE PRECISION ZERO
+      PARAMETER      ( ZERO  = 0.0D0 )
+
+      INTEGER          I , J , LB, LI
+
+      DOUBLE PRECISION DNRMNF
+      EXTERNAL         DNRMNF
+
+C
+C  SUBROUTINES AND FUNCTIONS CALLED:
+C
+C       APPLICATION:       DNRMNF
+C
+
+C
+C  CHECK SUFFICIENCY OF THE REAL WORKSPACE
+C
+
+      IF ( LWRK .LT. N ) THEN
+         IF( IPRINT .GE. 0 ) WRITE( IOUT, 1000 ) N
+         STOP
+      ENDIF
+
+      
+C
+C  CHECK IF THE IDX HAS A LEA GAL VALUE
+C
+      IF ( IDX.LT.0 .OR. IDX.GT.NQ ) THEN
+         IF( IPRINT .GE. 0 ) WRITE( IOUT, 1010 ) IDX
+         STOP 
+      ENDIF
+
+C
+C  IF IDX=0 COMPUTE DISTANCE TO ALL POINTS
+C
+      LB = ( BASE - 1 ) * N 
+
+      IF ( IDX .EQ. 0 ) THEN
+        DO 20 I = 1, NQ
+          IF ( I .EQ. BASE ) THEN
+            DIST( I ) = ZERO
+          ELSE
+            LI = ( I - 1 ) * N 
+            DO 10 J = 1, N
+              WRK( J ) = POINTS( LI + J ) - POINTS( LB + J )
+  10        CONTINUE
+C
+C  COMPUTE THE NORM  BY CALLING DNRMNF (NOW L-INFINITY NORM)
+C
+            DIST( I ) = DNRMNF( N, WRK )
+          ENDIF
+  20    CONTINUE
+
+C
+C  IF IDX>0 COMPUTE DISTANCE ONLY TO THAT POINT
+C
+      ELSE 
+        IF ( IDX .EQ. BASE ) THEN
+          DIST( IDX ) = ZERO
+        ELSE
+          LI = ( IDX - 1 ) * N
+            DO 30 J = 1, N
+              WRK( J ) = POINTS( LI + J ) - POINTS( LB + J )
+  30        CONTINUE
+C
+C  COMPUTE THE NORM  BY CALLING DNRMNF (NOW L-INFINITY NORM)
+C
+          DIST( IDX ) = DNRMNF( N, WRK )
+        ENDIF
+      ENDIF
+      RETURN
+
+
+
+
+1010  FORMAT( ' GETDIS: *** ERROR: IDX HAS ILLEGAL VALUE', I10,
+     +        '                    MUST BE A BUG!' ,/ )
+1000  FORMAT( ' GETDIS: *** ERROR: LWRK IS TOO SMALL!' /
+     +        '                    IT SHOULD BE AT LEAST ',I10 )
+      END
+
+
+
+
+**************************************************************
+
+*    NEXT SUBROUTINE
+
+**************************************************************
+
+
+
+      SUBROUTINE SHIFT(N, X, Y)
+
+C
+C  ***********************************************************
+C  THIS SUBROUTINE SUBTRACTS VECTOR X FROM VECTOR Y: Y=Y-X
+C
+C  PARAMETERS
+C     
+C    X  (INPUT)        THE 'SHIFT' 
+C
+C    Y  (INPUT/OUTPUT) THE VECTOR WHICH IS 'SHIFTED'
+C
+C    N  (INPUT)        PROBLEM DIMENSION
+C  **********************************************************
+C
+
+      INTEGER          N
+      DOUBLE PRECISION X(N), Y(N)
+
+C
+C  LOCAL VARIABLES
+C 
+      INTEGER          I
+
+
+      DO 10 I=1,N
+        Y(I)=Y(I)-X(I)
+ 10   CONTINUE
+      RETURN
+      END
+
+
+
+
+***************************************************************
+
+*    NEXT SUBROUTINE
+
+***************************************************************
+
+
+      SUBROUTINE UNSHFT(N, X, Y)
+
+C
+C  ***********************************************************
+C  THIS SUBROUTINE ADDS   VECTOR X TO VECTOR Y: Y = Y + X
+C
+C  PARAMETERS
+C     
+C    X  (INPUT)        THE 'SHIFT' 
+C
+C    Y  (INPUT/OUTPUT) THE VECTOR WHICH IS 'SHIFTED'
+C
+C    N  (INPUT)        PROBLEM DIMENSION
+C  **********************************************************
+C
+
+      INTEGER          N
+      DOUBLE PRECISION X(N), Y(N)
+
+C
+C  LOCAL VARIABLES
+C 
+      INTEGER          I
+
+
+      DO 10 I=1,N
+        Y(I)=Y(I)+X(I)
+ 10   CONTINUE
+      RETURN
+      END
+
+
+
+
+***************************************************************
+
+*    NEXT SUBROUTINE
+
+***************************************************************
+
+
+      DOUBLE PRECISION FUNCTION DNRMNF( N, X )
+C
+C  *****************************************************
+C  THIS FUNCTION COMPUTES THE INFINITY NORM OF VECTOR X:
+C
+C           DNRMNF = MAX_I {|X_I|}
+C  
+C  X (INPUT)  ARRAY OF LENGTH AT LEAST 'N' CONTAINING THE VECTOR
+C
+C  N (INPUT)  DIMENSION OF VECTOR IN X
+C
+C  *****************************************************
+
+C
+C  FUNCTION PARAMETERS
+C
+      DOUBLE PRECISION X( N )
+      INTEGER          N
+ 
+C
+C  LOCAL VARIABLES
+C
+      DOUBLE PRECISION VAL
+      INTEGER          J  
+      INTRINSIC        ABS
+C
+C  FUNCTION CALLED
+C 
+C  BLAS:    ABS
+C
+   
+      VAL=0.0D0
+      DO 10 J = 1, N
+        IF ( ABS( X( J ) ).GT.VAL) VAL=ABS( X( J ) )
+ 10   CONTINUE
+      DNRMNF=VAL
+      RETURN
+      END
+
+
+
+

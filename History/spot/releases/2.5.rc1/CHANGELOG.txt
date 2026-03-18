@@ -1,0 +1,38 @@
+###############################################################################
+#                                                                             #
+# TEVA-SPOT Toolkit Release 2.5 Changelog                                     #
+#                                                                             #
+###############################################################################
+
+-------------------------------------------------------------------------------
+TEVA-SPOT 2.5 (2011/05/06)
+-------------------------------------------------------------------------------
+
+The TEVA-SPOT 2.5 release does not contain fundamental algorithmic updates. 
+The new features included in this release are:
+
+- Updates to tevasim and tso2impact. Both scripts are now compatible with 
+  EPANET-MSX to handle multi-species simulation.  tevasim database is stored 
+  in ERD file format. tso2Imapct command line changed to reflect ERD database 
+  as input. EPANET and EPANET-MSX externals points to sourceforge.  EPANET-MSX 
+  and ERD files added to examples/simple.
+
+- Addition of sp-2tier. The two-tiered sensor placement approach reduces 
+  the memory footprint for sensor placement on large networks.
+
+- Addition of spotSkeleton.  Skeletonization steps include branch trimming, 
+  parallel and series pipe merge. spotSkeleton script located in 
+  spot/packages/network.
+
+- Addition of Net3_small, which contains smaller Net3 dataset. Removed large 
+  hourly datasets.
+
+- Memory allocation bug fix.
+
+- Updates to work with vpykit.
+
+- tevaspot changed to pyspot.
+
+- Documentation updated.
+
+

@@ -1,0 +1,123 @@
+/*! 
+ * \page install Installation Instructions
+
+
+The following sections describe the process for building sources directly from the TEVA SVN repository.
+
+
+
+\section Downloading
+
+The TEVA-SP software can be downloaded directly from the U Cincinnati
+SVN repository using the following command line:
+\verbatim
+    svn checkout http://engcvs.uc.edu/repos/TEVA/teva-sp
+\endverbatim
+The password for this repository depends on your user-account on the
+host machine.
+
+
+\section installUnix Installation on Unix
+
+Installation of TEVA-SP on UNIX systems is performed by 
+moving into the \c teva-sp directory and run the setup script.
+\verbatim
+    ./setup configure build
+\endverbatim
+The \c setup script automates much of the setup activity
+associated with building large software libraries like TEVA-SP on various
+hardware platforms.  This includes
+<ol>
+
+<li> generating Makefiles so that objects, libraries, executables and other           'targets' can be created for specific and unique hardware platforms
+
+<li> calling itself recursively so that sub-directories can also be configured
+</ol>
+Several output files can be viewed to assess whether the \c setup script 
+worked properly:
+<ol>
+
+<li> teva-sp/test/config.out - the logfile for the configuration process that 
+builds makefiles
+
+<li> teva-sp/test/config.xml - a summary of errors and warnings from the \c config.out file 
+
+<li> teva-sp/test/build.out - the logfile for the build process 
+
+<li> teva-sp/test/build.xml - a summary of errors and warnings from the \c build.out file 
+
+</ol>
+
+
+\section installWindows Installation on Windows
+
+Using TEVA-SP on windows requires the additional installation of Python.  The latest Python release can be obtained at 
+\htmlonly
+<a href="http://www.python.org/2.4.2/">http://www.python.org/2.4.2/</a>
+\endhtmlonly
+\latexonly
+\c http://www.python.org/2.4.2/
+\endlatexonly
+.  Python is installed with a MSI installer that is easy to use.  To employ Python from a DOS shell requires an additional step: the \c python executable needs to be made available via the system PATH environmental variable.
+
+The Python MS Windows FAQ provides details for how to configure the PATH
+environmental variable:
+\htmlonly
+<a href="http://www.python.org/doc/faq/windows.html">http://www.python.org/doc/faq/windows.html</a>
+\endhtmlonly
+\latexonly
+http://www.python.org/doc/faq/windows.html
+\endlatexonly
+.  The following text is taken from that source:
+\verbatim
+
+For Windows NT, 2000 and (I assume) XP, you will need to add a string
+such as
+
+   ;C:\Python23
+
+to the current setting for the PATH environment variable, which you
+will find in the properties window of "My Computer" under the "Advanced"
+tab. Note that if you have sufficient privilege you might get a choice of
+installing the settings either for the Current User or for System. The
+latter is preferred if you want everybody to be able to run Python on
+the machine.
+
+If you aren't confident doing any of these manipulations yourself, ask for
+help! At this stage you may want to reboot your system to make absolutely
+sure the new setting has taken effect. You probably won't need to reboot
+for Windows NT, XP or 2000. You can also avoid it in earlier versions by
+editing the file C:\WINDOWS\COMMAND\CMDINIT.BAT instead of AUTOEXEC.BAT.
+
+You should now be able to start a new command window, enter python at
+the C:> (or whatever) prompt, and see the >>> prompt that indicates the
+Python interpreter is reading interactive commands.
+
+Let's suppose you have a program called pytest.py in directory
+C:\Steve\Projects\Python
+\endverbatim
+
+If you don't find a "properties windows" at "My Computer", the same
+tool may be found on the "Control Panel" at "System Properties".
+
+
+\section installExamples Build Examples
+
+To build with executables that contain debugging information, use
+\verbatim
+   ./setup configure --with-debugging build
+\endverbatim
+
+To build with optimized executables, use
+\verbatim
+   ./setup configure --with-optimization=-O3 build
+\endverbatim
+
+To build native Windows executables, use
+\verbatim
+   ./setup configure --with-compiler=mingw build
+\endverbatim
+This only has been tested within a Cygwin shell under Windows.
+
+
+*/

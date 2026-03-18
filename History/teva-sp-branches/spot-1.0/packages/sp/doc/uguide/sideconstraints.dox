@@ -1,0 +1,33 @@
+/*! 
+ * \page sideconstraintsExecutable Executable sideconstraints
+
+\section sideconstraintsOverview Overview
+
+The \b sideconstraints executable heuristically solves p-median 
+formulations of the sensor placement problem where one or more side-constraints
+are specified.
+
+\section sideconstraintsUsage Usage
+
+\verbatim
+   sideconstraints sp-configuration-file num-samples random-seed impact-file-representation time-limit [solution-file]
+\endverbatim
+
+
+\section sideconstraintsDescription Description
+
+The \b sideconstraints executable invokes an iterated descent heuristic to solve
+p-median sensor sensor placement problems. Currently, the following statistics
+are supported: mean, var (Value At Risk), tce (Tail-Conditional Expectation), 
+and worst-case. 
+
+\section sideconstraintsExample Example
+
+None. Usage is intended to be strictly from the 'sp' script, which drives
+both heuristic and exact solvers.
+
+\section randomsampleNotes Notes
+
+None.
+
+*/

@@ -1,0 +1,259 @@
+#!/bin/sh
+
+# cccl 
+# Wrapper around MS's cl.exe and link.exe to make them act more like
+# Unix cc and ld
+#
+# Copyright (C) 2000-2003 Geoffrey Wossum (gwossum@acm.org)
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+#
+
+usage()
+{
+    cat <<EOF
+Usage: cccl [OPTIONS]
+
+cccl is a wrapper around Microsoft's cl.exe and link.exe.  It translates
+parameters that Unix cc's and ld's understand to parameters that cl and link
+understand.
+EOF
+    exit $1
+}
+
+# prog specifies the program that should be run (cl.exe or link.exe)
+# We'll assume cl to start out
+prog=cl
+progdir=`which cl.exe | sed 's/cl.exe//' | sed 's/ /\\\\ /g'`
+# opts specifies the command line to pass to the MSVC program
+clopt="/nologo"
+linkopt="/nologo"
+linkflag=""
+libraries=""
+srcs=""
+target=""
+compileonly=0
+Eflag=0
+# gotparam is 0 if we didn't ever see a param, in which case we show usage()
+gotparam=
+
+### Run through every option and convert it to the proper MS one
+while test $# -gt 0; do
+    case "$1" in
+    -D*) optarg= ;;
+    -*=*) optarg=`echo "$1" | sed 's/[-_a-zA-Z0-9]*=//'` ;;
+    *) optarg= ;;
+    esac
+    gotparam=1
+
+    case "$1" in
+    --version)
+	cat <<EOF
+cccl 0.03
+
+Copyright 2000-2003 Geoffrey Wossum
+This is free software; see the source for copying conditions.  There is NO
+waranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+EOF
+	exit 1;
+	;;
+
+    -ansi)
+	clopt="$clopt /Za"
+	;;
+
+    -c)
+	# -c (compile only) is actually the same, but for clarity...
+	clopt="$clopt /c"
+	linkflag=""
+        compileonly=1
+	;;
+
+    /D*)
+	clopt="$clopt $1"
+	;;
+	
+    -D*)
+	clopt="$clopt $1"
+	;;
+	
+    /EHs)
+	clopt="$clopt $1"
+	;;
+
+    -E)
+	clopt="$clopt /E"
+	Eflag=1
+	linkflag=""
+	;;
+
+    -g[0-9] | -g)
+	# cl only supports one debugging level
+	clopt="$clopt /Zi"
+	;;
+
+    -I*)
+	hdr=`echo "$1" | sed 's/-I//'`;
+        hdr=`echo "$hdr" | sed 's/\/cygdrive\/c//'`;
+        hdr=`echo "$hdr" | sed 's/ /\\\\ /g'`;
+	clopt="$clopt /I $hdr";
+	;;
+
+    -L*)
+	path=`echo "$1" | sed 's/-L//'`
+        path=`echo "$path" | sed 's/\/cygdrive\/\(.\)/\1:/'`;
+        path=`echo "$path" | sed 's/ /\\\\ /g'`;
+	libraries="$libraries /LIBPATH:$path";
+	;;
+
+    -lm)
+	;;
+
+    -l*)
+	lib=`echo "$1" | sed 's/-l//'`
+	lib="$lib.lib"
+	
+	clopt="$clopt $lib"
+	linkopt="$linkopt $lib"
+	;;
+
+    -m386)
+	clopt="$clopt /G3"
+	;;
+
+    -m486)
+	clopt="$clopt /G4"
+	;;
+
+    -mpentium)
+	clopt="$clopt /G5"
+	;;
+
+    -mpentiumpro)
+	clopt="$clopt /G6"
+	;;
+
+    -o)
+	# specifying output file, is it an object or an executable
+	shift
+        tmp=`echo "$1" | sed 's/\/cygdrive\/c//'`;
+        tmp=`echo "$tmp" | sed 's/ /\\\\ /g'`;
+	case "$tmp" in
+	*.o | *.obj)
+	    target="/Fo$tmp"
+	;;
+	
+	*)
+	    target="/Fe$tmp";
+	    linkopt="$linkopt /out:$tmp"
+	    linkflag="/link"
+	;;
+	esac;;
+
+    -O[0-9])
+	lvl=`echo "$1" | sed 's/-O//'`
+	clopt="$clopt /O$lvl";
+	;;
+
+    -O)
+	clopt="$clopt /O2";
+	;;
+
+    -pedantic)
+	#ignore pedantic
+	;;
+
+    -v)
+	linkopt="$linkopt /verbose"
+	;;
+
+    -Wall)
+	clopt="$clopt /Wall";
+	;;
+
+    -W[0-9])
+	lvl=`echo "$1" | sed 's/-W//'`
+	clopt="$clopt /W$lvl";
+        ;;
+
+    *.c)
+	# C source file 
+        tmp=`echo "$1" | sed 's/\/cygdrive\/c//'`;
+        tmp=`echo "$tmp" | sed 's/ /\\\\ /g'`;
+	srcs="$srcs /Tc$tmp"
+	;;
+
+    *.cc | *.cxx | *.C | *.cpp)
+	# C++ source file with non .cpp extension, make sure cl understand 
+	# that it is C++
+        tmp=`echo "$1" | sed 's/\/cygdrive\/c//'`;
+        tmp=`echo "$tmp" | sed 's/ /\\\\ /g'`;
+	srcs="$srcs /Tp$tmp"
+	;;
+
+    *.o | *.obj | *.a | *.lib)
+	# Object files/libraries seen, this command will require link
+	# Switch the prog to link
+	linkopt="$linkopt $1"
+	prog="$progdir/link"
+	;;
+
+    *)
+	tmp=`echo "$1" | sed 's/ /\\\\ /g'`
+        tmp=`echo "$tmp" | sed 's/\/cygdrive\/c/c:/'`;
+        tmp=`echo "$tmp" | sed 's/ /\\\\ /g'`;
+	clopt="$clopt $tmp"
+	linkopt="$linkopt $tmp"
+	if test x$optarg != x ; then
+	    clopt="$clopt=$optarg"
+	    linkopt="$linkopt=$optarg"
+	fi
+	;;
+
+    esac
+    shift
+done
+
+if [ "$srcs" != "" ] && [ $Eflag = 0 ]; then
+   if test x$target = x ; then
+      tmp=`echo "$srcs" | sed 's/\/Tc/\/Fo/'`;
+      tmp=`echo "$tmp" | sed 's/\/Tp/\/Fo/'`;
+      tmp=`echo "$tmp" | sed 's/\.cpp/\.o/'`;
+      tmp=`echo "$tmp" | sed 's/\.c/\.o/'`;
+      tmp=`echo "$tmp" | sed 's/\.C/\.o/'`;
+      tmp=`echo "$tmp" | sed 's/\.cxx/\.o/'`;
+      tmp=`echo "$tmp" | sed 's/\.cc/\.o/'`;
+      target="$tmp"
+   fi
+fi
+
+if test x$gotparam = x ; then
+    usage
+    exit 1
+fi
+
+# choose which opts we built up based on which program will actually run
+if test "x$prog" = "xcl" ; then
+    opts="$clopt $target $srcs $linkflag $libraries"
+else
+    opts="$linkopt $libraries"
+fi
+
+echo "$prog $opts"
+#exec $prog $opts
+eval "$prog $opts"
+exit 0
+
+    

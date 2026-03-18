@@ -1,0 +1,50 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+EXECUTABLES=
+
+TESTS=
+
+OBJS= $(EXECUTABLES:.exe=.o)
+
+objs:  $(OBJS)
+
+check:
+	@$(MAKE) executables
+	@$(MAKE) tests
+
+executables: clean
+	@$(ECHO) "==============================="
+	@$(ECHO) "==============================="
+	@$(ECHO) "= Building Test Codes - START =" 
+	@$(ECHO) "==============================="
+	@$(ECHO) "==============================="
+	@$(MAKE) all
+	@$(ECHO) "==============================="
+	@$(ECHO) "==============================="
+	@$(ECHO) "= Building Test Codes - END   ="
+	@$(ECHO) "==============================="
+	@$(ECHO) "==============================="
+
+tests:
+	@(for FILE in $(TESTS:.exe=); do \
+	  if [ -x $${FILE} ]; then\
+	     $(BINDIR)/test_script $${FILE} $${FILE};\
+	  fi;\
+	done) > tests.xml
+
+all:	
+
+
+library:
+	cd ../.. ; $(MAKE)
+
+cache:
+	$(RM) -Rf SunWS_cache
+
+clean: 
+	@$(RM) -Rf *.o *.i *.ii *.ti SunWS_cache *.out *.diff
+	@$(RM) -Rf $(EXECUTABLES)
+	@$(RM) -Rf $(EXECUTABLES:.exe=)
+	@$(RM) -Rf Net3.out test1.tsi test1.tso test1_* *.nodemap *.scenariomap
+	@$(RM) -Rf *.mod *.dat *.log *.sensors *.config 

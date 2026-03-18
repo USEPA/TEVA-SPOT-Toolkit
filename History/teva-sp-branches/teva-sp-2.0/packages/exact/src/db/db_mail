@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+#
+# This generates a summary file that is emailed to appropriate users.
+#
+
+#
+# Get the DB Server configuration
+#
+unshift @INC, ".";
+require db_config;
+#
+# generic setup
+# 
+#$ENV{CVSROOT} = $cvsroot;
+$ENV{PATH} = "/bin:/usr/bin:" . $ENV{PATH};
+umask 002;
+my $webroot="/space/homes/sqe/public_html/testdata";
+
+sub update_datadirectory {
+  my $project = shift;
+  if (-d "data") {
+  } else {
+      `mkdir data`;
+  }
+  if (!(-d $db_config{$project}{'dir'})) {
+     die "cvs failed: $_" if ($_ = `$db_config{$project}{'checkout'}`);
+  } else {
+     die "cvs failed: $_" if ($_ = `$db_config{$project}{'update'}`);
+  }
+  opendir DATADIR, ($db_config{$project}{'dir'}) or die ("opendir failed");
+  @dirlist = grep /(\.xml|\.out)$/, readdir DATADIR;
+  closedir DATADIR;
+  return @dirlist;
+}
+
+##
+## MAIN
+##
+#
+# Iterate through the software projects
+#
+foreach $project (@ARGV) {
+  print "  Summarizing project $project ...\n";
+  update_datadirectory($project);
+  `(./db_summary $project $db_config{$project}{'name'}) > db_mail.summary.$project 2>&1`;
+  `(mv db_summary.txt db_summary.txt.$project) > /dev/null 2>&1`;
+  if (-e "db_summary.txt.$project") {
+     $summary = `cat db_summary.txt.$project`;
+  } else {
+     $summary = "ERROR";
+  }
+  $summary = "$db_config{$project}{'name'} SQA Report: $summary";
+  `cat db_mail.summary.$project | Mail -s "$summary" $db_config{$project}{'maillist'}`;
+  }
+

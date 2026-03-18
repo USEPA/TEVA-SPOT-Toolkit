@@ -1,0 +1,15 @@
+#--------------------------------------------------#
+# Host ARCHitecture dependent definitions - RS6000 #
+#--------------------------------------------------#
+
+ECHO		= /bin/echo
+LN		= ln -s
+LND		= ln -s
+MYMAKE		= make
+MAKE		= $(MYMAKE) -f Makefile-$(TARGET_NAME)
+PWD		= pwd
+RM		= rm -rf
+SHELL		= /bin/sh
+SYMBTEST	= -h
+YACC		= yacc
+LEX		= lex

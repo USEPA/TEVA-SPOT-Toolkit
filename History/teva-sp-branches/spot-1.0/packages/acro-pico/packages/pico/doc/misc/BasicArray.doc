@@ -1,0 +1,142 @@
+The PackBuffer and UnPackBuffer classes provide a convenient mechanism
+for packing and unpacking buffers for communication.  They are
+currently implemented for use with MPI, with which they use MPI's Pack
+and UnPack routines.
+ 
+ 
+The PackBuffer class dynamically resizes its internal buffer to contain
+enough memory to pack the entire object.  When deleted, this internal buffer
+is deleted.
+ 
+const char* buf()
+ 
+  This method returns a pointer to the internal buffer.
+ 
+int len()
+ 
+  This method returns the amount of memory used to pack the data.
+ 
+void reset()
+ 
+  This method resets the pointer used for packing, which effectively resets
+  the PackBuffer class to pack new data.
+ 
+void pack(const <type>* data, const int num=1)
+void pack(const <type>& data)
+ 
+  The pack methods are defined for a variety of standard data types.
+  The first pack method can be used to pack a vector of <type>'s, and the
+  second pack method can be used to pack a single <type>.
+ 
+PackBuffer& operator<< (PackBuffer& buff, const <type>& data)
+ 
+  The in-stream operator provides a convenient shorthand for the second
+  pack method.
+ 
+ 
+
+The BasicArray defines a basic array data type that manages the
+allocation and deallocation of memory.  This code is strongly
+influenced on the discussion of reference counting in C. S. Horstmann,
+"Mastering C++ - An introduction to C++ and object-oriented programming
+for C and Pascal programmers."  This code represents an extension of
+the vector class developed by Brian Bartell, UC San Diego.
+
+
+
+The ArrayData class maintains the following data:
+
+  Data		a pointer to data
+  ref		a reference counter for this class instance
+  Len		the length of the array
+  own		the ownership flag
+
+The ownership categories for the data are:
+
+  DataNotOwned     - Data owned by some other SimpleArray
+  AcquireOwnership - Data originally copied from another SimpleArray
+  AssumeOwnership  - Data pointer points to another SimpleArray's data
+
+
+
+A BasicArray uses the ArrayData class to maintain a reference counter.  This array
+class preserves the copy semantics of the = operator.  The &= operator can be
+used to explicitly share data between two BasicArray classes.  
+
+int len() const
+
+  This method returns the length of the array (number of objects, not bytes)
+
+T* data() const
+
+  The method returns a pointer to the array.
+
+BasicArray();
+
+  The empty constructor;
+
+BasicArray(const int len, T *d=NULL, const EnumDataOwned o);
+
+  A constructor that sets up the class with given data.
+
+BasicArray(const BasicArray& array);
+
+  The copy constructor.
+
+
+int resize(const int);
+
+  The resize method copies the existing data into the array.
+
+BasicArray<T>& operator=(const BasicArray<T>& array);	// construct and copy
+
+  The equals operator constructs a new array and copies 'array' into it.
+
+BasicArray<T>& operator&=(const BasicArray<T>& array);	// copy ptr
+
+  The equals& operator copies the pointer to ArrayData into the class and
+  updates the ArrayData's reference counter.
+
+BasicArray<T>& operator<<(const BasicArray<T>& array);	// copy array
+
+  The << operator copies the data from 'array' onto the existing array in 
+  this class.
+
+BasicArray<T>& operator=(const T& val);
+
+  Sets all of the elements in the array equal to 'val'.
+
+T & operator[](const int ndx);
+
+  Returns a reference to the 'ndx'th element of the array.
+
+const T & operator[](const int ) const;
+
+  Returns a const reference to the 'ndx'th element of the array.
+
+BasicArray<T>& set_data(const int len, T *data, const EnumDataOwned o);
+
+  Sets the data in the ArrayData object equal to 'data'.  If the ArrayData
+  object contained a non-null pointer to an array, and it was owned, then
+  that data is deleted.  Otherwise it is discarded and ignored.
+
+BasicArray<T>& set_data(const BasicArray<T>& vec, const int start, const int newlen);
+
+  Sets the data in the ArrayData object equal to some subset of the
+  data in 'vec'.  If the ArrayData object contained a non-null pointer
+  to an array, and it was owned, then that data is deleted.  Otherwise
+  it is discarded and ignored.  The 'start' value determines where in
+  vec's array the ArrayData points to.  The 'newlen' value indicates
+  the length of the array pointed by ArrayData (the default is -1,
+  which indicates the rest of the arrray).
+
+BasicArray<T>& set_subvec(const int start, const int len,
+                                 const BasicArray<T>& datavec, const int offset);
+
+  Copies data from datavec[offset-start]...datavec[offset+len-start-1] into 
+  the ArrayData at [start]...[start+len-].
+
+BasicArray<T>& at(const int start, const int newlen, BasicArray<T>* vec) const;
+
+  If vec is not supplied, this method constructs a new BasicArray.  And calls
+  set_subvec.  Otherwise, it simply calls set_subvec.

@@ -1,0 +1,71 @@
+
+The classes Scheduler and MIPScheduler provide a basic mechanism for 
+scheduling threads/tasks with several priority queues.  The main difference
+between Scheduler and MIPScheduler is that MIPScheduler provides an enumerated
+type that defines the three priority queues that are used, while Scheduler 
+allows the user to provide integers to index the priority queues.
+
+The Scheduler and MIPScheduler objects maintain several queues and lists:
+  algBlockedList	threads that are in the ThreadBlocked state, which are
+				waiting for some algorithmic state to be true
+  deadList		threads that are removed from the scheduler (these are
+				not deleted for now).
+  interrupts		threads that are in the ThreadWaiting state, which are
+				waiting for some message to arrive
+  threadGroup[i]	threads that are in the ThreadReady state, which are 
+				waiting to run
+
+int add(ThreadQueue* queue);
+
+	The add method defines the next priority queue.  This method should be 
+	called before all calls to the insert method.  The integer
+	returned by add is the group number for that queue.  There are presently
+	only three types of thread queues, so the following calls to add are 
+	possible:
+
+	sched.add(new ThreadQueue(round_robin));
+		Implements a standard round-robin queue.
+	sched.add(new ThreadQueue(time_weighted_priority));
+		Implements a weighted queue that uses the amount of time used by
+		a thread to update the thread priorities.
+	sched.add(new ThreadQueue(bias_weighted_priority));
+		Implements a weighted queue that simply uses the thread's bias 
+		value (instead of the actual time taken) to update the thread 
+		priorities.
+
+void insert(ThreadObj* thread, int group=-1)
+void insert(ThreadObj* thread, int group, int debug, char* name=NULL)
+
+	The insert method inserts threads into one of the scheduler's queues.
+	If the value of group is -1, then the scheduler uses the queue index
+	specified by the thread's Group variable.  Otherwise, the insert
+	method overwrites the threads Group variable.  If the debug variable
+	is specified, then the thread's debug variable is overwritten.  When
+	the name variable is given, debugging output from the scheduler will
+	utilize this name tag.
+
+int execute();
+
+	The execute method runs the threads in the priority queues.  The 
+	thread with the highest priority in the highest queue (lowest queue
+	index) is run.  In each iteration of the scheduler, the following is
+	done:
+	  o Check the state of threads in the blocked list.  If a thread 
+		becomes unblocked, move it to the interrupts or threadGroup 
+		lists if it becomes unblocked.
+	  o Check the state of threads in the interrupts list.  If a threads'
+		message arrives, call its unwaiting method and move it
+		to the blocked or threadGroup lists if a message arrives.
+		(messages are checked in an arbitrary order that could, in
+		principle affect the dynamics of the scheduler).
+	  o Find the thread with the highest priority in the highest priority
+		queue and run it.  
+	  o If the thread returned OK, then move it into the appropriate list 
+		or queue.  Otherwise move it to the deadlist.
+
+static int termination_flag;
+
+	This flag can be used by other threads to terminate the scheduler.
+	(For example, see the methods in TermThread.H.)
+	
+	

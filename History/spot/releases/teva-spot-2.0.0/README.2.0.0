@@ -1,0 +1,146 @@
+====================================================================
+SPOT release 2.0.0, static executables and shared libraries 
+README file
+December 4, 2007
+====================================================================
+
+This file contains information about the files contained in this
+software release, and explains how to run a simple test of the 
+software.  
+
+====================================================================
+New in this release:
+
+  * getting started guide
+  * expanded and updated user guide
+  * directory of examples
+  * reorganization of software
+    - refactoring of detection and consequence assessment code
+    - extraction of health impacts consequences into a separate
+       code repository
+  * addition of new health impacts
+    - population dosed impact (pd)
+    - impact measures for 'detected' impacts (e.g. dtd, dpe)
+  * revision of integer programming solver to
+       minimize a 'detected' impact given a constraint on the number
+       of failed detections.
+  * update of the PICO solver, using new incumbent heuristics
+
+
+====================================================================
+Known issues:
+
+   * The heuristic solvers cannot minimize 'detected' impacts yet
+
+====================================================================
+Release contents:
+
+Executable files:
+	* aggregateImpacts-- creates smaller impact files by aggregating locations
+	* evalsensor	  -- computes objectives given sensor placements
+        * filter_impacts  -- a script to filter impacts
+	* PICO 		  -- integer programming solver
+	* randomsample	  -- local search heuristic for basic problems
+	* setupIPData	  -- prepares input for integer programming solver
+	* sideconstraints -- local search heuristic for side constraints
+	* scenarioAggr	  -- produces scenario-aggregated impact files
+	* sp   		  -- driver script for sensor placement runs
+	* sp_tracer	  -- driver script for sensor placement tracer studies
+	* tevasim	  -- ANL/UC "threat simulation output" file generator
+	* tso2Impact	  -- impact file generator
+	* ufl	  	  -- the Lagrangian solver
+
+====================================================================
+Testing the release:
+
+If you have chosen a Linux release with shared libraries, you must
+know that the libraries were built with the assumption that they
+would reside in the directory /usr/local/lib.  Create that directory
+if you don't already have it, and copy all of the .so files in the
+"lib" directory to it.  Then add "/usr/local/lib" to your 
+LD_LIBRARY_PATH environment variable.  Detailed instructions are at
+the end of this file if you're not familiar with these ideas.
+	
+You can test the software by running the test scripts in
+the "test" directory.  A simple one is "test1a".  If you look at
+this script, you will see it does the following:
+
+1. Run tevasim to create .tso files from a simple network (Net3.inp)
+and from a threat scenario file (test1.tsg).  (If you normally use
+TEVA to generate this information, you do not need tevasim other
+than when running "test1a".)
+
+2. Run tso2Impact to create impact files from the .tso files.
+
+3. Execute the sp script, which will
+   - run setupIPData to create the data for the solver
+   - run the PICO solver on the data, using a model in the /mod directory
+   - run the evalsensor program to evaluate the solver output
+
+The sp script and the other programs mentioned are described
+in detail in the User's Guide in the doc directory.
+
+You can see the output of the test by looking at the test1.log file.
+
+To execute a test script, just type its name:
+
+On Linux:
+
+./test1a
+./test1a_l
+./test1r
+
+On Windows:
+
+test1a
+test1a_l
+test1r
+
+---------------------------------------------------------------------
+TESTING 2.0 FUNCTIONALITY
+
+---------------------------------------------------------------------
+SHARED LIBRARIES ON LINUX 
+
+You can ignore this section if you are not using a release
+tar file containing shared libraries.
+
+The shared libraries must be installed in /usr/local/lib.  As
+superuser, make the directory if you don't already have it.
+
+su -
+<enter root password>
+mkdir /usr/local/lib
+exit
+
+Unpack the release.  (You can be an ordinary user to do this.)
+
+tar xvfz teva-spot-2.0.0-linux32-gcc4.1.2-shared.tar.gz
+
+Again as superuser, copy the libraries to /usr/local/lib:
+
+su -
+<enter root password>
+cd {path where you installed the tar file}
+cd teva-spot-2.0.0-linux32-gcc4.1.2-shared/lib
+cp *.so /usr/local/lib
+exit
+
+Now (as an ordinary user), add /usr/local/lib to your 
+LD_LIBRARY_PATH environment variable, which specifies
+the path that will be searched for shared libraries when you 
+run an executable:
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+cd teva-spot-2.0.0-linux32-gcc4.1.2-shared/test
+test1a
+
+The "export" command works in some shells, but not in others.
+If it doesn't work for you, try "setenv" instead:
+
+setenv LD_LIBRARY_PATH /usr/local/lib:${LD_LIBRARY_PATH}
+
+=====================================================================
+Good luck, and if you have any problems or feedback please contact
+Lee Ann Riesen at lafisk@sandia.gov or Jon Berry at jberry@sandia.gov
+=====================================================================

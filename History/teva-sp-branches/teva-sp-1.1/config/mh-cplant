@@ -1,0 +1,14 @@
+#-----------------------------------------------#
+# Host ARCHitecture dependent definitions - OSF #
+#-----------------------------------------------#
+
+ECHO		= /bin/echo
+LN		= ln -s
+LND		= ln -s
+MYMAKE		= gmake
+MAKE		= $(MYMAKE) -f Makefile-$(TARGET_NAME)
+PWD		= pwd
+RM		= rm -rf
+SHELL		= /bin/sh
+YACC		= yacc
+LEX		= lex

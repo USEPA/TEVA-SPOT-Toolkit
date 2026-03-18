@@ -1,0 +1,56 @@
+###############################################################################
+#                                                                             #
+# TEVA-SPOT Toolkit Release 2.3 Changelog                                     #
+#                                                                             #
+###############################################################################
+
+-------------------------------------------------------------------------------
+TEVA-SPOT 2.3 (2010/06/14)
+-------------------------------------------------------------------------------
+
+The TEVA-SPOT 2.3 release does not contain fundamental algorithmic updates. The new features included in this release are:
+
+-   Update of UTILIB software library
+
+-   Fixes to memory management in the health impacts code
+
+-   Reorganized TEVA-SPOT to only build with acro-utilib.  The executables
+    in acro-pico are assumed to have been built separately.
+
+-   HIA bug fixes
+
+-   Updates for nmake Makefiles, for MS Windows builds
+
+-   Rework of TEVA-SPOT tests.  A simple driver script now runs two
+    types of tests: (1) Python driver tests for TEVA-SPOT executables,
+    and (2) C++ unit tests.
+
+-   Extension of the test suite to include all EXACT tests (which is
+    no longer used), as well as the test1 tests.  Code coverage is used
+    to verify that a high percentage of C++ code is being tested.
+
+-   Reorganization of the TEVA-SPOT Python code into a Python package.
+    This reorganization supports the preliminary implementation of the
+    next-generation sp script: sptk.  This script uses Python plugins
+    to facilitate extensibility of the optimization capability to new
+    problem domains, and to leverage the optimization capabilities being
+    developed in Sandias Coopr software.
+
+-   Rework various C++ command-line tools to use the OptionParser class.
+    Now, all TEVA-SPOT executables should have a consistent look and feel.
+
+-   Adapted the Python virtualenv bootstrap utility to provide a portable
+    Python installer for TEVA-SPOT.
+
+-   The TEVA-SPOT 2.3 release is being managed within
+    Hudson, which provides graphical displays of test correctness,
+    code coverage and build histories.  Hudson builds have been setup
+    for 32- and 64-bit Linux, as well as 32- and 64-bit MS Windows.
+    This capability critically depends on the Python installer to
+    automatically generate a TEVA-SPOT installation on MS Windows
+    platforms that can be tested with the same scripts that are used
+    on Linux.  (The key issue here is that on Linux TEVA-SPOT builds
+    are coordinated with autoconf and shell scripts.  On MS Windows,
+    these tools are not available, and thus the Python installer is
+    necessary to integrate the builds with the testing capabilities.)
+

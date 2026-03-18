@@ -1,0 +1,16 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for OSF are used everywhere.		#
+#-----------------------------------------------------------------------#
+
+MPI_DIR=/usr/opt/mpi
+MPI_INCLUDES=-I$(MPI_DIR)/include 
+MPI_LIBS=-lmpi
+MPI_LDFLAGS=-L$(MPI_DIR)/lib
+
+SOPLEX_DIR=/home/wehart/SOPLEX
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+

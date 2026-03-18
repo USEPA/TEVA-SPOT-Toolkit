@@ -1,0 +1,171 @@
+<pre>
+------------------------------------------------------------------------------
+
+UTILIB:
+A C++ software library that provides general, portable utilities for
+developing C++ codes.  UTILIB provides utilities for random number
+generation, abstract data types (including dense arrays and matrices),
+sorting routines, I/O (including parallel I/O), common numerical routines
+and for masking system-specific differences in operating systems.
+
+------------------------------------------------------------------------------
+
+William E. Hart
+
+Sandia National Laboratories
+wehart@sandia.gov 
+
+------------------------------------------------------------------------------
+License.
+
+UTILIB is distributed under the GNU Lesser General Public License.  It is free
+software; you can redistribute it and/or modify it under the terms of the GNU
+Lesser General Public License as published by the Free Software Foundation; either
+version 1 of the License, or (at your option) any later version.  A copy of
+this license is included in the LICENSE file, and is also available online
+from http://www.gnu.org/copyleft/lesser.html.  Also refer to the COPYRIGHT file
+for important U.S. Government legal notices.
+
+UTILIB contains software from the RANLIB library, which has been published
+by ACM Tran. Math. Software.   General permission  to copy and  distribute
+the algorithm without fee is granted provided that the copies  are not
+made  or   distributed for  direct   commercial  advantage.  See 
+utilib/src/ranlib/README for further details.
+
+------------------------------------------------------------------------------
+Overview.
+
+The principle directories contained in this distribution are
+
+bin			Executables used to configure/compile UTILIB.
+
+config			Makefile fragments
+
+doc			Documentation about UTILIB.  See below.
+
+include			A common directory where include files are linked
+			(to faciliate the use of UTILIB as a library).
+
+lib			Contains the compiled source archived in a library.
+
+src			The source directories:
+
+src/adt			Abstract data types (arrays, heaps, hash tables, etc)
+
+src/io			Misc I/O support utilities (esp. the CommonIO tool)
+
+src/math		Misc mathematical routines.
+
+src/python		Hooks for wrapping UTILIB routines in Python scripts.
+
+src/qa			Test utilities for validating the functionality of
+			the UTILIB source.
+
+src/ranlib		Random number generators.
+
+src/sort		Sorting routines.
+
+src/sys			Misc utilities for maintaining portability between
+			various systems.
+
+src/templates		Ignore.
+
+src/vcpp		VC++ project files.  (Not currently supported)
+
+------------------------------------------------------------------------------
+Installation.
+
+The installation procedure is very similar to the GNU installation.
+If you have a tar file
+
+	utilib-1-0.tar.gz
+
+then you can extract the source files with
+
+	zcat | tar xvBf -
+
+The installation procedure is very similar to the GNU installation.
+You should be able to configure UTILIB for your particular system by
+typing
+
+	./configure
+
+and then type 
+
+	make 
+
+in the top level directory.  See the file INSTALL for further details
+on how to install this software.
+
+------------------------------------------------------------------------------
+Dependencies.
+
+UTILIB is not dependent on any other software.
+
+------------------------------------------------------------------------------
+Platforms.
+
+This package is quite generic and thus it should compile on a wide range
+of platforms.  UTILIB is actively being developed for the following platforms:
+(machines/OS with the given C++ compilers and MPI libraries)
+
+  SUN      Solaris 2.8                CC v5.0         MPICH
+
+  SGI      IRIX 6.5                   CC v7.3.1.2     SGI MPI
+
+  DEC      OSF 4.0                    cxx v6.3        Digital MPI
+
+  TFLOP    Cougar   (compute)         ciCC v4.0       MPICH
+           TFLOP OS (service)         iCC  v4.0       MPICH
+
+  PC       Red Hat LINUX 6.2/7.1      g++/egcs v.96   MPICH
+           Cygwin 1.3.x               g++/gcc v.96    MPICH
+
+Currently, the presence of gmake is required to successfully compile
+on HP, SGI, and DEC platforms.  This package has also compiled on the
+following machines in the past (although they are not actively supported):
+
+  HP       HP-UX 10.20                CC              -
+
+  IBM      AIX                         xlC             POE MPI
+
+  Cplant   Cplant OS 0.46 (compute)   c++             MPICH
+           LINUX          (service)   g++/egcs        MPICH
+
+  PC       NT                         MS VC++         -
+
+------------------------------------------------------------------------------
+Versions.
+
+The initial release is version 1.0, which is the first formal recognition of
+UTILIB as a library seperate from SGOPT.
+
+------------------------------------------------------------------------------
+Documentation.
+
+Two forms of documentation are supported: html and pdf.  The main html page
+can be accessed at 
+
+	<a href="file:doc/html/index.html">file:doc/html/index.html</a>
+
+The pdf version of the User Manual is available at
+
+	<a href="doc/userman.pdf">file:doc/userman.pdf.gz</a>
+
+This documentation provides an abbreviated users guide (which needs
+more work), as well as extensive source-level documentation generated
+with doxygen.  Additionally, this documentation is provided in the form
+of man pages in
+
+	utilib/doc/man
+
+Adding this directory to your MANPATH variable will enable the use of
+'man' to gget information about specific classes or methods.
+
+------------------------------------------------------------------------------
+
+WARNING: This is a RESEARCH code and is the subject of continuing
+active development.  Bug reports, suggestions for improvement, and
+required changes for other machines/compilers are welcome.  Direct all
+messages to utilib@sandia.gov.
+</pre>

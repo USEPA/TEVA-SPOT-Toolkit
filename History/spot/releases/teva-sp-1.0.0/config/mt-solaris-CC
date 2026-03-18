@@ -1,0 +1,39 @@
+#-----------------------------------------------------#
+# Target ARCHitecture dependent definitions - SOLARIS #
+#-----------------------------------------------------#
+
+AR		= CC
+ARFLAGS 	= -xar -o
+RANLIB		= ls
+ARCLEAN		= $(RM)
+
+CC		= cc
+CWARNINGS	= -dalign
+CC_SHARED	= -G -KPIC
+
+CCC		= CC
+C++		= $(CCC)
+C++WARNINGS	= -dalign -xtarget=native -features=no%conststrings
+C++_SHARED	= -G -KPIC
+
+F77		= f77
+FFLAGS		= -xtarget=native -libmil #-u
+F_SHARED	= -pic
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(LIB_PATH) $(ARCH_LIBS)
+LDSTATIC	= #-Bstatic
+LDFLAGS		=
+OPTIMIZATION	= -fast
+
+ARCH_LIB_PATH	= -L/opt/SUNWspro/lib
+ARCH_LIBS	= -ll -lF77 -lsunmath -lfsu
+ARCH_INCLUDES	= -I. -I/usr/include/X11R5
+ARCH_FLAGS	= -DUNIX -DSOLARIS -DMULTITASK -DANSI_HDRS -DANSI_NAMESPACES
+XTRAFLAGS	= 
+PROFILE_FLAG	= -xpg
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard

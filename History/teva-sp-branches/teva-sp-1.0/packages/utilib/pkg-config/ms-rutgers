@@ -1,0 +1,46 @@
+#-----------------------------------------------------------------------#
+#       These SITE Macros for the RUTGERS configuration are used 	#
+#	everywhere.				                        #
+#									#
+#	This is the configuration that I use for development, so I make	#
+#	assumptions that the make environment is less brain-dead.	#
+#	In particular, I use VPATH and the += option			#
+#-----------------------------------------------------------------------#
+
+BINDIR= $(ROOT_DIR)/bin
+LIBDIR= $(ROOT_DIR)/lib
+LIBRARY= $(LIBDIR)/libpico
+INCDIR=$(ROOT_DIR)
+TEMPLATE_DIR=$(ROOT_DIR)/src/templates
+TEMPLATE_DEFNS= $(TEMPLATE_DIR)/template.defns
+
+##
+## This software may also rely on the dpo++ package
+##
+PACKAGE_INCLUDES= $(MPMILP_INCLUDES) $(CPLEX_INCLUDES) $(XPRESS_INCLUDES)\
+		  $(MPI_INCLUDES) $(SOPLEX_INCLUDES) -I$(UTILIB_DIR)/include
+PACKAGE_LIBS=	  -lutilib $(MPMILP_LIBS) $(CPLEX_LIBS) \
+		  $(XPRESS_LIBS) $(MPI_LIBS) $(SOPLEX_LIBS)
+PACKAGE_LDFLAGS=  -L$(UTILIB_DIR)/lib\
+		  $(MPI_LDFLAGS) 
+PACKAGE_DEFINES=  $(MPI_DEFINE) $(MPE_DEFINE)
+
+# Put MPE into build manually
+# XTRAFLAGS = -DRUTCOR -DMISALIGNED_DOUBLE_SCALARS -DMPE $(DEBUGGING)
+# Removed -DMISALIGNED_DOUBLE_SCALARS
+XTRAFLAGS = -DRUTCOR $(WARNINGS) $(DEBUGGING) \
+            $(MPE_INCLUDES) $(MPE_LDFLAGS) $(MPE_LIBS) $(ANSI_FLAG) \
+            $(ANSIHDR_FLAG) $(MAPPEDIO_FLAG) -DDLL_API=
+
+
+##
+## Define global compiling flags
+##
+INCLUDES = $(PACKAGE_DEFINES) -I. -I$(INCDIR) $(PACKAGE_INCLUDES)
+
+VPATH = $(CPLEX_DIR):$(SOPLEX_DIR)
+
+LDLIBS = $(PACKAGE_LIBS) $(ARCH_LIBS) -lm
+ 
+LDFLAGS = -L$(LIBDIR) $(PACKAGE_LDFLAGS)
+

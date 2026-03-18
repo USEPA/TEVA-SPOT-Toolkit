@@ -1,0 +1,709 @@
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+
+#include <algorithm>
+#include <vector>
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <float.h>
+#include <assert.h>
+
+#include "constructive.h"
+#include "instance.h"
+#include "impact_instance.h"
+#include "instance_factory.h"
+#include "search.h"
+#include "bossa_random.h"
+
+#include <sp/SPProblem.h>
+
+#include <utilib/BitArray.h>
+#include <utilib/BasicArray.h>
+
+double worstCaseMoveEvaluator(const PMSolution &startSolution,
+			      int facilityToOpen,
+			      double gamma)
+{
+  // PMInstance *instance=startSolution.getInstance();
+  // to avoid the virtual overhead and enable function inlining...
+  PMImpactInstance *instance=dynamic_cast<PMImpactInstance*>(startSolution.getInstance());
+
+  int numCustomers(instance->getN());
+
+  double worstCaseDistance(0.0);
+
+  // assess the impact of opening the new facility.
+  for(int i=1;i<=numCustomers;++i)
+    {
+      double distToNewFacility(instance->fastGetDist(i,facilityToOpen));
+      if(distToNewFacility<startSolution.getDistClosest(i))
+	{
+	  worstCaseDistance=std::max(worstCaseDistance,distToNewFacility);
+	}
+      else
+	{
+	  worstCaseDistance=std::max(worstCaseDistance,startSolution.getDistClosest(i));
+	}
+    }
+
+  return worstCaseDistance;
+}
+
+double varMoveEvaluator(const PMSolution &startSolution,
+			int facilityToOpen,
+			double gamma)
+{
+  // PMInstance *instance=startSolution.getInstance();
+  // to avoid the virtual overhead and enable function inlining...
+  PMImpactInstance *instance=dynamic_cast<PMImpactInstance*>(startSolution.getInstance());
+
+  int numCustomers(instance->getN());
+
+  std::vector<double> impacts(numCustomers);
+
+  // assess the impact of opening the new facility.
+  for(int i=1;i<=numCustomers;++i)
+    {
+      double distToNewFacility(instance->fastGetDist(i,facilityToOpen));
+      if(distToNewFacility<startSolution.getDistClosest(i))
+  	{
+  	  impacts[i-1]=distToNewFacility;
+  	}
+      else
+  	{
+  	  impacts[i-1]=startSolution.getDistClosest(i);
+  	}
+    }
+
+  std::sort(impacts.begin(),impacts.end());
+
+  // compute the gamma index under the fixed-probability assumption
+  int index((int)(ceil(numCustomers*(1.0-gamma))));
+
+  return impacts[index-1];  
+}
+
+double tceMoveEvaluator(const PMSolution &startSolution,
+			int facilityToOpen,
+			double gamma)
+{
+  // PMInstance *instance=startSolution.getInstance();
+  // to avoid the virtual overhead and enable function inlining...
+  PMImpactInstance *instance=dynamic_cast<PMImpactInstance*>(startSolution.getInstance());
+
+  int numCustomers(instance->getN());
+
+  std::vector<double> impacts(numCustomers);
+
+  // assess the impact of opening the new facility.
+  for(int i=1;i<=numCustomers;++i)
+    {
+      double distToNewFacility(instance->fastGetDist(i,facilityToOpen));
+      if(distToNewFacility<startSolution.getDistClosest(i))
+  	{
+  	  impacts[i-1]=distToNewFacility;
+  	}
+      else
+  	{
+  	  impacts[i-1]=startSolution.getDistClosest(i);
+  	}
+    }
+
+  std::sort(impacts.begin(),impacts.end());
+
+  // compute the gamma index under the fixed-probability assumption
+  int index((int)(ceil(numCustomers*(1.0-gamma))));
+  index--;
+
+  double perAttackProbability=1.0/numCustomers;
+
+  // sum the tail weight and normalize
+  double result(0.0);
+  double tailProb(0.0);
+  for(int i=index;i<numCustomers;++i)
+    {
+      result+=(impacts[i]*perAttackProbability);
+      tailProb+=perAttackProbability;
+    }
+
+  return result/tailProb;
+}
+
+PMSolution *descend(PMSolution &startingPoint,
+		    double (*moveEvaluator)(const PMSolution&,int,double),
+		    double (PMSolution::*costFunction)(double)const,
+		    const std::vector<int> &facilityLocationConstraints,
+		    double gamma)
+{
+  // this function assumes that all fixed/invalid constraints 
+  // are satisfied in the input solution. 
+
+  PMSolution *result=new PMSolution(startingPoint.getInstance());
+  result->copyFrom(startingPoint);
+
+  int p(result->getP());
+  int m(result->getM());
+  
+  bool improvementFound(true); // to trip the loop
+  while(improvementFound==true)
+    {
+      double baselineCost((result->*costFunction)(gamma));
+      improvementFound=false; // until proven otherwise
+
+      for(int facilityToClosePosition=1;
+	  (facilityToClosePosition<=p)&&(improvementFound==false);
+	  facilityToClosePosition++)
+	{
+	  int facilityToClose(result->getFacility(facilityToClosePosition));
+
+	  if(facilityLocationConstraints[facilityToClose]!=1)
+	    {
+	      // the "source" facility isn't constrained to be open
+
+	      // remove the facility from the solution and update the distances accordingly
+	      PMSolution baselineSolution(result->getInstance());
+	      baselineSolution.copyFrom(*result);
+
+	      baselineSolution.remove(facilityToClose,true);
+	  
+	      // recall that the first p facilities in a solution are all open.
+	      // the remaining p+1..m are closed. 
+	      for(int facilityToOpenPosition=p+1; // you've closed all but one facility
+		  (facilityToOpenPosition<=m)&&(improvementFound==false);
+		  facilityToOpenPosition++)
+		{
+		  int facilityToOpen(result->getFacility(facilityToOpenPosition));
+
+		  if(facilityLocationConstraints[facilityToOpen]!=2)
+		    {
+		      // the "destination" facility isn't constrained to be closed
+
+		      double costOfMove=(moveEvaluator)(baselineSolution,facilityToOpen,gamma);
+
+		      if(costOfMove<baselineCost)
+			{
+			  baselineCost=costOfMove;
+			  improvementFound=true;
+			  result->swap(facilityToClose,facilityToOpen,true);
+			}
+		    }
+		}
+	    }
+	}
+    }
+
+  return result;
+}
+
+// fixes up the input solution (via random pertrubation) to ensure consistency with the 
+// input sensor location constraints. intended as a patch to avoid extensive modification
+// of the various constructive heuristics in the grasp distribution (at least for now).
+// this doesn't have to be overly efficient (and isn't), as it will be a tiny fraction
+// of the overall run-time.
+void enforceFacilityLocationConstraints(PMSolution *theSolution, 
+					int numFixed,
+					int numInvalid,
+					const std::vector<int> &facilityLocationConstraints)
+{
+  int targetP(theSolution->getP());
+  int totalNumFacilities(theSolution->getM());
+
+  assert(int(facilityLocationConstraints.size())==totalNumFacilities);
+
+  // first, eliminate all of the invalid locations from the solution
+  for(int i=1;i<=totalNumFacilities;++i)
+    {
+      if(facilityLocationConstraints[i]==2)
+	{
+	  if(theSolution->contains(i)==true)
+	    {
+	      theSolution->remove(i,false);
+	    }
+	}
+    }
+
+  // second, ensure that all fixed locations are open in the solution
+  for(int i=1;i<=totalNumFacilities;++i)
+    {
+      if(facilityLocationConstraints[i]==1)
+	{
+	  if(theSolution->contains(i)==false)
+	    {
+	      // find an existing facility to close that 
+	      // isn't also constrained to be open. chase
+	      // backwards on the assumption that the 
+	      // early moves in any greedily biased constructive
+	      // procedure are likely to be the most important.
+	      bool found(false);
+	      for(int j=theSolution->getP();(j>=1)&&(found==false);j--)
+		{
+		  int theCandidate(theSolution->getFacility(j));
+		  if(facilityLocationConstraints[theCandidate]!=1)
+		    {
+		      // at this point, there are no invalid 
+		      // facilities open in the solution. close
+		      // the existing facility and open the 
+		      // fixed one.
+		      theSolution->remove(theCandidate,false);
+		      theSolution->add(i,false);
+		      found=true;
+		    }
+		}
+	      if(found==false)
+		{
+		  std::cout << "***No open, non-fixed locations available to place a fixed sensor - budget p is insufficient" << std::endl;
+		}
+	    }
+	}
+    }
+
+  // third, fill up the solution with free-but-not-opened facilities
+  while(theSolution->getP()<targetP)
+    {
+      std::vector<int> sequence(BossaRandom::generateRandomSequence(theSolution->getM()));
+      bool found(false);
+      for(size_t i=0;(i<sequence.size())&&(found==false);i++)
+	{
+	  int index(sequence[i]+1);
+	  int theCandidate(theSolution->getFacility(index));
+	  if((theSolution->contains(theCandidate)==false)&&
+	     (facilityLocationConstraints[theCandidate]==0))
+	    {
+	      // the facility isn't currently in the solution and
+	      // the facility can be opened
+	      theSolution->add(theCandidate,false);
+	      found=true;
+	    }
+	}
+      if(found==false)
+	{
+	  std::cout << "***No open, valid locations available to place more than " << theSolution->getP() << " sensors" << std::endl;
+	  break;
+	}
+    }
+  
+  // fourth, ensure the solution is consistent
+  theSolution->ensureConsistency();
+}
+
+int main(int argc, char **argv)
+{
+  if((argc!=4)&&
+     (argc!=5))
+    {
+      std::cout << "***Usage: randomsample configuration-file num-samples random-seed [solution-file]" << std::endl;
+      return 0;
+    }
+
+  //////////////////////////////////////////////////////////////
+  // all problem-specific (as opposed to algorithm-specific)  //
+  // parameters are read from the SPProblem class, which is   //
+  // an interface to the configuration text file generated by //
+  // the 'sp' solver script.                                  //
+  //////////////////////////////////////////////////////////////
+
+  SPProblem theProblem;
+  std::ifstream configFile(argv[1]);
+  if(!configFile)
+    {
+      std::cout << "***Failed to open configuration file=" << argv[1] << std::endl;
+      return 0;
+    }
+  theProblem.read_config_file(configFile);
+  configFile.close();
+
+  std::cout << "Configuration file=" << argv[1] << std::endl;
+
+  ///////////////////////////////////////////////////////
+  // determine the objective, statistic, and number of //
+  // facilities to open (i.e., sensors to place) from  //
+  // the overall problem definition.                   //
+  ///////////////////////////////////////////////////////
+
+  double gamma(theProblem.gamma);
+
+  std::string impactFileName;
+  std::string objective;
+  std::string statistic;
+  int numFacilitiesToOpen(-1);  
+
+  for(size_t i=0;i<theProblem.goals.size();++i)
+    {
+      SPGoalInfo &thisGoal=theProblem.goals[i];
+      // only take the first goal
+      if((thisGoal.objective_flag==true)&&(objective==""))
+	{
+	  objective=thisGoal.goal;
+	  impactFileName=thisGoal.impact_file;
+	  statistic=thisGoal.measure.front();
+	}
+      else 
+	{
+	  if((thisGoal.goal=="ns")&&(numFacilitiesToOpen==-1))
+	    {
+	      numFacilitiesToOpen=int(rint(thisGoal.bound.front()));
+	    }
+	}
+    }
+
+  /////////////////////////////////////////////////////////
+  // validate the problem-specific parameters. shouldn't //
+  // be necessary, but you never know...                 //
+  /////////////////////////////////////////////////////////
+  
+  std::cout << "Number of facilities to open=" << numFacilitiesToOpen << std::endl;
+  
+  if(numFacilitiesToOpen<=0)
+    {
+      std::cout << "***The value of p must be >= 1" << std::endl;
+      return 0;
+    }
+  std::cout << "P=" << numFacilitiesToOpen << std::endl;
+
+  if(objective=="")
+    {
+      std::cout << "***No objective was specified" << std::endl;
+      return 0;
+    }
+
+  if(statistic=="")
+    {
+      std::cout << "No statistic was specified" << std::endl;
+      return 0;
+    }
+
+  std::cout << "Objective=" << objective << std::endl;
+
+  //////////////////////////
+  // load the impact file //
+  //////////////////////////
+
+  std::cout << "Instance filename=" << impactFileName << std::endl;
+  PMInstance *instance(readInstance(impactFileName.c_str(),numFacilitiesToOpen));
+  if(instance==0)
+    {
+      std::cout << "***Failed to read problem instance" << std::endl;
+      return 0;
+    }
+
+  // post-impact validations...
+  if(numFacilitiesToOpen>instance->getM())
+    {
+      std::cout << "***The value of p must be <= the number of potential facilities" << std::endl;
+      return 0;
+    }
+
+  ////////////////////////////////////////////////////////////////
+  // load and validate all of the facility location constraints //
+  ////////////////////////////////////////////////////////////////
+
+  const utilib::BasicArray<int> fixeds=theProblem.fixed_placements;
+
+  // validate the fixed placements - ideally, SPProblem should
+  // do this, but the combination of it and the sp script 
+  // aren't ensuring this as of yet.
+  for(size_t i=0;i<fixeds.size();++i)
+    {
+      if((fixeds[i]<=0)||(fixeds[i]>instance->getM()))
+	{
+	  std::cout << "***Illegal fixed node index specified, value=" << fixeds[i] << std::endl;
+	  return 0;
+	}
+    }
+
+  std::cout << "Fixed placements=(" << fixeds.size() << ")";
+  for(size_t i=0;i<fixeds.size();++i)
+    {
+      std::cout << fixeds[i] << " ";
+    }
+  std::cout << std::endl;
+
+  const utilib::BasicArray<int> invalids=theProblem.invalid_placements;
+
+  // validate the invalid placements - ideally, SPProblem should
+  // do this, but the combination of it and the sp script aren't 
+  // ensuring this as of yet.
+  for(size_t i=0;i<invalids.size();++i)
+    {
+      if((invalids[i]<=0)||(invalids[i]>instance->getM()))
+	{
+	  std::cout << "***Illegal invalid node index specified, value=" << invalids[i] << std::endl;
+	  return 0;
+	}
+    }
+
+  std::cout << "Invalid placements (" << invalids.size() << ")=";
+  for(size_t i=0;i<invalids.size();++i)
+    {
+      std::cout << invalids[i] << " ";
+    }
+  std::cout << std::endl;
+
+  int effectiveP(numFacilitiesToOpen-fixeds.size());
+  if(effectiveP<0)
+    {
+      std::cout << "***The number of fixed sensor locations must be <= p" << std::endl;
+      return 0;
+    }
+  std::cout << "Effective P=" << effectiveP << std::endl;
+
+  /////////////////////////////////////////////////////////
+  // load and validate any algorithm-specific parameters //
+  /////////////////////////////////////////////////////////
+
+  int numSamples(atoi(argv[2]));
+  if(numSamples<=0)
+    {
+      std::cout << "***The number of samples must be >= 1" << std::endl;
+      return 0;
+    }
+  std::cout << "Number of requested samples=" << numSamples << std::endl;
+
+  ////////////////////////////////////////////
+  // initialize the random number generator //
+  ////////////////////////////////////////////
+
+  int randomSeed(atoi(argv[3]));
+  if(randomSeed<=0)
+    {
+      std::cout << "***The random number seed must be >= 1" << std::endl;
+      return 0;
+    }
+  BossaRandom::randomize(randomSeed);
+  std::cout << std::endl << "Random number seed=" << randomSeed << std::endl << std::endl;  
+
+  ////////////////////////////////////
+  // set up the move/cost functions //
+  ////////////////////////////////////
+  
+  double (PMSolution::*costFunction)(double)const;
+  double (*moveEvaluator)(const PMSolution&,int,double);
+
+  if(statistic=="worst")
+    {
+      costFunction=&PMSolution::worstCaseCost;
+      moveEvaluator=&worstCaseMoveEvaluator;
+    }
+  else if(statistic=="var")
+    {
+      costFunction=&PMSolution::varCost;      
+      moveEvaluator=&varMoveEvaluator;
+    }
+  else if(statistic=="tce")
+    {
+      costFunction=&PMSolution::tceCost;      
+      moveEvaluator=&tceMoveEvaluator;
+    }
+  else if(statistic=="mean")
+    {
+      costFunction=0;
+      moveEvaluator=0;
+    }
+  else
+    {
+      std::cout << "***Unknown performance statistic=" << statistic << std::endl;
+      return 0;
+    }
+
+  std::cout << "Performance statistic=" << statistic << std::endl;
+
+  // construct the facility location constraint vector.
+  // the array is 1-based, like the facility indices
+  // 0=no constraints, free to place facility
+  // 1=fixed facility location
+  // 2=invalid facility location
+  std::vector<int> facilityLocationConstraints(theProblem.num_nodes+1,0);
+  for(size_t i=0;i<fixeds.size();++i)
+    {
+      facilityLocationConstraints[fixeds[i]]=1;
+    }
+  for(size_t i=0;i<invalids.size();++i)
+    {
+      if(facilityLocationConstraints[invalids[i]]!=0)
+	{
+	  std::cout << "***WARNING - Over-riding fixed facility location index=" << invalids[i] << " with an invalid constraint" << std::endl;
+	}
+      facilityLocationConstraints[invalids[i]]=2;
+    }
+
+  //////////////////////////////////////////////////
+  // initialize the constructive algorithm, which //
+  // currently isn't anything special.            //
+  //////////////////////////////////////////////////
+
+  PMConstructive constructiveAlgorithm; 
+  if(statistic=="mean")
+    {
+      // default in the grasp executable
+      constructiveAlgorithm.setMethod("sample:2"); 
+    }
+  else
+    {
+      // initial default for var/tce/worst-case variants - who knows if it matters (I doubt it).
+      constructiveAlgorithm.setMethod("pgreedy:0.75"); 
+    }
+
+  //////////////////////////////////////////////
+  // start the main routine, which is nothing //
+  // but iterated hill-climbing.              //
+  //////////////////////////////////////////////
+
+  std::cout << "Starting iterated descent" << std::endl;
+
+  double minCost(DBL_MAX);
+  double sumCosts(0.0);
+  double maxCost(0.0);
+
+  PMSolution *bestSolution=new PMSolution(instance);
+
+  std::cout.setf(std::ios_base::fixed,std::ios_base::floatfield);
+  std::cout.precision(2);
+
+  const int STATUS_INTERVAL=1000;
+  for(int i=1;i<=numSamples;++i)
+    {
+      if((i%STATUS_INTERVAL)==0)
+	{
+	  std::cout << "Generated " << i << " samples so far" << std::endl;
+	}
+
+      PMSolution *initialPoint=new PMSolution(instance);
+      initialPoint->reset();
+      constructiveAlgorithm.run(initialPoint,numFacilitiesToOpen);
+
+      //      std::cout << "Initial solution before constraint enforcement= [ ";
+      //      for(int j=1;j<=initialPoint->getP();j++)
+      //	{
+      //	  std::cout << initialPoint->getFacility(j) << " ";
+      //	}
+      //      std::cout << " ]" << std::endl;
+
+      enforceFacilityLocationConstraints(initialPoint,int(fixeds.size()),int(invalids.size()),facilityLocationConstraints);
+
+      //      std::cout << "Initial solution after constraint enforcement= [ ";
+      //      for(int j=1;j<=initialPoint->getP();j++)
+      //	{
+      //	  std::cout << initialPoint->getFacility(j) << " ";
+      //	}
+      //      std::cout << " ]" << std::endl;
+
+      double initialCost(0.0);
+      if(statistic=="mean")
+	{
+	  initialCost=double(initialPoint->cost())/double(instance->getN());
+	}
+      else
+	{
+	  initialCost=(initialPoint->*costFunction)(gamma);
+	}
+
+      PMSolution *localOptimum(0);
+
+      if(statistic=="mean")
+	{
+	  localOptimum=new PMSolution(initialPoint->getInstance());
+	  localOptimum->copyFrom(*initialPoint);
+	  // "f" is for interchange (slower)
+	  // "s" is for sparse matrix (fastest)
+	  PMSearch::runLocalSearch(localOptimum,"s",facilityLocationConstraints);
+	}
+      else
+	{
+	  localOptimum=descend(*initialPoint,moveEvaluator,costFunction,facilityLocationConstraints,gamma);
+	}
+
+      double localOptimumCost(0.0);
+      if(statistic=="mean")
+	{
+	  localOptimumCost=double(localOptimum->cost())/double(instance->getN());
+	}
+      else
+	{
+	  localOptimumCost=(localOptimum->*costFunction)(gamma);
+	}
+
+      int numFacs=localOptimum->getP();
+      std::vector<int> locations;
+      locations.reserve(numFacs);
+      for(int j=1;j<=numFacs;j++)
+	{
+	  locations.push_back(localOptimum->getFacility(j));
+	}
+      std::sort(locations.begin(),locations.end());
+
+      std::cout << std::setw(4) << i << " [" << initialCost << "] -> [" << localOptimumCost << "]  Solution=[ ";
+      for(size_t j=0;j<locations.size();j++)
+	{
+	  std::cout << locations[j] << " ";	  
+	}
+      std::cout << "]";
+
+      if(localOptimumCost<minCost)
+	{
+	  minCost=localOptimumCost;
+	  bestSolution->copyFrom(*localOptimum);
+	  std::cout << "   <<<"; // denote the new best-so-far
+	}
+
+      sumCosts+=localOptimumCost;
+
+      if(localOptimumCost>maxCost)
+	{
+	  maxCost=localOptimumCost;
+	}
+
+      std::cout << std::endl;
+
+      delete initialPoint;
+      delete localOptimum;
+    }
+
+  std::cout << std::endl;
+  std::cout << "Summary statistics" << std::endl;
+  std::cout << "Minimum cost=" << minCost << std::endl;
+  std::cout << "Average cost=" << sumCosts/double(numSamples) << std::endl;
+  std::cout << "Maximum cost=" << maxCost << std::endl;
+  std::cout << std::endl;
+
+  // output facility locations to file, if requested
+  if(argc==5)
+    {
+      int numFacs=bestSolution->getP();
+      std::vector<int> locations;
+      locations.reserve(numFacs);
+      for(int i=1;i<=numFacs;++i)
+	{
+	  locations.push_back(bestSolution->getFacility(i));
+	}
+      std::sort(locations.begin(),locations.end());
+
+      std::ofstream facilityOutputFile(argv[4]);
+      if(!facilityOutputFile)
+	{
+	  std::cerr << "***Failed to open facility output file=" << argv[4] << std::endl;
+	  return 0;
+	}
+
+      facilityOutputFile << "#" << std::endl;
+      facilityOutputFile << "# Generated by GRASP solver interface" << std::endl;
+      facilityOutputFile << "#" << std::endl;
+
+      facilityOutputFile << rand() << " "; // the ID
+      facilityOutputFile << numFacs << " "; // the number of sensors
+      for(size_t i=0;i<locations.size();++i)
+	{
+	  facilityOutputFile << locations[i] << " ";	  
+	}
+      facilityOutputFile << std::endl;
+
+      facilityOutputFile.close();
+
+      std::cout << "Best solution written to file=" << argv[4] << std::endl;
+    }
+
+  delete bestSolution;
+
+  return 1;
+}

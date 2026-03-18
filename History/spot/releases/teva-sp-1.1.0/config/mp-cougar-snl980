@@ -1,0 +1,19 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=COUGAR at site=SNL980		#
+#-----------------------------------------------------------------------#
+
+CPLEX_DIR=/Net/proj/opt/packages/COUGAR/CPLEX
+CPLEX_INCLUDES=-I$(CPLEX_DIR)
+CPLEX_LIBS=-lcplex
+CPLEX_LDFLAGS=-L$(CPLEX_DIR)
+
+MPI_DIR=/opt/intel/tflop/current/tflops/lib
+MPI_INCLUDES=-I$(MPI_DIR)/include  -I$(MPI_DIR)build/solaris/ch_p4/include
+MPI_LIBS=-lmpi 
+MPI_LDFLAGS= -L$(MPI_DIR)/lib/
+
+MPE_DIR=
+MPE_INCLUDES=
+MPE_LIBS=
+MPE_LDFLAGS=
+

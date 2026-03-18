@@ -1,0 +1,54 @@
+/*! 
+
+\mainpage TEVA-SPOT Toolkit User Guide\ Version 2.3
+
+<center>
+Jonathan Berry<br>
+Erik Boman<br>
+William E. Hart<br>
+Cynthia A. Phillips<br>
+Lee Ann Riesen<br>
+Jean-Paul Watson
+</center>
+
+<center>
+<table borderwidth=0><tr><td width=500 align=left>
+This document describes the TEVA-SPOT Toolkit (SPOT). SPOT provides a
+sensor placement framework that facilitates research in sensor placement
+optimization and enables the practical application of sensor placement
+solvers to real-world water security applications.  SPOT contains a number
+of command line executables that can be used to analyze the impact of
+contamination events and to identify optimal sensor placements.
+</td></tr></table>
+</center>
+
+<h2> Table of Contents</h2>
+
+<ul>
+<li> \ref intro
+<li> \ref gstarted
+<li> \ref formulations
+<li> \ref impacts
+<li> \ref solvers
+<li> \ref formats
+<li> Main Executables
+<ul>
+<li> \ref tevasimExecutable
+<li> \ref tso2ImpactExecutable
+<li> \ref scenarioAggrExecutable
+<li> \ref filter_impactsExecutable
+<li> \ref spExecutable
+<li> \ref evalsensorExecutable
+</ul>
+<li> Other Executables
+<ul>
+<li> \ref randomsampleExecutable
+<li> \ref sideconstraintsExecutable
+<li> \ref picoExecutable
+<li> \ref lagrangianExecutable
+<li> \ref setupIPDataExecutable
+</ul>
+<li> <a class="el" href="../html-ref/index.html">Software Reference Guide</a>
+</ul>
+
+*/

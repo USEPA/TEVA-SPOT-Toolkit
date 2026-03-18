@@ -1,0 +1,80 @@
+
+The ThreadObj is an abstract class that defines the basic mechanisms
+for thread objects.  
+
+int Group;
+
+  The Group value specifies the priority queue into which the thread is
+  placed.  This value can be changed dynamically, except when 
+  the thread is in the ThreadReady state.
+
+int bias;
+
+  The bias value specifies the bias used by a weighted priority queue.
+
+ThreadState state_flag;
+
+  The state_flag value specifies the thread state:  ThreadReady, ThreadWaiting
+  and ThreadBlocked.
+
+MessageObj *message;
+
+  The message value is a pointer to a message object constructed by the
+  thread class which can be used for communication.
+
+MPI_Status status;
+
+  The status value is an MPI_Status object that can be used for asynchronous
+  communication.
+
+char* name;
+
+  This is the character tag used to describe the thread during debugging.
+  A default name is provided which incorporates the thread's id number.
+
+
+ThreadObj(int Group_=0, int bias_=0, MPI_Comm comm=MPI_COMM_WORLD);
+ThreadObj(MPI_Comm comm);
+
+  The constructors can be provided with the group and bias information.  Additionally,
+  they can be provided with the MPI communication group that is used
+  for communication by the thread (this feature is not carefully used at the
+  moment).
+
+int run(double timelimit=-1.0)
+ 
+  This method performs the basic execution of the thread.  The timelimit variable
+  is a suggested time quanta for this thread (this is not a well-supported
+  feature as the Scheduler object doesn't make intelligent suggestions about the
+  timelimit).
+
+ThreadState state()  {return state_flag;}
+int ready()   {return (state()==ThreadReady);}
+int blocked() {return (state()==ThreadBlocked);}
+int waiting() {return (state()==ThreadBlocked);}
+
+  The method state returns the current state of the thread.  The methods
+  ready, blocked and waiting return TRUE if the current state matches the
+  corresponding method name and FALSE otherwise.
+
+void unready()
+
+  This method is called after running the thread and is principly used to 
+  modify the thread state.
+
+void unblocked()
+
+  This method is called after unblocking the thread and is principly used to 
+  modify the thread state.
+
+void unwaiting()
+
+  This method is called after receiving a message that the thread was waiting for,
+  and is principly used to modify the thread state.
+
+int operator==(const ThreadObj& thread) {return (id == thread.id);}
+
+  The operator== returns 1 if the thread id's match and 0 otherwise.
+
+
+

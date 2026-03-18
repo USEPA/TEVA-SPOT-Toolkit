@@ -1,0 +1,33 @@
+
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+#
+# Define objects and headers
+#
+LIBRARY=libutilib
+
+
+#
+# Define objects and headers
+#
+MISC_SRCS= misc/genprm.c misc/globals.cpp misc/LCG.cpp
+
+RAND_SRCS= random/gencau.c random/scauchy.c random/genbet.c random/genchi.c  \
+	random/genexp.c \
+	random/genf.c random/gengam.c random/genmn.c random/gennch.c \
+	random/gennf.c random/gennor.c random/genunf.c \
+	random/ignbin.c random/ignpoi.c random/sexpo.c \
+	random/sgamma.c random/snorm.c 
+
+RNG_SRCS= rng/global_rng.c misc/PM_LCG.cpp misc/ParkMiller.c
+
+SRCS= $(RAND_SRCS) $(MISC_SRCS) $(RNG_SRCS)
+
+#
+# Define compiler flags
+#
+#OPTIMIZATION= -g
+
+include ../MakeMacros
+

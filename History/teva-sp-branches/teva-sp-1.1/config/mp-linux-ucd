@@ -1,0 +1,34 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=LINUX  at site=DEFAULT          #
+#-----------------------------------------------------------------------#
+
+CPLEX_DIR=/usr/local/cplex/CPLEX.6.0/SOLARIS
+CPLEX_INCLUDES=-I$(CPLEX_DIR)
+CPLEX_LIBS=-lcplex
+CPLEX_LDFLAGS=-L$(CPLEX_DIR)
+
+MPI_DIR=/opt/scali
+MPI_INCLUDES=-I$(MPI_DIR)/include
+MPI_LIBS=-lmpi -lpthread
+MPI_LDFLAGS=-L$(MPI_DIR)/lib
+
+MPE_DIR=/usr/local/MPEX
+MPE_INCLUDES= -DUSING_MPE -I$(MPE_DIR)
+MPE_LIBS= -lmpe
+MPE_LDFLAGS= -L$(MPE_DIR)
+
+XPRESS_DIR=/usr/local/express
+XPRESS_INCLUDES=-I$(XPRESS_DIR)/include
+XPRESS_LIBS=-lxmsl -lxosl -lmp-opt
+XPRESS_LDFLAGS=-L$(XPRESS_DIR)/lib
+
+SOPLEX_DIR=$(ROOT_DIR)/../soplex
+SOPLEX_INCLUDES=-I$(SOPLEX_DIR)
+SOPLEX_LIBS=-lsoplex
+SOPLEX_LDFLAGS=-L$(SOPLEX_DIR)
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+

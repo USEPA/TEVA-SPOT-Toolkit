@@ -1,0 +1,164 @@
+read_impact_files:  Net3_mc.impact
+Note: witness aggregation disabled for grasp
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9480
+
+Number of sensors=5
+Objective=mc
+Statistic=mean
+Impact file=Net3_mc.impact
+Delay=0
+
+Running iterated descent SNL grasp for *perfect* sensor model
+Iterated descent completed
+Executable: randomsample
+Configuration file=Net3.config
+Max number of facilities to open=5
+P=5
+Objective=mc
+Impact file representation=1
+Instance filename=Net3_mc.impact
+myImpactRepresentation=1
+Time to read impact file: 0.01 0
+Time to convert impact data: 0 0
+Time to init oracle: 0 0
+Problem Define: n=236, p=5, m=97.
+Fixed placements(0)=
+Invalid placements(0)=
+Effective P=5
+Number of requested samples=20
+Random number seed=1234567
+WallClock Time Limit=0
+sort is done------------------------------------------------
+Performance statistic=mean
+
+Starting iterated descent
+   1 [32410.32] -> [21786.75]  Solution=[ 2 4 59 70 81 ] <<<Best solution written to file=Net3.sensors>>>
+   2 [45666.99] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+   3 [35230.65] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+   4 [35934.80] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+   5 [34065.05] -> [24025.94]  Solution=[ 2 4 59 70 82 ]
+   6 [38493.45] -> [23048.69]  Solution=[ 4 29 59 70 81 ]
+   7 [40902.50] -> [21809.21]  Solution=[ 2 4 59 71 81 ]
+   8 [42058.32] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+   9 [35077.95] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  10 [40954.82] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  11 [31655.15] -> [25287.88]  Solution=[ 4 29 59 70 82 ]
+  12 [41944.35] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  13 [34363.94] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  14 [34741.63] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  15 [37417.87] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  16 [42378.09] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  17 [46519.68] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  18 [50256.00] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  19 [31136.90] -> [21786.75]  Solution=[ 2 4 59 70 81 ]
+  20 [43042.96] -> [23539.28]  Solution=[ 2 4 59 69 81 ]
+
+CPU RunTime=         0.04
+CPU TotalTime=       0.05
+WallClock TotalTime= 0.06
+
+Summary statistics
+Minimum cost= 21786.75
+Average cost= 22225.61
+Maximum cost= 25287.88
+# No weights file: Net3_mc.impact.prob
+------------------------------------------------------------------------------
+Sensor placement id:        31399
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            2 4 59 70 81 
+Sensor junctions:           15 35 203 219 253 
+
+Impact File:                Net3_mc.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                21786.7482
+Lower quartile impact:      289.3540
+Median impact:              1364.7100
+Upper quartile impact:      9272.3900
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144275.1667
+Max impact:                 144321.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_mc.impact
+------------------------------------------------------------------------------
+-1	137028.5263
+81	55217.6532
+2	36436.6597
+70	28902.4158
+4	24640.0395
+59	21786.7482
+Done with sp
+# No weights file: Net3_ec.impact.prob
+# No weights file: Net3_mc.impact.prob
+# No weights file: Net3_nfd.impact.prob
+------------------------------------------------------------------------------
+Sensor placement id:        31399
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            2 4 59 70 81 
+Sensor junctions:           15 35 203 219 253 
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                21101.0432
+Lower quartile impact:      3050.0000
+Median impact:              11830.0000
+Upper quartile impact:      32761.9000
+Value at Risk (VaR) (  5%): 81586.8000
+TCE                 (  5%): 93102.0250
+Max impact:                 103746.0000
+
+Impact File:                Net3_mc.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                21786.7482
+Lower quartile impact:      289.3540
+Median impact:              1364.7100
+Upper quartile impact:      9272.3900
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144275.1667
+Max impact:                 144321.0000
+
+Impact File:                Net3_nfd.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                0.1144
+Lower quartile impact:      0.0000
+Median impact:              0.0000
+Upper quartile impact:      0.0000
+Value at Risk (VaR) (  5%): 1.0000
+TCE                 (  5%): 1.0000
+Max impact:                 1.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_ec.impact
+------------------------------------------------------------------------------
+-1	59035.8890
+4	33458.5542
+2	24089.9754
+59	22540.9203
+81	21525.8992
+70	21101.0432
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_mc.impact
+------------------------------------------------------------------------------
+-1	137028.5263
+81	55217.6532
+2	36436.6597
+70	28902.4158
+4	24640.0395
+59	21786.7482
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_nfd.impact
+------------------------------------------------------------------------------
+-1	1.0000
+81	0.2542
+2	0.1992
+70	0.1483
+4	0.1314
+59	0.1144

@@ -1,0 +1,12 @@
+/*!
+ * \page math
+
+\section math Mathematical Routines
+
+The \c utilib/src/math directory contains definitions for a variety of
+mathematical and array functions, which are defined in the following header
+files:
+  - _math.h
+  - linpack.h
+
+*/

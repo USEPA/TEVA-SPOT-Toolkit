@@ -1,0 +1,29 @@
+OBJECTS = tso.o nrutil.o
+
+# needs to be set by configure:
+# assumes that you checked teva-ac out explicitly  :    svn co...   TEVA/teva-ac
+TEVA_AC_LIB = $(HOME)/code/TEVA/teva-ac/trunk/teva-ac/lib
+
+all: libtevautil.a tso2text
+
+libtevautil.a: $(OBJECTS)
+	ar cr $@ $(OBJECTS)
+	ranlib $@
+	cp libtevautil.a ../../lib/.
+
+.c.o:
+	gcc -c -O6 $<
+
+install: tso2text
+	cp tevautil.h ../../include/.
+	cp nrutil.h ../../include/.
+	cp tso2text ../../bin/.
+
+tso2text: tso2text.o
+	gcc -o tso2text tso2text.o -L$(TEVA_AC_LIB) -ltevautil
+
+clean: 
+	rm -f *.o lib*.a tso2text
+
+nrutil.c: nrutil.h
+teva.c: teva.h

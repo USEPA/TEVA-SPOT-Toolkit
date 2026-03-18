@@ -1,0 +1,49 @@
+This files contains the commands used in the the tutorial examples.  These are included here to make it easy to cut and paste these commands to try them out:
+
+Example 1
+------------------------------------------------------------
+tevasim -tsg ex1.tsg -tso ex1.tso net1.inp net1.out
+
+tso2Impact ex1 ex1.tso -ec
+
+evalsensor --nodemap=ex1.nodemap none ex1_ec.impact
+
+sp --print-log --network=ex1 --objective=ec --solver=grasp --ub=ns,1 --seed=123
+
+Example 2
+------------------------------------------------------------
+tso2Impact ex1 ex1.tso -ec -mc -vc -nfd -td -epanetin net1.inp
+
+evalsensor --nodemap=ex1.nodemap ex1.sensors ex1_ec.impact ex1_mc.impact ex1_nfd.impact ex1_vc.impact ex1_td.impact
+
+evalsensor --nodemap=ex1.nodemap none ex1_ec.impact ex1_mc.impact ex1_nfd.impact ex1_vc.impact ex1_td.impact
+
+Example 3
+------------------------------------------------------------
+Run example3-ns-vc.bat to generate data for the graphic
+
+Run example3-ns-td.bat to generate data for the graphic
+
+Example 4
+------------------------------------------------------------
+tso2Impact ex1 ex1.tso -td -responseTime 60 -minQuality 0.1
+
+Run example3-rt.bat to generate data for the graphic
+
+Run example3-dl.bat to generate data for the graphic
+
+Example 5
+------------------------------------------------------------
+tso2Impact ex1 ex1.tso -td -vc -ec 
+
+evalsensor --nodemap=ex1.nodemap example5.sensors ex1_ec.impact
+sp --print-log --network=ex1 --objective=ec --solver=grasp --ub=ns,3 --seed=123 --sensor-locations=loc1.txt
+
+sp --print-log --network=ex1 --objective=ec --solver=grasp --ub=ns,1 --seed=123
+sp --print-log --network=ex1 --objective=ec --solver=grasp --ub=ns,1 --seed=123 --sensor-locations=loc2.txt
+
+sp --print-log --network=ex1 --objective=ec --solver=pico --ub=ns,1
+sp --print-log --network=ex1 --objective=td --solver=pico --ub=ns,1 --ub=ec,16000
+sp --print-log --network=ex1 --objective=td --solver=pico --ub=ns,1 --ub=ec,19000
+
+

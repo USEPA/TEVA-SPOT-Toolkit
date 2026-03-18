@@ -1,0 +1,31 @@
+#!/bin/bash
+##
+## Test1 test script
+##
+
+function do_tests
+{
+# pretty fast "smoke" tests
+./test1f
+./test1g
+./test1h
+./test1l
+./test1aa
+./test1m
+./test1n
+./test1o
+# slower tests
+#./test1i
+#./test1j
+#./test1k
+#./test1q
+
+#
+# Uncomment the following test if you have AMPL.
+#
+#./test1a
+#./test1ab
+}
+
+uname -a
+time do_tests

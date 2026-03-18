@@ -1,0 +1,124 @@
+
+%% ==================================================================
+%% DOCUMENT CLASS ---------------------------------------------------
+%% ==================================================================
+
+%%    Uncomment the following for <article> mode
+
+\documentclass[pdf,report]{EPAmanual}
+
+%% ==================================================================
+%% PREAMBLE ---------------------------------------------------------
+%% ==================================================================
+
+\usepackage{myoxygen}
+\usepackage[sort]{natbib}
+%\usepackage{apaish}
+\usepackage{color,atbeginend}
+\usepackage{fancyhdr,verbatim,extramarks}
+\usepackage{listings,arydshln,hhline,graphicx}
+\usepackage{lastpage}
+\usepackage[small,compact]{titlesec}
+\usepackage[english]{babel}
+\usepackage{hyperref}
+
+% ---------------------------------------------------------------- %
+%
+% Set the title, author, and date
+  \title{\sc User's Manual\\TEVA-SPOT Toolkit 2.3}
+
+  \author{\\by\\
+Jonathan Berry, Erik Boman, Lee Ann Riesen\\
+Scalable Algorithms Dept\\
+Sandia National Laboratories\\
+Albuquerque, NM 87185\\
+\mbox{}\\
+William E. Hart, Cynthia A. Phillips, Jean-Paul Watson\\
+Discrete Math and Complex Systems Dept\\
+Sandia National Laboratories\\
+Albuquerque, NM 87185\\
+    \\\\\\
+    Project Officer:\\
+    \sc Regan Murray\\
+    \sc National Homeland Security Research Center\\
+    \sc Office of Research and Development\\
+    \sc U.S. Environmental Protection Agency\\\
+    \sc Cincinnati, OH 45256
+  }
+  
+  \date{}
+
+\SANDnum{\ }
+\SANDprintDate{Oct 2009}
+\SANDauthor{J. Berry, E. Boman, L.A. Riesen, W.E. Hart, C.A. Phillips, J.-P. Watson}
+
+\hypersetup{colorlinks=false}
+\parindent 0mm
+\parskip = 2mm
+\AfterBegin{itemize}{\setlength{\itemsep}{1.75mm}}
+\AfterBegin{enumerate}{\setlength{\itemsep}{1.75mm}}
+\AfterBegin{description}{\setlength{\itemsep}{1.75mm}}
+\titleformat{\chapter}[hang]{\bf\large}{\thechapter\quad}{2mm}{\large}[]
+\titlespacing{\chapter}{0pt}{0mm}{5mm}
+
+%% Set up the XML language
+\lstdefinestyle{XML}{language=XML, basicstyle={\ttfamily},
+  usekeywordsintag=true, alsoletter={-}, escapechar={\#},
+  markfirstintag=true, morestring=[b]{''}, mathescape=true,
+  keywordstyle=\sffamily\bfseries, stringstyle=\rmfamily\textsl }
+%% End of preamble --------------------------------------------------
+
+
+%% ==================================================================
+%% MAIN DOCUMENT ----------------------------------------------------
+%% ==================================================================
+
+\begin{document}
+  \maketitle
+
+  \clearpage
+  \input{Disclaimer}
+  
+  \clearpage
+  \chapter*{Forward}
+  \input{Forward}
+
+  \clearpage
+  \chapter*{License Notice}
+  \input{LicenseNotice}
+
+  \clearpage
+  \chapter*{Acknowledgements}
+  \input{EPAAcknowledgements}
+
+  \cleardoublepage
+  \tableofcontents
+  %\listoffigures
+  %\listoftables
+
+  \SANDmain
+
+\input{uguide}
+
+\newpage
+
+\bibliographystyle{abbrv}
+\bibliography{../sensors}
+
+\newpage
+
+%%\appendix
+
+%%\input{../uguide/executables}
+
+%\chapter{BSD License}\label{BSDPage}
+%\input{BSDPage}
+
+  %% ==================================================================
+  % END MAIN DOCUMENT
+  %% ==================================================================
+  
+\end{document}
+
+END-OF-DOC
+

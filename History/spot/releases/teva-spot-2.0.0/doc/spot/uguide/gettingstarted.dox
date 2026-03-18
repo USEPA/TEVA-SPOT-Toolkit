@@ -1,0 +1,309 @@
+/*! 
+ * \page gstarted Getting Started
+
+\if USER_GUIDE
+This section describes how to download, build and install the TEVA-SPOT
+Toolkit (SPOT) software. Further, we use a simple example to illustrate
+how to run SPOT.
+
+\section gStartedInstalling Installing SPOT
+\else
+\latexonly
+\section*{Installing SPOT}
+\endlatexonly
+\endif
+
+\if USER_GUIDE
+\subsection gStartedInstallingWindows Windows
+\else
+\latexonly
+\subsection*{Windows}
+\endlatexonly
+\endif
+
+NOTE: these instructions will likely change once we have an automated installer.  In fact, these instructions may not be necessary at all!
+
+The SPOT distribution for MS Windows is a gzip'd archive with executables and
+scripts.  Although this can be extracted anywhere, it's convenient to extract it in a standard place, such as the root disk, or in "C:\Program Files".
+Native MS Windows executables can be used in the DOS shell by configuring the MS Windows environment. For Windows NT, 2000 and XP, you will need to add a string such as
+\verbatim
+    ;C:\teva-spot_2.0\bin
+\endverbatim
+to the current setting for the PATH environment variable, which you
+will find in the properties window of "My Computer" under the "Advanced"
+tab. If you don't find a properties window at "My Computer", the same
+tool may be found on the "Control Panel" at "System Properties".
+
+Note that if you have sufficient privilege you might get a choice of
+installing the settings either for the Current User or for System. The
+latter is preferred if you want everybody to be able to run SPOT on
+the machine. At this stage you may need to reboot your system to have the new setting take effect; you probably will not need to reboot
+for XP.
+
+Using SPOT in a DOS shell requires the additional installation of Python.  The latest Python release can be obtained at 
+\htmlonly
+<a href="http://www.python.org">http://www.python.org</a>
+\endhtmlonly
+\latexonly
+\c http://www.python.org
+\endlatexonly
+.  Python is installed with a MSI installer that is easy to use.  To employ Python from a DOS shell requires an additional step: the PATH environmental variable needs to be edited to specify the location of the Python executable. This is the same process used to configure SPOT, but the Python MS Windows FAQ provides further details:
+\htmlonly
+<a href="http://www.python.org/doc/faq/windows.html">http://www.python.org/doc/faq/windows.html</a>.
+\endhtmlonly
+\latexonly
+http://www.python.org/doc/faq/windows.html .
+\endlatexonly
+
+
+\if USER_GUIDE
+\subsection gStartedInstallingUnix Unix
+\else
+\latexonly
+\subsection*{Unix}
+\endlatexonly
+\endif
+
+In Unix, a user can install SPOT executables from the tarball distribution.
+The command
+\verbatim
+    gzcat teva-spot.tar.gz | tar xf -
+\endverbatim
+extracts the files from the tarball into a local subdirectory, such as \c teva-spot_2.0/bin. A user can setup the \c PATH environment variable to configure the command shell to use these executables. The details of this depend on the command shell. For example, if the SPOT files were extracted in the user's home
+directory, then a BASH shell would be configured by adding the lines
+\verbatim
+    PATH=$PATH:$HOME/teva-spot_2.0/bin
+    export PATH
+\endverbatim
+to the \c ~/.bashrc file.
+
+
+
+\if USER_GUIDE
+\section gStartedExecutables SPOT Executables
+\else
+\latexonly
+\section*{SPOT Executables}
+\endlatexonly
+\endif
+
+The following executables included in SPOT can be used from a command line:
+<ul>
+
+<li> \ref tevasimExecutable "tevasim" - A command to execute an ensemble of contamination incidents, using EPANET. This command builds a \c  TSO file that summarizes these simulation results in a compact manner.
+
+<li> \ref tso2ImpactExecutable "tso2Impact" - A command that reads a \c TSO file and creates one or more \c IMPACT files that are used to formulate sensor placement problems.
+
+<li> \ref scenarioAggrExecutable "scenarioAggr" - A command that reads an \c IMPACT file and creates an \c IMPACT file with fewer events, along with a file of event probabilities.
+
+<li> \ref spExecutable "sp" - The SPOT solver interface for performing sensor placement, which uses data from \c IMPACT files.
+
+<li> \ref evalsensorExecutable "evalsensor" - A command that reads in one or more sensor placements and summarizes their performance according to various metrics.
+
+</ul>
+A variety of other executables are provided with SPOT, many of which are used by \ref spExecutable "sp" to
+perform sensor placement.
+
+
+\if USER_GUIDE
+\section gStartedExample A Simple Example
+\else
+\latexonly
+\section*{A Simple Example}
+\label{gstarted-example}
+\endlatexonly
+\endif
+
+The following example illustrates the main steps required to (1) simulate  contamination incidents,  (2) compute contamination impacts, (3) perform sensor placement, and (4) evaluate a sensor placement. The data used in this example is available in the \c spot/examples/simple directory.  This example places sensors in EPANET example 3 (Net3), a small distribution system with 97 junctions.
+\if USER_GUIDE
+See Section \ref impacts
+\else
+See Section <b>Contamination Incidents and Impact Measures</b> 
+of the TEVA-SPOT Toolkit User Guide
+\endif
+for a complete description of the objective measures supported by SPOT.
+
+\if USER_GUIDE
+\subsection gStarted1 Using tevasim
+\else
+\latexonly
+\subsection*{Using tevasim}
+\endlatexonly
+\endif
+
+The file \c spot/examples/simple/Net3.tsg defines an ensemble of contamination scenarios for Net3. 
+Contamination incidents are simulated for all network junctions, one for each hour of the day, and each
+contamination incident models an inject that continues for 24 hours.  The \c tevasim command uses EPANET to
+perform these contaminant transport simulations, using the following command line:
+\verbatim
+    tevasim -tsg Net3.tsg -tso Net3.tso Net3.inp Net3.out
+\endverbatim
+This command generates three files: (a) Net3.tso, a binary file that contains the contamination transport data, (b) Net3.sdx, a binary file that provides an index into the TSO file, and (c) Net3.out, which provides a textual summary of the EPANET simulations.
+
+
+\if USER_GUIDE
+\subsection gStarted2 Using tso2Impact
+\else
+\latexonly
+\subsection*{Using tso2Impact}
+\endlatexonly
+\endif
+
+Next, the \c Net3.tso and \c Net3.sdx files can be used to compute one or more \c IMPACT files.  An \c IMPACT file summarizes the consequence of each contamination incident in a manner that facilitates optimization.
+The \c tso2Impact command generates these files with the following command line:
+\verbatim
+    tso2Impact Net3 Net3.tso -mc -vc -td -nfd -ec -epanetin Net3.inp
+\endverbatim
+This command generates impact files for each of the five objectives specified: mass consumed (mc), volume consumed (vc), time to detection (td), number of failed detections (nfd) and extent of contamination (ec).  For each impact file (e.g. \c Net3_mc.impact ), a corresponding id file is generated to map the sensor placement ids back to the network junction labels (e.g. \c Net3_mc.impact.id ).
+
+
+\if USER_GUIDE
+\subsection gStarted3 Using sp
+\else
+\latexonly
+\subsection*{Using sp}
+\endlatexonly
+\endif
+
+The \c sp command is a Python script that coordinates the application of optimization solvers for sensor placement.  This script reads in one or more \c impact files, and computes a sensor placement.  For example, the command
+\verbatim
+    sp --path=../../bin --path=../../etc/mod --print-log --network="Net3" \
+       --objective=mc --solver=heuristic --ub=ns,5 --seed=1234567
+\endverbatim
+ generates some solver output, ending with the following summary of the final solution:
+\verbatim
+------------------------------------------------------------------------------
+Sensor placement id:        22775
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            2 4 59 70 81
+Sensor junctions:           15 35 203 219 253
+
+Impact File:                /home/wehart/src/spot-limited/examples/simple/Net3_mc.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                21781.9899
+Lower quartile impact:      289.3540
+Median impact:              1355.1400
+Upper quartile impact:      9272.3900
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144276.3333
+Max impact:                 144335.0000
+------------------------------------------------------------------------------
+\endverbatim
+Further, the sensors found by this optimizer are put into the \c Net3.sensors file.
+
+
+\if USER_GUIDE
+\subsection gStarted4 Using evalsensor
+\else
+\latexonly
+\subsection*{Using evalsensor}
+\endlatexonly
+\endif
+
+The final output provided by \c sp is actually generated by the \c evalsensor command.  However, this command can evaluate a sensor placement for a wide variety of different objectives.  For example, the command
+\verbatim
+    evalsensor --nodemap=Net3.nodemap Net3.sensors Net3_ec.impact \
+               Net3_mc.impact Net3_nfd.impact
+\endverbatim
+will summarize the solution in the \c Net3.sensors file for the \c ec, \c mc and \c nfd impact measures:
+\verbatim
+------------------------------------------------------------------------------
+Sensor placement id:        22775
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            2 4 59 70 81
+Sensor junctions:           15 35 203 219 253
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                21082.9924
+Lower quartile impact:      3050.0000
+Median impact:              11830.0000
+Upper quartile impact:      32761.9000
+Value at Risk (VaR) (  5%): 81586.8000
+TCE                 (  5%): 93102.0250
+Max impact:                 103746.0000
+
+Impact File:                Net3_mc.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                21781.9899
+Lower quartile impact:      289.3540
+Median impact:              1355.1400
+Upper quartile impact:      9272.3900
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144276.3333
+Max impact:                 144335.0000
+
+Impact File:                Net3_nfd.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                0.1144
+Lower quartile impact:      0.0000
+Median impact:              0.0000
+Upper quartile impact:      0.0000
+Value at Risk (VaR) (  5%): 1.0000
+TCE                 (  5%): 1.0000
+Max impact:                 1.0000
+------------------------------------------------------------------------------
+\endverbatim
+
+
+
+\if USER_GUIDE
+
+\section gStartedDownload Downloading and Building SPOT Source Code (FOR DEVELOPERS)
+
+The SPOT software is split into two codes: the SPOT software that is
+distributed with an open-source license, and the SPOT-Limited software
+that contains health impacts assessment software that is not freely
+distributed.
+The SPOT software can be downloaded directly from the University of Cincinnati
+subversion repository using the following command line:
+\verbatim
+    svn checkout http://engcvs.uc.edu/repos/TEVA/spot/trunk spot
+\endverbatim
+Similarly, the SPOT-Limited software can be downloaded from the Argonne subversion repository with:
+\verbatim
+    svn checkout https://tevasvn.dis.anl.gov/TEVA/spot-limited/trunk spot-limited
+\endverbatim
+Note that user-accounts are needed to access these software repositories.
+
+
+The SPOT software can be compiled on UNIX systems within a standard Unix shell. SPOT can also be compiled in a similar way on Windows within the Cygwin shell application. After checking out SPOT, 
+move into the \c spot directory and run the setup script:
+\verbatim
+    cd spot
+    ./setup configure build
+\endverbatim
+The \c setup script automates much of the setup activity
+associated with building SPOT on various
+hardware platforms.  This script recursively configures SPOT for the specific characteristics of the hardware platform, and it then
+generates the SPOT executables and libraries.
+
+Several output files can be viewed to assess whether the \c setup script 
+worked properly:
+<ol>
+
+<li> spot/test/config.out - the logfile for the configuration process
+
+<li> spot/test/config.xml - a summary of errors and warnings from the \c config.out file 
+
+<li> spot/test/build.out - the logfile for the build process 
+
+<li> spot/test/build.xml - a summary of errors and warnings from the \c build.out file 
+
+</ol>
+
+The executables built within the Cygwin shell can only run within this shell. However, SPOT can be configured to build "native" Windows executables, which can run in a DOS shell:
+\verbatim
+    cd spot
+    ./setup configure --with-compiler=mingw build
+\endverbatim
+
+\endif
+
+*/

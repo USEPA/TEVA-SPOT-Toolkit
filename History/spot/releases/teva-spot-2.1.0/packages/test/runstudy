@@ -1,0 +1,3 @@
+#!/bin/csh
+
+../../tpl/acro-pico/bin/exact $*

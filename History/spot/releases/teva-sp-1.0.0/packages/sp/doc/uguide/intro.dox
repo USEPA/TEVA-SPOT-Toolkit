@@ -1,0 +1,58 @@
+/*! 
+ * \page intro
+
+
+\section intro Introduction
+
+The TEVA-SP software contains a variety of software components that support the application of sensor placement methods for water security:
+<ul>
+
+<li> The \ref spExecutable "sp" sensor placement solver interface
+
+<li> Integer programming models for sensor placement
+
+<li> The <b>libsp.a</b> software library, which contains core routines used for sensor placement solvers
+
+<li> Various executables that are used by the \ref spExecutable "sp" solver interface.
+
+</ul>
+This document describes these executables, the file formats that they use, and the sensor placement formulations that are supported by the \ref spExecutable "sp" solver interface.
+
+
+\subsection introExecutables Executables
+
+The following executables included in teva-sp are likely to be used 
+directly by users:
+<ul>
+
+<li> \ref spExecutable "sp" - The solver interface for performing sensor placement.
+
+<li> \ref evalsensorExecutable "evalsensor" - An application that reads in one or more sensor placements and summarizes their performance according to various metrics.
+
+<li> \ref tso2ImpactExecutable "tso2Impact" - An application that reads a TSO file and creates one or more impact files that are used to formulate sensor placement problems.
+</ul>
+Additionally, the following executables are used by \ref spExecutable "sp" to
+perform sensor placement:
+<ul>
+
+<li> \ref graspExecutable "grasp" - The GRASP sensor placement solver.
+
+<li> \ref picoExecutable "PICO" - The PICO integer programming solver.
+
+<li> \ref setupIPDataExecutable "setupIPData" - An application that creates the input file needed to run \ref picoExecutable "PICO" for sensor placement formulations.
+
+</ul>
+The TEVA executables \b epanet, \b threat_sim, \b threat_assess, and \b tso2text are also created as part of the TEVA-SP build process, though these executables are not strictly required to perform sensor placement.
+
+
+\subsection introNotes Release Notes
+
+The section describing each section includes some notes and caveats
+for the use of the different solvers.  These solvers have been tested
+on simple examples, as well as on some moderate-scale water networks
+(e.g. network1).  Current efforts have focused on ensuring the correctness of
+these solvers, and their scalability to problems of this scale.  The notes
+in this document identify additional limitations that we know about and which 
+will be addressed in subsequent releases.
+
+*/

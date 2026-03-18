@@ -1,0 +1,695 @@
+#!/usr/bin/perl
+
+# Stefan Chakerian (schake@sandia.gov)
+# Sandia National Labs
+# Jan, 2005
+#
+# This extracts xml and output files from the data directory,
+# summarizes them, moves the pertinent ones to webspace, and
+# removes them from cvs repository.
+#
+
+use POSIX;
+
+use Data::Dumper;
+
+use XML::Simple;
+use URI::Escape;
+
+my $dirname='/home/sqe/acro-test/data';
+my $webroot='/home/sqe/public_html/testdata/acro';
+my $weburl='http://software.sandia.gov/~sqe/testdata/acro';
+my $cvsroot='/space/CVS-Acro';
+
+my ($curname, @dirlist, $xml, $i, $j, $webdir, $result, $interactive, $outfile);
+my ($cdate,$ctime,$cwho,$chost,$ccat,$cfile);
+my ($site, $tsite, $type, $dstat, $software, $estat, $istat);
+my ($percent, $total, $skipped, $status);
+my (%buildfail); # site/date/software hash
+
+my @errors = ();    # list of non-fatal errors to print at bottom
+
+local %world;
+local %packages;
+
+use DBI;
+my $dbh;
+my $sth;
+my $statement;
+my $rows;
+my $machineId;
+my $scenarioId;
+
+
+$dbh = DBI->connect('DBI:mysql:acro', 'acrodb', '',
+            { RaiseError => 0, PrintError => 1, AutoCommit => 1 });
+
+
+
+sub getmachine_select {
+  my $host = shift;
+  my $kernel = shift;
+  my $arch = shift;
+  my ($sth, $machineId, $statement, $rows);
+
+# Check for existing entry for this machine.  Get machine_id.
+  $statement = "SELECT machine_id FROM machine WHERE ";
+  $statement .= "host_name=\"" . $host . "\" AND ";
+  $statement .= "kernel_name=\"" . $kernel . "\" AND ";
+  $statement .= "machine_hardware=\"" . $arch . "\"";
+print "$statement\n";
+  $sth = $dbh->prepare("$statement");
+  $sth->execute();        
+  $machineId = $sth->fetchrow_array();
+  $sth->finish();
+  return $machineId;
+}
+
+sub getmachine {
+  my $host = shift;
+  my $kernel = shift;
+  my $arch = shift;
+  my ($sth, $machineId, $statement, $rows);
+
+# Check for existing entry for this machine.  Get machine_id.
+  $machineId = getmachine_select($host, $kernel, $arch);
+
+  if (!defined $machineId) {
+print "$host not found ... adding\n";
+    $statement = "INSERT INTO machine SET ";
+    $statement .= "host_name=\"" . $host . "\", ";
+    $statement .= "kernel_name=\"" . $kernel . "\", ";
+    $statement .= "machine_hardware=\"" . $arch . "\"";
+    $rows = $dbh->do("$statement");
+
+    $machineId = getmachine_select($host, $kernel, $arch);
+printf("Added $host to db as \#$machineId\n");
+    die "getmachine: select failed after insert" if (!defined $machineId);
+  }
+  return $machineId;
+}
+
+# scenario is similar to "build" in the trilinos stuff, although not exact
+sub getscenario_select {
+  $hostid = shift;
+  $name = shift;
+  $starttime = shift;
+  $endtime = shift;
+
+  my $scenario;
+  my ($sth, $statement, $rows);
+
+# Check for existing entry
+  $statement = "SELECT scenario_id FROM scenario WHERE ";
+  $statement .= "machine_id=\"$hostid\" AND ";
+  $statement .= "label=\"$name\" AND ";
+  $statement .= "start_time=\"$starttime\" AND ";
+  $statement .= "end_time=\"$endtime\"";
+print "$statement\n";
+
+  $sth = $dbh->prepare("$statement");
+  $sth->execute();        
+  $scenario = $sth->fetchrow_array();
+  $sth->finish();
+  return $scenario;
+}
+
+sub getscenario {
+  my $hostid = shift;
+  my $name = shift;
+  my $starttime = shift;
+  my $endtime = shift;
+  my $scenario;
+  my ($sth, $id, $statement, $rows);
+
+# print "getscen: host $hostid name $name\n\tstart ($starttime) end ($endtime)\n";
+
+# Check for existing entry for this machine.  Get machine_id.
+  $scenario = getscenario_select($hostid, $name, $starttime, $endtime);
+
+  if (!defined $scenario) {
+print "$scenario not found ... adding\n";
+    $statement = "INSERT INTO scenario SET ";
+    $statement .= "machine_id=\"$hostid\", ";
+    $statement .= "label=\"$name\", ";
+    $statement .= "start_time=\"$starttime\", ";
+    $statement .= "end_time=\"$endtime\"";
+    $rows = $dbh->do("$statement");
+
+    $scenario = getscenario_select($hostid, $name, $starttime, $endtime);
+printf("Added $name to db as \# $scenario\n");
+    die "getscenario: select failed after insert" if (!defined $scenario);
+  }
+  return $scenario;
+}
+
+ 
+# generic setup
+# 
+
+$ENV{CVSROOT} = $cvsroot;
+$ENV{PATH} = "/bin:/usr/bin:" . $ENV{PATH};
+umask 002;
+
+#
+# Commandline args:
+#	use arguments as data files, or else read $dirname/*.xml
+#
+if (($interactive = scalar(@ARGV)) > 0) {
+  @dirlist = grep /\.xml$/, @ARGV;
+  $dirname = '';
+} else {
+  die "cvs failed: $_"
+    if ($_ = `cvs -Q update $dirname`);
+  opendir DATADIR, ($dirname) or die ("opendir failed");
+  @dirlist = grep /\.xml$/, readdir DATADIR;
+  closedir DATADIR;
+}
+
+#
+# Pass 0:
+#xxx	create directory in webspace
+#	setup everything
+#xxx	move all the xml/out files there
+#xxx	remove from cvs
+#	read in xml files given, or those in webspace directory
+#
+
+# create $webroot/$webdir
+{
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)= localtime(time);
+  $webdir = sprintf "%4d%02d%02d", $year+1900, $mon + 1, $mday;
+
+#  unless (-d "$webroot/$webdir" && -w "$webroot/$webdir" ) {
+#    die $_ if ($_ = `mkdir -p $webroot/$webdir`);
+#  }
+}
+
+# deal with cvs repository
+
+if (! $interactive) {
+# first, move everything from $dirname to $webroot/$webdir
+# config and builds have a .out file, tests do not.
+
+  foreach $curname (@dirlist) {
+  # strip out some convenience and garbage variables
+    ($cdate,$ctime,$cwho,$chost,$ccat,$cfile) = split /#/, $curname;
+    $_ = $cfile;
+    if (/(config|build)/) {
+      ($outfile = $curname) =~ s/xml$/out/;
+      die "mv $outfile failed\n$result"
+		if ($result = `mv $dirname/$outfile $webroot/$webdir`);
+      push @errors, "cvs remove $outfile failed\n$result"
+		if ($result = `cvs -Q remove $dirname/$outfile`);
+    } elsif (/(scenario|results)/) {
+      # nuttin
+    } else {
+      push @errors, "skipping unknown input type \"$curname\"\n";
+      push @errors, "(filename missing [config|build|results|scenario]\n";
+      next;
+    }
+    die "mv $curname failed\n$result"
+		if ($result = `mv $dirname/$curname $webroot/$webdir`);
+    push @errors, "cvs remove $curname failed\n$result"
+		if ($result = `cvs -Q remove $dirname/$curname`);
+  }
+
+# second, commit stuff and reset $dirname to be where the files moved.
+  push @errors, "cvs commit result\n-------\n$result"
+    if ($result = `cvs -Q commit -m "removed by daemon" $dirname > /dev/null`);
+  $dirname = "$webroot/$webdir";
+
+# last, reread the directory with the files just moved,
+# which will also have any pre-existing xml files
+  opendir DATADIR, ($dirname) or die "opendir $dirname failed";
+  @dirlist = grep /\.xml$/, readdir DATADIR;
+  closedir DATADIR;
+}
+
+
+#
+# Read in the xml files finally.
+
+foreach $curname (@dirlist) {
+  # strip out some convenience and garbage variables
+  ($cdate,$ctime,$cwho,$chost,$ccat,$cfile) = split /#/, $curname;
+##  $_ = $cfile;
+  if ($curname =~ /scenario\.xml/) {
+    $type = "scenario";
+  } else {
+    push @errors, "skipping non-scenario \"$curname\"\n";
+    next;
+  }
+
+print "processing $curname...\n";
+  if ($interactive) {
+    eval {
+      $xml = XMLin("$curname", forcearray => [ 'Test' ] );
+    };
+  } else {
+    eval {
+      $xml = XMLin("$dirname/$curname", forcearray => [ 'Test' ] );
+    };
+  }
+  if ($@) {
+    push @errors, "skipping $curname... (Bad XML format)\n$@";
+    next;
+  }
+
+  if (defined($xml->{Key}->{HostName})) {
+    $site = $xml->{Key}->{HostName}
+  } elsif (defined($xml->{Test}[0]{Key}->{HostName})) {
+    $site = $xml->{Test}[0]->{Key}->{HostName};
+  } else {
+    push @errors, "Key not found in $curname\n";
+    next;
+  }
+
+print "site = \"$site\", type = \"$type\"\n";
+  #
+  # Add to array of scenarios, based on $site: $world{$site}[]{filename|xml}
+  #
+  # reverse link to filename that contains the xml we're using
+  # the perl xml::simple structure itself
+  #
+  $world{$site}[++$#{$world{$site}}]{filename} = "$curname";
+  $world{$site}[$#{$world{$site}}]{xml} = $xml;
+  #
+  # Setup the per-software tests
+
+  $software = $xml->{Key}->{Software};
+  #print "$software\n";
+  if ($software =~ /^([^-]*)-(.*)/) {
+     #print "#1 $1 #2 $2\n";
+     $software = $1;
+     }
+  #print "$software\n";
+
+# print Dumper $xml;
+
+}
+
+# At this point, all scenario files are loaded and we can iterate over
+# $world{$site}[] {filename|xml}
+# print Dumper(%world);
+
+
+###
+### DB INSERT
+###
+
+for $site (keys %world) {
+
+print "processing site \"$site\"\n";
+  my ($arch,$kern,$scenname,$date,$startt,$endt);
+  for $j (0 .. $#{$world{$site}} ) {
+# print Dumper($world{$site}[$j]{xml});
+    if ($j && ($kern ne $world{$site}[$j]{xml}{Key}{KernelName}
+    		or $arch ne $world{$site}[$j]{xml}{Key}{Machine})) {
+      push @errors, "Warning: kern or arch changed for $site\n";
+    }
+    $kern = $world{$site}[$j]{xml}{Key}{KernelName};
+    $arch = $world{$site}[$j]{xml}{Key}{Machine};
+    $scenname = $world{$site}[$j]{xml}{Key}{Scenario};
+#    $date = $world{$site}[$j]{xml}{Date};
+    $startt = $world{$site}[$j]{xml}{StartTime};
+    $endt = $world{$site}[$j]{xml}{EndTime};
+
+    $machineId = getmachine($site,$kern,$arch);	# inserts if non-existent
+    $scenarioId = getscenario($machineId,$scenname,$startt,$endt);
+#   host scenario start end
+
+# foreach file in <Files><Name>, if it's xml, read it in.
+    for $i (0 .. $#{$world{$site}[$j]{xml}{Files}{Name}}) {
+      $curname = $world{$site}[$j]{xml}{Files}{Name}[$i];
+      next unless ($curname =~ /\.xml$/);  # just want the xml files
+      if (!-e "$curname" && !-e "$dirname/$curname") {
+	  push @errors, "Missing scenario subfile ($dirname/)$curname\n";
+	  next;
+      } else {
+	$curname = "$dirname/$curname" if (!-e "$curname");
+      }
+
+      eval {
+	$xml = XMLin("$curname", forcearray => [ 'Test', 'Experiment' ] );
+      };
+
+      if ($@) {
+	push @errors, "skipping $curname (Failed XML read)\n$@";
+	next;
+      }
+
+      if ($curname =~ /config\.xml/) {
+        $type = "config";
+	if (exists ($world{$site}[$j]{$type}[0]{filename})) {
+	  push @errors, "Warning: multiple $site/$type/$scenname $world{$site}[$j]{$type}{filename}\n";
+	}
+      } elsif ($curname =~ /build\.xml/) {
+        $type = "build";
+	if (exists ($world{$site}[$j]{$type}[0]{filename})) {
+	  push @errors, "Warning: multiple $site/$type/$scenname $world{$site}[$j]{$type}{filename}\n";
+	}
+      } elsif ($curname =~ /results\.xml/) {
+        $type = "results";
+      } elsif ($curname =~ /test\.xml/) {
+        $type = "test";
+      } else {
+	push @errors, "(skipping unknown type $curname for $site)\n";
+	next;
+      }
+      $world{$site}[$j]{$type}[++$#{$world{$site}[$j]{$type}}]{filename} = "$curname";
+      $world{$site}[$j]{$type}[$#{$world{$site}[$j]{$type}}]{xml} = $xml;
+    }
+
+
+    for $type ("config","build") {		# add in "results" later
+      if (!exists ($world{$site}[$j]{$type})) {
+        push @errors, "Warning: missing $type data for $site/$scenname\n";
+	next;
+      }
+      for $i (0 .. $#{$world{$site}[$j]{$type}}) {
+
+	if ($type eq "config" or $type eq "build") {
+	  $curname = $world{$site}[$j]{$type}[$i]{filename};
+	  ($cfile = $curname) =~ s/xml$/out/;
+	  $estat = $world{$site}[$j]{$type}[$i]{xml}->{ExecutionStatus};
+	  $istat = $world{$site}[$j]{$type}[$i]{xml}->{IntegrityStatus};
+	}
+
+	if ($type eq "config") {
+	  $nconfigs++;
+	} elsif ($type eq "build") {
+	  $nbuilds++;
+	} elsif ($type eq "results") {
+	  $estat = $world{$site}[$j]{$type}[$i]{xml}->{Experiment}->{ExecutionStatus};
+	}
+
+
+	if ($estat eq "Pass" && $istat eq "Pass") {
+	  $world{$site}[$j]{Pass}{$type}++;
+	  unlink "$dirname/$cfile" if (! $interactive);
+	} elsif ($type eq "config") {
+	   $nconfig_failures++;
+	} else {
+	   $nbuild_failures++;
+	}
+	$world{$site}[$j]{Fail}{$type}++;
+      }
+    print "$type: $world{$site}[$j]{Pass}{$type}\n";
+    }
+  }
+}
+
+print @errors;
+exit;
+
+
+#
+# Pass 1:
+#	gather config and build summaries
+#	move failure output files to webspace
+#	unlink success output files, except when interactive
+#
+
+my $nconfig_failures=0;
+my $nconfigs=0;
+my $nbuild_failures=0;
+my $nbuilds=0;
+
+for $site (keys %world) {
+  for $type ("config","build") {
+    $world{$site}{Pass}{$type} = 0;
+    $world{$site}{Fail}{$type} = 0;
+    for $i (0 .. $#{$world{$site}{$type}} ) {
+      $estat = $world{$site}{$type}[$i]{xml}->{ExecutionStatus};
+      $istat = $world{$site}{$type}[$i]{xml}->{IntegrityStatus};
+
+      $curname = $world{$site}{$type}[$i]{filename};
+      ($cfile = $curname) =~ s/xml$/out/;
+
+      if ($type eq "config") {
+      $nconfigs++;
+      }
+      else {
+      $nbuilds++;
+      }
+      if ($estat eq "Pass" && $istat eq "Pass") {
+	$world{$site}{Pass}{$type}++;
+	unlink "$dirname/$cfile" if (! $interactive);
+      } else {
+	if ($type eq "config") {
+	   $nconfig_failures++;
+	}
+	else {
+	   $nbuild_failures++;
+	}
+	$world{$site}{Fail}{$type}++;
+      }
+    }
+  }
+}
+
+$ntest_failures=0;
+$ntests=0;
+for $site (keys %world) {
+  for $type ("tests") {
+    $world{$site}{Pass}{$type} = 0;
+    $world{$site}{Fail}{$type} = 0;
+    for $i (0 .. $#{$world{$site}{$type}} ) {
+      for $j (0 .. $#{$world{$site}{$type}[$i]{xml}{Test}} ) {
+	$ntests++;
+	$estat = $world{$site}{$type}[$i]{xml}{Test}[$j]->{ExecutionStatus};
+	if (defined $world{$site}{$type}[$i]{xml}{Test}[$j]->{IntegrityStatus}){
+	  $istat = $world{$site}{$type}[$i]{xml}{Test}[$j]->{IntegrityStatus};
+	} else {
+	  $istat = "Unknown";
+	}
+	if ($estat eq "Pass" && $istat eq "Pass") {
+	  $world{$site}{Pass}{$type}++;
+	} else {
+	  $ntest_failures++;
+	  $world{$site}{Fail}{$type}++;
+	}
+      }
+    }
+  }
+}
+
+for $software (keys %packages) {
+  for $type ("config","build") {
+    $packages{$software}{Pass}{$type} = 0;
+    $packages{$software}{Fail}{$type} = 0;
+    for $i (0 .. $#{$packages{$software}{$type}} ) {
+      $estat = $packages{$software}{$type}[$i]{xml}->{ExecutionStatus};
+      $istat = $packages{$software}{$type}[$i]{xml}->{IntegrityStatus};
+      if ($estat eq "Pass" && $istat eq "Pass") {
+	$packages{$software}{Pass}{$type}++;
+      } else {
+	$packages{$software}{Fail}{$type}++;
+      }
+    }
+  }
+
+  for $type ("tests") {
+    $packages{$software}{Pass}{$type} = 0;
+    $packages{$software}{Fail}{$type} = 0;
+    for $i (0 .. $#{$packages{$software}{$type}} ) {
+      for $j (0 .. $#{$packages{$software}{$type}[$i]{xml}{Test}} ) {
+	$estat = $packages{$software}{$type}[$i]{xml}{Test}[$j]->{ExecutionStatus};
+	if (defined $packages{$software}{$type}[$i]{xml}{Test}[$j]->{IntegrityStatus}){
+	  $istat = $packages{$software}{$type}[$i]{xml}{Test}[$j]->{IntegrityStatus};
+	} else {
+	  $istat = "Unknown";
+	}
+	if ($estat eq "Pass" && $istat eq "Pass") {
+	  $packages{$software}{Pass}{$type}++;
+	} else {
+	  $packages{$software}{Fail}{$type}++;
+	}
+      }
+    }
+  }
+}
+
+$mydate = `date`;
+print "****************************************************************************\n";
+printf "Acro SQA REPORT %61.61s", $mydate;
+print "****************************************************************************\n";
+open TESTSUMMARY, ">db_daemon.summary" || die "ERROR: cannot open db_daemon.summary";
+if ($nconfigs==0) { $config_percent=0; }
+   else { $config_percent=(100-floor(100*$nconfig_failures/$nconfigs)); }
+if ($nbuilds==0) { $build_percent=0; }
+   else { $build_percent=(100-floor(100*$nbuild_failures/$nbuilds)); }
+if ($ntests==0) { $test_percent=0; }
+   else { $test_percent=(100-floor(100*$ntest_failures/$ntests)); }
+#print "$nconfig_failures $nnconfigs\n";
+#print "$nbuild_failures $nnbuilds\n";
+#print "$ntest_failures $nntests\n";
+printf TESTSUMMARY "(%3d/%3d/%3d)\n", $config_percent, $build_percent, $test_percent;
+close(TESTSUMMARY);
+
+print "\nSUMMARY: Config/Build/Test Results by Test Machine\n";
+print "----------------------------------------------------------------------------\n";
+print "Machine                        OS               Config     Build     Test\n";
+print "----------------------------------------------------------------------------\n";
+for $site (sort keys %world) {
+  my $arch = 'UNKNOWN';
+# print Dumper($world{$site}{config}[0]{xml});
+#old  my @a;
+#old  @a = split /-/, $world{$site}{config}[0]{xml}{Key}{BuildName};
+#old  $arch = $a[2] if ($a[2]);
+  $arch = $world{$site}{config}[0]{xml}{Key}{KernelName};
+
+  printf "%-30.30s %-15.15s", $site, $arch;
+  for $type ("config","build","tests") {
+    my $total = $world{$site}{Pass}{$type} + $world{$site}{Fail}{$type};
+    printf " %4d/%-4d", $world{$site}{Pass}{$type},$total;
+  }
+  $---;			# decrement format page count
+  print "\n";
+}
+
+
+print "\n\nSUMMARY: Config/Build/Test Results by Test Package\n";
+print "----------------------------------------------------------------------------\n";
+print "Package                        Coverage         Config     Build     Test\n";
+print "----------------------------------------------------------------------------\n";
+for $software (sort keys %packages) {
+  printf "%-30.30s %-15.15s", $software, "NA";
+  for $type ("config","build","tests") {
+    my $total = $packages{$software}{Pass}{$type} + $packages{$software}{Fail}{$type};
+    printf " %4d/%-4d", $packages{$software}{Pass}{$type},$total;
+  }
+  $---;			# decrement format page count
+  print "\n";
+}
+
+
+#
+## format for config/build summaries
+#
+
+format STDOUT =
+@<<<<<<<<<<<<<<< @>>>>>>>>> ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<  @<<<<<<<<<<<<<<
+$tsite,           $dstat,    $software,                       $status
+~                           ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			      $software
+~                           ^<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+			      $software
+.
+
+#
+# Pass 2: print config and build results
+#
+
+print "\n\nFAILURES: Config/Build\n";
+print "----------------------------------------------------------------------------\n";
+print "Host             Date       Build Name                        Status\n";
+print "----------------------------------------------------------------------------\n";
+
+$flag=0;
+for $site (sort keys %world) {
+  for $type ("config","build") {
+    for $i (0 .. $#{$world{$site}{$type}} ) {
+      $dstat = $world{$site}{$type}[$i]{xml}->{Date};
+      $software = $world{$site}{$type}[$i]{xml}->{Key}->{Software};
+      $estat = $world{$site}{$type}[$i]{xml}->{ExecutionStatus};
+      $istat = $world{$site}{$type}[$i]{xml}->{IntegrityStatus};
+      if ($estat ne "Pass") {
+        $status = "Error";
+      } elsif ($istat ne "Pass") {
+	$status = "Fail";
+      } else {
+	$status = "Pass";
+      }
+      if ($status ne "Pass") {
+# don't print test results in lower section for failed build
+	$buildfail{$site}{$dstat}{$software} = 1;
+
+# this will give problems if multiple tests run on same day and output
+# was committed to repository.  Any build failure will suppress test
+# output, even if a subsequent build worked.  The only way around this
+# is to run with recent build files, interactively (command-line args)
+
+	$tsite = $site;	# protection vs write side-effects
+	$flag=1;
+	write;
+        $curname = $world{$site}{$type}[$i]{filename};
+	($cfile = $curname) =~ s/xml$/out/;
+        print "$weburl/$webdir/" . uri_escape($cfile) . " \n";
+        $--- if ($- > 0);
+      }
+    }
+  }
+}
+if ($flag == 0) {
+   print "None\n";
+   }
+
+# print test summaries
+
+print "\n\nFAILURES: Tests\n";
+print "----------------------------------------------------------------------------\n";
+print "Host             Date       Test Info                        Status\n";
+print "                                                             %Good/ #/ #Good\n";
+print "----------------------------------------------------------------------------\n";
+
+$flag=0;
+for $site (sort keys %world) {
+  for $type ("tests") {
+    my %h;
+    my $skipped=0;
+    for $i (0 .. $#{$world{$site}{$type}} ) {
+      my $passed = 0;
+      for $j (0 .. $#{$world{$site}{$type}[$i]{xml}{Test}} ) {
+	if (defined $world{$site}{$type}[$i]{xml}{Test}[$j]->{IntegrityStatus}){
+	  $istat = $world{$site}{$type}[$i]{xml}{Test}[$j]->{IntegrityStatus};
+	} else {
+	  $istat = "Unknown";
+	}
+        $passed++ if ($istat eq "Pass");
+      }
+      $dstat = $world{$site}{$type}[$i]{xml}{Test}[0]->{Date};
+      $software = $world{$site}{$type}[$i]{xml}->{Key}->{Software} . ' ' .
+	      $world{$site}{$type}[$i]{xml}{Test}[0]->{Category};
+      $estat=$#{$world{$site}{$type}[$i]{xml}{Test}} + 1;
+      $skipped = 0;
+      $percent = ($estat - $skipped == 0) ? 100
+		      : sprintf "%2d", 100.0*($passed / ($estat - $skipped));
+#
+# save data to be printed but don't write yet
+      $flag=1;
+      push @{$h{ $software }}, ( {
+	  "date" => "$dstat",
+	  "software" => "$world{$site}{$type}[$i]{xml}->{Key}->{Software}",
+	  "percent" => $percent,
+	  "total" => $estat,
+	  "skipped" => "$skipped",
+	} ) if ($passed < ($estat - $skipped) );
+    }
+
+# print Dumper(%h);
+
+# sort output by name, then write it out
+    for my $sware (sort keys %h) {
+      for $i (0 .. $#{$h{$sware}}) {
+	$software = $sware;
+	$dstat = $h{$sware}[$i]{date};
+	$percent = "$h{$sware}[$i]{percent}";
+	$total = $h{$sware}[$i]{total};
+	$skipped = $h{$sware}[$i]{skipped};
+	$sw = $h{$sware}[$i]{software};
+	$status = sprintf '%3s%% /%3d/%3d', $percent, $total, $skipped;
+	$tsite = $site;	# protection vs write side-effects
+
+# no use showing failed tests if the build failed earlier
+# (bah, this should be up above.)
+ 	write if (!$buildfail{$site}{$dstat}{$sw});
+      }
+    }
+  }
+}
+if ($flag == 0) {
+   print "None\n";
+   }
+

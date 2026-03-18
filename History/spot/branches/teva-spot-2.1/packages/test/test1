@@ -1,0 +1,68 @@
+#!/bin/bash
+##
+## Test1 test script
+##
+
+limited="no"
+if [ -d ../healthImpacts ] || [ -e ../docs/HIA.doc ] ; then
+  limited="yes"
+fi
+
+function do_tests
+{
+# pretty fast "smoke" tests
+echo "========= test1a ============="
+./test1a
+echo "========= test1f ============="
+./test1f
+echo "========= test1g ============="
+./test1g
+echo "========= test1aa ============="
+./test1aa
+echo "========= test1aa_new ============="
+./test1aa_new
+echo "========= test1n ============="
+./test1n
+echo "========= test1o ============="
+./test1o
+echo "========= test1r ============="
+./test1r
+echo "========= test1r_new ============="
+./test1r_new
+echo "========= test1s ============="
+./test1s
+echo "========= test1s_new ============="
+./test1s_new
+if limited=="yes" ; then
+  echo "========= test1a_l ============="
+  ./test1a_l
+fi
+echo "========= test1p ============="
+./test1p
+echo "========= test1p_new ============="
+./test1p_new
+#
+# slower tests - uncomment if you are patient
+#echo "========= test1h ============="
+#./test1h
+#echo "========= test1k ============="
+#./test1k
+#echo "========= test1l ============="
+#./test1l
+#echo "========= test1t ============="
+#./test1t
+#echo "========= test1q ============="
+#./test1q
+#echo "========= test1i ============="
+#./test1i
+#echo "========= test1j ============="
+#./test1j
+#
+# Uncomment these if you have AMPL.
+#
+#./test1a
+#./test1ab
+}
+
+uname -a
+time do_tests

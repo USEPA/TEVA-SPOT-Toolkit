@@ -1,0 +1,169 @@
+##
+## Root Makefile
+##
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+default: scripts
+	if [ -e "bin/evalsensor" ] || [ -e "bin/evalsensor.exe" ]; then\
+	   $(MAKE) library;\
+	else\
+	   $(MAKE) install;\
+	fi;
+
+install:	clean scripts
+	@$(ECHO) "==================================="
+	@$(ECHO) "==================================="
+	@$(ECHO) "= Install teva-sp Package - BEGIN ="
+	@$(ECHO) "==================================="
+	@$(ECHO) "==================================="
+	@$(ECHO) "=========Start Time================"
+	@date
+	@$(ECHO) "==================================="
+	(cd packages; $(MAKE) install);
+	@$(ECHO) "==================================="
+	@$(ECHO) "==================================="
+	@$(ECHO) "= Install teva-sp Package - END   ="
+	@$(ECHO) "==================================="
+	@$(ECHO) "==================================="
+	@$(ECHO) "=========Finish Time==============="
+	@date
+	@$(ECHO) "==================================="
+
+library:
+	@$(ECHO) "====================================="
+	@$(ECHO) "====================================="
+	@$(ECHO) "= Libraries teva-sp Package - BEGIN ="
+	@$(ECHO) "====================================="
+	@$(ECHO) "====================================="
+	(cd packages; $(MAKE) library)
+	@$(ECHO) "====================================="
+	@$(ECHO) "====================================="
+	@$(ECHO) "= Libraries teva-sp Package - END   ="
+	@$(ECHO) "====================================="
+	@$(ECHO) "====================================="
+
+shared_library:
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	@$(ECHO) "= Shared Libraries teva-sp Package - BEGIN ="
+	@$(ECHO) "============================================"
+	@$(ECHO) "============================================"
+	(cd packages; $(MAKE) shared_library)
+	@$(ECHO) "============================================="
+	@$(ECHO) "============================================="
+	@$(ECHO) "=  SharedLibraries teva-sp Package - END    ="
+	@$(ECHO) "============================================="
+	@$(ECHO) "============================================="
+
+executables:
+	@$(ECHO) "==========================================="
+	@$(ECHO) "==========================================="
+	@$(ECHO) "= Executables for teva-sp Package - BEGIN ="
+	@$(ECHO) "==========================================="
+	@$(ECHO) "==========================================="
+	(cd packages; $(MAKE) executables)
+	@$(ECHO) "==========================================="
+	@$(ECHO) "==========================================="
+	@$(ECHO) "= Executables for teva-sp Package - END   ="
+	@$(ECHO) "==========================================="
+	@$(ECHO) "==========================================="
+
+check:
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	@$(ECHO) "= Checking teva-sp Package - BEGIN ="
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	(cd packages; $(MAKE) check)
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	@$(ECHO) "= Checking teva-sp Package - END   ="
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	
+test:
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	@$(ECHO) "= Checking teva-sp Package - BEGIN ="
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	(cd packages; $(MAKE) test)
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	@$(ECHO) "= Checking teva-sp Package - END   ="
+	@$(ECHO) "===================================="
+	@$(ECHO) "===================================="
+	
+##
+## Remove core files (assume libraries are removed at a lower level
+##
+clean:
+	@$(ECHO) "=================================="
+	@$(ECHO) "=================================="
+	@$(ECHO) "= Clean teva-sp Package - BEGIN  ="
+	@$(ECHO) "=================================="
+	@$(ECHO) "=================================="
+	@$(RM) bin/doinstemp
+	(cd packages; $(MAKE) clean)
+	- $(RM) lib/*.a lib/*.lib
+	@$(ECHO) "=================================="
+	@$(ECHO) "=================================="
+	@$(ECHO) "= Clean teva-sp Package - END    ="
+	@$(ECHO) "=================================="
+	@$(ECHO) "=================================="
+
+## 
+## Clean up all compiled objects 
+##
+distclean:	
+	@$(ECHO) "=============================================="
+	@$(ECHO) "=============================================="
+	@$(ECHO) "= Distribution Clean teva-sp Package - BEGIN ="
+	@$(ECHO) "=============================================="
+	@$(ECHO) "=============================================="
+	(cd packages; $(MAKE) distclean)
+	- $(RM) core *.obj *.o Templates.DB ptrepository tempinc \
+		config.status config/mf-* Makefile-* Makefile-${target_name}
+	@$(ECHO) "=============================================="
+	@$(ECHO) "=============================================="
+	@$(ECHO) "= Distribution Clean teva-sp Package - END   ="
+	@$(ECHO) "=============================================="
+	@$(ECHO) "=============================================="
+
+##
+## Process t/csh scripts
+##
+scripts:
+	@if [ ! -x bin/doinstemp ] ; then\
+	   (cd bin; ./mkscripts) ; \
+	fi
+
+
+##
+## Recursively translate CRLF to LF in all files
+##
+dos2unix:
+	@(cd src; for FILE in `find . -name "*.[hHcCf]" -print ` `find . -name "*.cpp" -print`; do\
+	   dos2unix $${FILE} $${FILE};\
+	done) > /dev/null 2>&1
+
+
+##
+## Make PDF documentation
+##
+pdf:
+	@(cd doc; make pdf)
+	
+##
+## Make postscript documentation
+##
+ps:
+	@(cd doc; make ps)
+	
+##
+## Make html documentation
+##
+html:
+	@(cd doc; make web)
+

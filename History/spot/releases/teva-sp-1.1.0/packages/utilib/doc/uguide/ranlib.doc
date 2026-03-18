@@ -1,0 +1,25 @@
+/*!
+ * \page ranlib
+
+\section ranlib Random Number Generation
+
+
+The \c utilib/src/ranlib directory contains definitions for 
+datatypes that define random variables.  The basic datatype for random 
+number generators is RNG, and two classes are provided for encapsulating 
+linear congruential generators: LCG, which encapsulates the unix random
+number generator, and PM_LCG, which encapsulates a portable random
+number generator.
+
+\par
+A variety of types are defined for generating random variables using a
+random number generator.  In particular, classes are defined for the 
+Cauchy, Normal, Uniform and Triangular distributions.
+These distributions are described in detail in a variety of texts (e.g.
+\if GeneratingLaTeX Evans, Hastings and \latexonly Peacock~\cite{EvaHasPea93}).\endlatexonly \endif
+\if GeneratingHTML [EvaHasPea93]). \endif  The 
+MNormal and MUniform provide multivariate versions of some of these
+distributions, and the DUniform class provides the discrete uniform
+distribution.
+
+*/

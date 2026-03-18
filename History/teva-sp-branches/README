@@ -1,0 +1,15 @@
+This directory contains the sources that are branched off
+the main repository periodically at the start of the release 
+process.  The sources are tested, and bugs may be fixed.  When 
+it is time to release the code, the sources are copied to a 
+release directory, where the source remains frozen.  
+
+Release numbers have two parts in the branch directory: "major.minor".
+
+Release numbers have three parts in the release directory:
+"major.minor.sub".
+
+The source in this branch directory may continue to be modified,
+after the initial release, with patch releases obtained by copying 
+the improved code to the releases directory again and incrementing 
+the third part ("sub") of the release number.

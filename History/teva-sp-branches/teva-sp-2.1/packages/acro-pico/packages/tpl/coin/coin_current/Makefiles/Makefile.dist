@@ -1,0 +1,174 @@
+MAKE = make
+WHERETOCHECKOUT = ${HOME}/tmp
+COINROOT = $(WHERETOCHECKOUT)/COIN
+OPT_LEVEL = -O2
+WHATTOMAKE =  Mps Coin Osi Cgl Cbc Clp Smi
+CC = /home/asm4/tmp/bin1/bin/g++
+CXX = /home/asm4/tmp/bin1/bin/g++
+LIBTYPE = SHARED
+DATE = -D 2006-02-06
+COMPRESSEDFILE = coin-linux-ix86-gcc4.tgz
+COMPRESS = tar -czvf
+#COMPRESS = zip
+UNAME = $(shell uname)
+
+ifeq ($(findstring CYGWIN,${UNAME}),CYGWIN)
+    UNAME := CYGWIN
+endif
+
+#ifeq ($(findstring osi,$(WHATTOMAKE),osi)
+#	ifeq ($(findstring clp,$(WHATTOMAKE),clp)
+#		LPXDIR = OsiClp	
+#		LPXINCDIR = ClpIncDir
+#	endif
+#endif
+
+ifeq ($(findstring Darwin,${UNAME}),Darwin)
+   DYLD_LIBRARY_PATH=$(COINROOT)/lib
+endif
+ifeq ($(findstring Linux,${UNAME}),Linux)
+   LD_LIBRARY_PATH=$(COINROOT)/lib
+endif
+
+###############################################################################
+###############################################################################
+# Targets
+###############################################################################
+###############################################################################
+
+all: checkout build test package
+
+checkout: 
+	(cd $(WHERETOCHECKOUT) && cvs \
+	-d :pserver:anonymous@www.coin-or.org:2401/home/coin/coincvs \
+	checkout $(DATE) $(addprefix COIN/,$(WHATTOMAKE)) COIN/Makefiles)
+
+build: $(addsuffix -bin,$(WHATTOMAKE))
+	true
+
+.EXPORT_ALL_VARIABLES test: $(addsuffix -test,$(WHATTOMAKE))
+	true
+
+package: 
+	(cd $(COINROOT) && $(COMPRESS) $(COMPRESSEDFILE) lib/* include/*)
+
+clean: $(addsuffix -clean,$(WHATTOMAKE))
+
+Coin-bin: 
+	(cd $(COINROOT)/Coin && \
+	$(MAKE) CXX=$(CXX) LibType=$(LIBTYPE) OptLevel=$(OPT_LEVEL) \
+	SHLINKPREFIX= default unitTest)
+
+Coin-test:
+	@echo 
+	@echo ================ Starting Coin unit test ================
+	@echo 
+	(cd $(COINROOT)/Coin && ./unitTest)
+
+Coin-clean:
+	cd $(COINROOT)/Coin && $(MAKE) clean
+
+Osi-bin:
+	(cd $(COINROOT)/Osi && \
+	$(MAKE) CXX=$(CXX) LibType=$(LIBTYPE) OptLevel=$(OPT_LEVEL) \
+	SHLINKPREFIX= default unitTest)
+
+Osi-test:
+	@echo 
+	@echo ================ Starting Osi unit test ================
+	@echo 
+	(cd $(COINROOT)/Osi && ./unitTest -testOsiSolverInterface)
+
+Osi-clean:
+	cd $(COINROOT)/Osi && $(MAKE) clean
+
+Clp-bin:
+	(cd $(COINROOT)/Clp && \
+	$(MAKE) CXX=$(CXX) LibType=$(LIBTYPE) OptLevel=$(OPT_LEVEL) \
+	SHLINKPREFIX= default unitTest)
+
+Clp-test:
+	@echo 
+	@echo ================ Starting Clp unit test ================
+	@echo 
+	(cd $(COINROOT)/Clp  && \
+	Test/$(UNAME)$(OPT_LEVEL)/clp -unitTest -presolve on -netlib)
+
+Clp-clean:
+	cd $(COINROOT)/Clp && $(MAKE) clean
+
+Cbc-bin:
+	(cd $(COINROOT)/Cbc && \
+	$(MAKE) CXX=$(CXX) LibType=$(LIBTYPE) OptLevel=$(OPT_LEVEL) \
+	SHLINKPREFIX= default unitTest)
+
+Cbc-test:
+	@echo 
+	@echo ================ Starting Cbc unit test ================
+	@echo 
+	(cd $(COINROOT)/Cbc  && \
+	Test/$(UNAME)$(OPT_LEVEL)/cbc -unitTest)
+
+Cbc-clean:
+	cd $(COINROOT)/Cbc && $(MAKE) clean
+
+Cgl-bin:
+	(cd $(COINROOT)/Cgl && \
+	$(MAKE) CXX=$(CXX) LibType=$(LIBTYPE) OptLevel=$(OPT_LEVEL) \
+	SHLINKPREFIX= default unitTest)
+
+Cgl-test:
+	@echo 
+	@echo ================ Starting Cgl unit test ================
+	@echo 
+	(cd $(COINROOT)/Cgl && ./unitTest)
+
+Cgl-clean:
+	cd $(COINROOT)/Cgl && $(MAKE) clean
+
+Smi-bin:
+	(cd $(COINROOT)/Smi && \
+	$(MAKE) CXX=$(CXX) LibType=$(LIBTYPE) OptLevel=$(OPT_LEVEL) \
+	SHLINKPREFIX= default unitTest)
+
+Smi-test:
+	@echo 
+	@echo ================ Starting Smi unit test ================
+	@echo 
+	(cd $(COINROOT)/Smi/Test && ./unitTest)
+
+Smi-clean:
+	cd $(COINROOT)/Smi && $(MAKE) clean
+
+Mps-bin: $(COINROOT)/Mps/Netlib/afiro.mps	
+
+$(COINROOT)/Mps/Netlib/afiro.mps:
+	(cd $(COINROOT)/Mps && gunzip Netlib/*.gz)
+
+Mps-test:
+	true
+
+Mps-clean:
+	true
+
+#############################################################################
+# Eventually, this may be all we will need, but for now, need different lines 
+# for each because of different unit tests.
+#
+#% : 
+#	cd $(COINROOT)/%
+#	$(MAKE) CXX=$(CXX) CC=$(CC) LibType=$(LIBTYPE) OptLevel=$(OPT_LEVEL))
+#	$(MAKE) CXX=$(CXX) CC=$(CC) LibType=$(LIBTYPE) \
+#	OptLevel=$(OPT_LEVEL)) unitTest
+#	./unitTest
+#############################################################################
+
+clean:
+	cd $(COINROOT)/Coin && $(MAKE) clean
+	cd $(COINROOT)/Clp && $(MAKE) clean
+	cd $(COINROOT)/Cgl && $(MAKE) clean
+	cd $(COINROOT)/Cbc && $(MAKE) clean
+	cd $(COINROOT)/Osi && $(MAKE) clean
+	cd $(COINROOT)/Smi && $(MAKE) clean
+	cd $(COINROOT) && rm -r lib
+

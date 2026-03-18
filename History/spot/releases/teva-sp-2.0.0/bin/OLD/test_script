@@ -1,0 +1,170 @@
+#!/usr/bin/perl
+#-w
+#
+# This script controls the execution of a single test
+#
+################################################################
+#  Usage:       test_script [-p <analysiscode>] <name> <arg1> ...
+################################################################
+##
+## TODO get package name information.  Pass this in, or use a 
+## configure-generated file of Perl package information????
+##
+
+$host = `hostname`;
+chomp($host);
+if ($host eq "SPECIAL HOST WITH HIRES INSTALLED") {
+   require Time::HiRes;
+   }
+else {
+   require Time::Local;
+   }
+
+sub mytime {
+  if ($host eq "SPECIAL HOST WITH HIRES INSTALLED") {
+     return [Time::HiRes::gettimeofday()];
+  } else {
+     return time;
+  }
+}
+
+sub time_diff {
+  my $t0 = shift @_;
+  my $t1 = shift @_;
+  if ($host eq "bobo.mp.sandia.gov") {
+     return Time::HiRes::tv_interval($t0,$t1);
+  } else {
+     return $t1-$t0;
+  }
+}
+
+
+##
+## Run the test
+##
+#
+# Get the name of the test
+#
+$name = shift @ARGV;
+#
+# Test if an analysis code is provided
+#
+if ("$ARGV[0]" eq "-p") {
+   #
+   # We're executing a performance test, which uses the analysis code
+   # to extract performance measures from the test output
+   #
+   $testtype = "PerformanceTest";
+   shift @ARGV;
+   $analysiscode = shift @ARGV;
+   }
+else {
+   #
+   # We're executing a regression test, which we compare with a static
+   # benchmark
+   #
+   $testtype = "RegressionTest";
+   }
+#
+# Execute the test using the test_exec command
+# TODO: is the test_exec command necessary?
+#
+$t0 = mytime();
+$status = 0xffff & system("rm -f $name.out; test_exec @ARGV > $name.out 2>&1");
+$elapsed = time_diff($t0,mytime());
+
+##
+## Process the test results
+##
+#
+# See if test executed properly
+#
+if ($status != 0) {
+   #
+   # Test failed to execute
+   #
+   $executionstatus      = "Fail";
+   $explanation = "Failed execution";
+   }
+else {
+   #
+   # Test executed properly
+   #
+   $executionstatus = "Pass";
+   $regressionstatus = "Pass";
+   if (! (-e "$name.out")) {
+      #
+      # The test output file appears to be missing
+      #
+      $regressionstatus      = "Fail";
+      $explanation = "Missing output file $name.out";
+      }
+   #
+   # Process a regression test
+   #
+   elsif ($testtype eq "RegressionTest") {
+      if (! (-e "$name.qa")) {
+         #
+         # The test benchmark file appears to be missing
+         #
+         $regressionstatus      = "Fail";
+         $explanation = "Missing QA file $name.qa";
+         }
+         ##
+         ## TODO - enable version-specific QA benchmarks
+         ##
+      elsif (system("diff $name.out $name.qa > $name.diff")) {
+	 #
+	 # Failure because of difference with the benchmark
+	 #
+         $regressionstatus      = "Fail";
+         $explanation = "Differences with benchmark";
+         }
+      }
+   #
+   # Process a performance test
+   #
+   else {
+      $regressionstatus      = "Unknown";
+      $analysis = `$analysiscode $name.out`;
+      }
+   }
+
+##
+## Print out results
+##
+print "<$testtype>\n";
+print "  <Package> TODO </Package>\n";
+print "  <Name> $name </Name>\n";
+($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime(time);
+print "  <Date> $mon/$mday/$year </Date>\n";
+##
+## TODO - format the output to 2 decimal places
+##
+$hourfrac = $hour + ($min + $sec/60.0)/60.0;
+print "  <StartTime> $hourfrac </StartTime>\n";
+print "  <RunTime unit=\"seconds\"> $elapsed </RunTime>\n";
+if ($executionstatus eq "Fail") {
+   print "  <ExecutionStatus> $executionstatus </ExecutionStatus>\n";
+   print "  <FailureInfo>\n";
+   print "    <Explanation> $explanation </Explanation>\n";
+   print "  </FailureInfo>\n";
+   }
+else {
+   print "  <ExecutionStatus> $executionstatus </ExecutionStatus>\n";
+   if ("$testtype" eq "PerformanceTest") {
+      print "$analysis";
+      }
+   else {
+      print "  <IntegrityStatus> $regressionstatus </IntegrityStatus>\n";
+      if ($regressionstatus eq "Fail") {
+         print "  <FailureInfo>\n";
+         print "    <Explanation> $explanation </Explanation>\n";
+         print "  </FailureInfo>\n";
+         }
+      }
+   }
+print "<LogFile>\n";
+print "$name.out\n";
+print "</LogFile>\n";
+print "</$testtype>\n";

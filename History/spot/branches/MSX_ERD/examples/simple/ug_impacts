@@ -1,0 +1,33 @@
+#!/bin/csh
+#
+# This script runs experiments from "Impacts" section of the SPOT User Guide
+#
+set path = ($path `pwd`/../../bin)
+
+
+echo "tevasim -tsg Net3.tsg -tso Net3.tso Net3.inp Net3.out > impact1.out"
+tevasim -tsg Net3.tsg -tso Net3.tso Net3.inp Net3.out >&! impact1.out
+
+echo "tso2Impact Net3 Net3.tso -mc -vc -td -nfd -ec -epanetin Net3.inp > impact2.out"
+tso2Impact Net3 Net3.tso -mc -vc -td -nfd -ec -epanetin Net3.inp >&! impact2.out
+
+echo "tso2Impact Net3 Net3.tso -responseTime 60 -minQuality 0.1 -mc -epanetin Net3.inp > impact3.out"
+tso2Impact Net3 Net3.tso -responseTime 60 -minQuality 0.1 -mc -epanetin Net3.inp >&! impact3.out
+
+cp Net3.tso Net3_1a.tso
+cp Net3.sdx Net3_1a.sdx
+cp Net3.tso Net3_1b.tso
+cp Net3.sdx Net3_1b.sdx
+echo "tso2Impact Net3 Net3_1a.tso Net3_1b.tso -minQuality 30000000 0.0001 -mc -epanetin Net3.inp > impact4.out"
+tso2Impact Net3 Net3_1a.tso Net3_1b.tso -minQuality 30000000 0.0001 -mc -epanetin Net3.inp >&! impact4.out
+
+echo "tso2Impact Net3 Net3.tso -pe bio.tai -epanetin Net3.inp > impact5.out"
+tso2Impact Net3 Net3.tso -pe bio.tai -epanetin Net3.inp >&! impact5.out
+
+echo "scenarioAggr --numEvents=236 Net3_mc.impact > impact6.out"
+tso2Impact Net3 Net3.tso -mc -epanetin Net3.inp >&! impact2.out
+scenarioAggr --numEvents=236 Net3_mc.impact >&! impact6.out
+
+echo "filter_impacts --percent=5 Net3_mc.impact filtered.impact > impact7.out"
+filter_impacts --percent=5 Net3_mc.impact filtered.impact >&! impact7.out
+

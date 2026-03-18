@@ -1,0 +1,27 @@
+<experimental-study name="pico-lp">
+  <tags>
+    <tag>nightly</tag>
+  </tags>
+
+  <experiment>
+    <factors>
+      <factor name="test" filename="lp_problems"/>
+      <factor name="lptype">
+        <level>lpType=clp</level>
+        <level>lpType=soplex</level>
+        <level>lpType=glpk</level>
+      </factor>
+    </factors>
+    <controls>
+       <executable>./exp.pico.pl --lp</executable>
+    </controls>
+  </experiment>
+
+  <analyze>
+    <test name="FinalValue" type="validate">
+      <options>_measurement='Value' _tolerance=_opttol</options>
+    </test>
+  </analyze>
+
+</experimental-study>
+

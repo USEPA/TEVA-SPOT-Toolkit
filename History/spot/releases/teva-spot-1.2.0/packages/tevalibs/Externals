@@ -1,0 +1,6 @@
+TEVAUtils -r2119 http://engcvs.uc.edu/repos/TEVA/TEVAUtils/trunk
+TEVAEpanet  -r2119   http://engcvs.uc.edu/repos/TEVA/Epanet/trunk
+TEVAThreatSim -r2119  http://engcvs.uc.edu/repos/TEVA/ThreatSim/trunk
+TEVAThreatAssess -r2119 http://engcvs.uc.edu/repos/TEVA/ThreatAssess/trunk
+TEVADCDFlib -r2119 http://engcvs.uc.edu/repos/TEVA/DCDFlib/trunk
+

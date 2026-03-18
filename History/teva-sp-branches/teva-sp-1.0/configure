@@ -1,0 +1,9 @@
+#!/bin/sh
+##
+## Dummy script that calls ./bin/configure
+##
+                                                                                
+./bin/configure $*
+                                                                                
+make scripts
+(cd packages; make update_includes)

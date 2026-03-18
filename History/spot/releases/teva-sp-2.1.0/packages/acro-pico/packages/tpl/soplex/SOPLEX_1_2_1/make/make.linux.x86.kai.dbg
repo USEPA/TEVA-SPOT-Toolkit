@@ -1,0 +1,7 @@
+#--- $Id: make.linux.x86.kai.dbg,v 1.1 2002/06/25 21:07:09 DEVspx Exp $
+CXX	=	KCC
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-g --linux_headers # --lint
+LDFLAGS	=	--static_libKCC -lm
+AR	=	KCC
+ARFLAGS	=	-o

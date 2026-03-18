@@ -1,0 +1,45 @@
+#-----------------------------------------------------#
+# Target ARCHitecture dependent definitions - DARWIN  #
+#-----------------------------------------------------#
+
+AR		= ar
+ARFLAGS		= ruv
+RANLIB		= ranlib -s
+ARCLEAN		= $(RM)
+
+CC              = gcc-4.0
+CWARNINGS     	= $(C++WARNINGS) -Wstrict-prototypes -Wmissing-prototypes
+CC_SHARED	=
+ 
+CCC             = g++-4.0
+C++             = $(CCC)
+C++WARNINGS     = -Wall -fexceptions -Wno-long-double
+C++_SHARED	=
+ 
+F77		= g77
+FFLAGS		= -O4
+F_SHARED	=
+FLIBS		= -L/sw/lib -lg2c
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= 
+LDFLAGS		=
+OPTIMIZATION	= -O2
+
+ARCH_LIB_PATH	=
+ARCH_LIBS	=
+ARCH_INCLUDES	= -I. -I/usr/include/X11R6
+ARCH_FLAGS	= -DUNIX -DDARWIN -DMULTITASK -DANSI_HDRS -DANSI_NAMESPACES
+XTRAFLAGS	= 
+PROFILE_FLAG	= -pg
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard
+
+# BLAS and LAPACK are provided within Darwin's vecLib framework
+BLAS_LIBS = /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libBLAS.dylib
+
+LAPACK_LIBS = /System/Library/Frameworks/Accelerate.framework/Versions/A/Frameworks/vecLib.framework/Versions/A/libLAPACK.dylib

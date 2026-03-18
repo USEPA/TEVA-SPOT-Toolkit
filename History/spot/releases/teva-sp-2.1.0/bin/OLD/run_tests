@@ -1,0 +1,61 @@
+#!/usr/bin/perl
+#
+# This script controls the execution of a set of tests defined
+# by a file
+#
+################################################################
+#  Usage:       run_test <input-file>
+################################################################
+##
+## TODO get package name information.  Pass this in, or use a 
+## configure-generated file of Perl package information????
+##
+
+sub my_signal_catcher {
+    $saw_signal = 1;
+}
+
+$saw_signal = 0;
+$SIG{'INT'} = 'my_signal_catcher';
+$SIG{'HUP'} = 'my_signal_catcher';
+$SIG{'QUIT'} = 'my_signal_catcher';
+$SIG{'TERM'} = 'my_signal_catcher';
+
+if ("$ARGV[0]" eq "") {
+   die "run_test <input-file>\n";
+   }
+@fname = split /\./,"$ARGV[0]";
+$testname = join ".",@fname[1..$#fname];
+
+print "Executing run_test\n";
+print "  Removing old result files\n";
+open (TESTFILE, $ARGV[0]) || die "cannot open file $ARGV[0]!\n";
+while ($line = <TESTFILE>) {
+  @word = split(/[\t\ ]+/, "$line");
+  $name = @word[0];
+  $status = system("rm -f $testname.$name.out $testname.$name.diff");
+  }
+close(TESTFILE);
+
+print "  Running tests ";
+open (TESTFILE, $ARGV[0]) || die "cannot open file $ARGV[0]!\n";
+open (XMLFILE, ">$testname.xml") || die "cannot open file $testname.xml!\n";
+while ($line = <TESTFILE>) {
+  chomp($line);
+  @word = split(/[\t\ ]+/, "$line");
+  $name = @word[0];
+  $cmd  = join " ", @word[1..$#word];
+  $result = `../bin/test_script $testname.$name $cmd 2>&1`;
+  print XMLFILE $result;
+  if ($saw_signal) {
+     print "  Terminating due to signal!\n";
+     goto end;
+     }
+  print ".";
+  } 
+close(TESTFILE);
+print "\n";
+
+end:
+
+print "Terminating run_test\n";

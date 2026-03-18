@@ -1,0 +1,28 @@
+#!/bin/csh
+##
+## Test1 test script
+##
+
+setenv bindir `pwd`/../../bin
+setenv moddir `pwd`/../../mod
+
+set limited="no"
+if (( -d ../healthImpacts ) || ( -e ../doc/HIA.doc )) then
+  set limited="yes"
+endif
+
+
+if $limited == "yes" then
+
+  if (! -e test1.tso) then
+     $bindir/tevasim --tsg test1.tsg --tsi test1.tsi --tso test1.tso Net3.inp Net3.out
+  endif
+  if ((! -e test1_mc.impact) || (! -e test1_pe.impact) || (! -e test1_vc.impact) || (! -e test1_ec.impact)) then
+     $bindir/tso2Impact --mc --vc --ec --pe --epanetin Net3.inp test1 test1.tso chem.tai
+  endif
+  
+  $bindir/sp --path=$bindir --path=$moddir --network=test1 --objective=mc --ub=ns,5 --solver=lagrangian  --disable-aggregation=all --ub=pe,800 --ub=ec,15000 --ub=vc,25000
+  
+else
+  echo "test not run because health impact objectives are not available"
+endif

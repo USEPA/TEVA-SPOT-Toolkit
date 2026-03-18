@@ -1,0 +1,54 @@
+/*! 
+ * \page filter_impactsExecutable Executable filter_impacts
+
+\section filter_impactsOverview Overview
+
+The \c filter_impacts script  filters out the low-impact incidents from an impact file.
+
+\section filter_impactsUsage Usage
+
+\verbatim
+   filter_impacts [options...] <impact-file> <out-file>
+\endverbatim
+
+\section filter_impactsOptions Options
+
+\verbatim
+    --threshold=<val>
+	   Keep only the incidents whose undetected impact is above a 
+	   specified threshold.
+
+    --percent=<num>
+	   Keep the <num> percent of the incidents with the worst  
+	   undetected impact.
+
+    --num=<num>
+	   Keep the <num> incidents with the worst  
+	   undetected impact.
+
+    --rescale
+	   Rescale the impacts using a log10 scale.
+
+    --round
+	   Round input values to the nearest integer.
+\endverbatim
+
+\section filter_impactsArguments Arguments
+
+\verbatim
+    <impact-file>
+	   The input impact file.
+
+    <out-file>
+	   The output impact file.
+\endverbatim
+
+
+
+\section filter_impactsDescription Description
+
+The \b filter_impacts command reads an
+impact file, filters out the low-impact incidents, rescales  the impact values, and  writes out
+another impact file.
+
+*/

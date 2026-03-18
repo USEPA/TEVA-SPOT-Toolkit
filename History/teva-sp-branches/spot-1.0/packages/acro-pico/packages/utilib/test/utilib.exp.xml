@@ -1,0 +1,48 @@
+<experimental-study name="utilib">
+  <tags>
+    <tag>smoke</tag>
+    <tag>nightly</tag>
+    <tag>utilib</tag>
+  </tags>
+
+  <experiment>
+    <factors>
+      <factor name="test">
+        <level>command=any</level>
+        <level>command=array</level>
+        <level>command=bitarray</level>
+        <level>command=class_options</level>
+        <level>command=commonio</level>
+        <level>command=commonio_debug</level>
+        <level>command=ereal</level>
+        <level>command=exception_test</level>
+        <level>command=heap</level>
+        <level>command=iotest</level>
+        <level>command=iotest_debug</level>
+        <level>command=listtest</level>
+        <level>command=lphash</level>
+        <level>command=malloc</level>
+        <level>command=multibitarray</level>
+        <level>command=olist</level>
+        <level>command=pvector</level>
+        <level>command=qlist</level>
+        <level>command=smartptr</level>
+        <level>command=sort_test</level>
+        <level>command=splay</level>
+        <level>command=stltest</level>
+        <level>command=stringtest</level>
+        <level>command=tuple</level>
+        <level>command=vectest</level>
+      </factor>
+    </factors>
+    <controls>
+       <executable>utilib.script.pl</executable>
+    </controls>
+  </experiment>
+
+  <analyze>
+    <test name="UtilibRegression" type="validate">
+       <options>_measurement='diffs' _value='0'</options>
+    </test>
+  </analyze>
+</experimental-study>

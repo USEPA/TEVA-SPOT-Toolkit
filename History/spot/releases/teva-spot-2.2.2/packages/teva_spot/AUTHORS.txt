@@ -1,0 +1,4 @@
+teva_spot
+  William Hart - lead developer
+  Lee Ann Fisk - core development of the 'sp' script
+  Cindy Phillips - development of the 'sp' script

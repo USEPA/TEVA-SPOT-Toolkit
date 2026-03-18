@@ -1,0 +1,8 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=CYGWIN  at site=DAKOTA.STD       #
+#-----------------------------------------------------------------------#
+
+MPI_DIR=
+MPI_INCLUDES=-I/usr/local/mpich/include
+MPI_LIBS= -lmpich
+MPI_LDFLAGS=-L/usr/local/mpich/lib

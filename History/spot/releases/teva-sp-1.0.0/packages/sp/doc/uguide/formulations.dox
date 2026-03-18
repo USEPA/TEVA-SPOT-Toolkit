@@ -1,0 +1,24 @@
+/*! 
+ * \page formulations Sensor Placement Formulations
+
+
+There are a variety of sensor placement formulations supported by the 
+\ref spExecutable "sp" solver interface, including
+<ul>
+
+<li> Minimize performance for a bounded number of sensors
+
+<li> Minimize performance for a bounded number of sensors with performance constraints (for other impact measures)
+
+<li> Minimize number of sensors with one-or-more performance constraints
+</ul>
+These different formulations are not currently uniformly supported by the TEVA-SP solvers (though that remains a goal of this project).  The \ref spExecutable "sp" solver interface tries to verify that all of the options that it gets are feasible with respect to the different solvers.
+
+TODO: extend this documentation to...
+<ul>
+
+<li> document these problem formulations in greater detail
+<li> document the different solver options, how they work, and their performance characteristics
+</ul>
+
+*/

@@ -1,0 +1,56 @@
+/*! 
+ * \page scenarioAggr Executable scenarioAggr
+
+\section scenarioAggrOverview Overview
+
+The \b scenarioAggr executable takes an impact file and produces a 
+scenario-aggregated impact file using the algorithm described in
+Phillips, et al. 2007, "...Aggregation".
+
+
+\section Usage Usage
+
+\verbatim
+   scenarioAggr --numEvents=<num_events> <impact file>
+\endverbatim
+
+
+\section Description Description
+
+The <b>scenarioAggr</b> executable is a C++ program that reads an
+impact file, finds similar events, combines them, and writes out
+another impact file.  The convention is to prepend the string "aggr"
+to the output.  
+
+The following files are generated during the execution of <b>scenarioAggr</b>,
+assuming that the input was named "network.impact":
+<ul>
+
+<li> aggrnetwork.impact - the new impact file
+
+<li> aggrnetwork.impact.prob - the probabilities of the aggregated events.  These are non-uniform, so any solver must recognize event probabilities.
+
+</ul>
+
+
+\section Example1
+
+The following example can be executed in the teva-sp/packages/sp/test
+directory.  
+
+\verbatim
+./test1a
+../../../bin/scenarioAggr --numEvents=236 test1_mc.impact
+\endverbatim
+
+Now the "aggrtest1_mc.impact" file can be used by sp.
+\section Notes
+
+The local search heuristic solver does not currently support 
+scenario aggregation because it does not expect event probabilities.
+The lagrangian and PICO solvers support scenario aggregation.  However,
+initial results (spot-1.1) suggest that although the number of events 
+is reduced significantly, the number of impacts may not be, and solvers 
+may not run much faster. 
+
+*/

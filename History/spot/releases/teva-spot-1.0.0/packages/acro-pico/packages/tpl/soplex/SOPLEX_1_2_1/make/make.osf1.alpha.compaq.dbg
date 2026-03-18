@@ -1,0 +1,8 @@
+#--- $Id: make.osf1.alpha.compaq.dbg,v 1.2 2002/09/27 16:45:47 DEVspx Exp $
+CXX	=	cxx
+CPPFLAGS=	-Isrc 
+CXXFLAGS=	-O0 -w0 -std strict_ansi -gall -verbose -check \
+		-msg_disable basclsnondto,boolexprconst,constrlitnondep  -tlocal
+# -ieee
+LDFLAGS	=	-lm
+ARFLAGS	=	crs

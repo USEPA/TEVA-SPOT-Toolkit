@@ -1,0 +1,36 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=LINUX  at site=RUTGERS          #
+#-----------------------------------------------------------------------#
+
+CPLEX_DIR=/usr/local/cplex/cplex
+CPLEX_INCLUDES=-I$(CPLEX_DIR)/include/ilcplex
+CPLEX_LIBS=$(CPLEX_DIR)/lib/i86_linux2_glibc2.3_gcc3.2/static_pic_mt/libcplex.a -lm -lpthread
+CPLEX_LDFLAGS=
+
+# LAM presently now in /usr/local/lam
+MPI_DIR=/usr/local/lam
+MPI_INCLUDES=-I$(MPI_DIR)/include
+MPI_LIBS= -llammpio -llammpi++ -llamf77mpi -lmpi -llam -lpthread
+MPI_LDFLAGS=-L$(MPI_DIR)/lib
+
+# No MPE yet
+MPE_DIR=
+MPE_INCLUDES= 
+MPE_LIBS= 
+MPE_LDFLAGS=
+
+XPRESS_DIR=
+XPRESS_INCLUDES=
+XPRESS_LIBS=
+XPRESS_LDFLAGS=
+
+SOPLEX_DIR=
+SOPLEX_INCLUDES=
+SOPLEX_LIBS=
+SOPLEX_LDFLAGS=
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+

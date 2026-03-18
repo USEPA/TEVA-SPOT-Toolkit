@@ -1,0 +1,26 @@
+To create the configure script and Makefiles:
+
+./setup configure
+
+For mingw builds use these configure flags:
+
+--target=i686-pc-mingw32 --host=i686-pc-mingw32 --with-compiler=mingw
+
+The above will build all the statically-linked executables needed.
+
+To build the shared libraries needed by the TEVA framework, the following
+flags should be added to those above:
+
+--enable-shared --with-jdk-root=PATH_TO_JDK_ROOT
+
+where PATH_TO_JDK_ROOT is the path on your system where the JDK is installed.
+There should be an include directory in that path, if not, then the installation
+may be just a JRE installation.
+
+If you are building shared libraries you should probably
+disable executables.  On cygwin/mingw systems, the executables
+are a complicated collection of libtool created stubs and
+scripts which only work if you run them in the directory
+in which they were created.
+
+--disable-executables

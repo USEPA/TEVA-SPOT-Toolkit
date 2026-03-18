@@ -1,0 +1,40 @@
+#!/bin/sh
+##
+## Dummy script that calls testdriver to manage configuration, builds
+## and testing
+##
+
+if [ -e packages/acro-pico ]; then
+   pushd packages/acro-pico
+   ./setup
+   popd
+else
+  if [ -e packages/*.gz ] ; then
+    #
+    # assuming the tar file creates a directory with name
+    # equal to tar file name, and this is an acro-pico directory
+    #
+    gzname=$(ls packages/*.gz)
+    gzname=${gzname#packages/}
+    echo "Found $gzname in packages"
+    tardir=${gzname%.tar.gz}
+    echo "Opening tar file to create acro-pico directory..."
+    pushd packages
+    gunzip *.gz
+    tar xvf *.tar
+    if [ $tardir != "acro-pico" ] ; then
+      ln -s $tardir acro-pico
+    fi
+    echo "Done"
+    pushd acro-pico
+    ./setup
+    popd
+    popd
+  else
+    echo "ERROR: acro-pico directory not found"
+    exit
+  fi
+fi
+if [ "$#" != "0" ] ; then
+  ./packages/fast/client/driver --I=packages/fast/client --S=config $*
+fi

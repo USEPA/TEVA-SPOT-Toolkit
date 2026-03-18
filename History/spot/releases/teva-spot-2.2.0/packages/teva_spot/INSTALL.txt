@@ -1,0 +1,74 @@
+TEVA_SPOT INSTALL
+=================
+
+Downloading TEVA_SPOT
+---------------------
+
+The latest development version of FAST can be downloaded usin subversion:
+
+  svn checkout https://software.sandia.gov/svn/public/fast/fast/trunk fast
+
+
+Installing FAST
+---------------
+
+If you have downloaded the FAST source tree, then no additional
+installation is necessary to use the code in the download directory.
+However, you will need to set the PYTHONPATH environmental variable to
+enable imports FAST packages.
+
+You can install FAST in the system Python installation to avoid the need
+to update the PYTHONPATH.  This installcation can be performed by typing
+
+  python setup.py install
+
+If you have the MSI installer, then on a MS Windows machine you can
+execute this command and follow the installation menu.
+
+NOTE: FAST will install on recent versions of Python, but Python 2.5 or
+newer is required to apply most FAST packages.
+
+
+Third-Party Software
+-------------------
+
+Most of the functionality of FAST is available without third-party
+software.  Thus, installation of FAST is not strictly dependent on these
+additional tools.The following list describes the third-party software
+tools that can be used within FAST:
+
+- Python 'nose' package
+
+  This is needed to perform unit testing in fast/test.
+
+  See http://www.somethingaboutorange.com/mrl/projects/nose/ for details.
+
+- Python 'coverage' module
+
+  This is needed to generate coverage reports in the FAST tests.  Tests
+  can be run without this module, but an error message will be generated.
+
+  See http://nedbatchelder.com/code/modules/coverage.html for details.
+
+
+Running FAST
+------------
+
+FAST contains both Python packages and command-line executables.  Each
+package can be directly used in Python with the Python import command.
+For example, in Python you can execute
+
+  import fast.exact
+
+to import the FAST exact library.
+
+FAST's command-line executables are located in the fast/scripts directory.
+Each command prints help information when passed the '--help' option.
+Further information about running these commands is available in the
+fast/doc directory.
+
+Note that there is a DOS script for some of the commands.  For example,
+there is a 'exact' Python script for Unix, and a 'exact.cmd' DOS script
+for MS Windows.  The DOS scripts are installed by the MSI installer to
+avoid the need to specify the PYTHONPATH for a local installation.
+

@@ -1,0 +1,682 @@
+-6 7 1e+16 -1e+16
+1 0 0 1
+Comparing: -6 -6
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	-12
+x-y	0
+x*y	36
+x/y	1
+
+Comparing: 7 7
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	14
+x-y	0
+x*y	49
+x/y	1
+
+Comparing: Infinity Infinity
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	Infinity
+x-y	Indeterminate
+x*y	Infinity
+x/y	Indeterminate
+
+Comparing: -Infinity -Infinity
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	-Infinity
+x-y	Indeterminate
+x*y	Infinity
+x/y	Indeterminate
+
+Comparing: -6 7
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	1
+x-y	-13
+x*y	-42
+x/y	-0.857143
+
+Comparing: 7 -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	1
+x-y	13
+x*y	-42
+x/y	-1.16667
+
+Comparing: -6 Infinity
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	Infinity
+x-y	-Infinity
+x*y	-Infinity
+x/y	0
+
+Comparing: Infinity -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	Infinity
+x-y	Infinity
+x*y	-Infinity
+x/y	-Infinity
+
+Comparing: 7 Infinity
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	Infinity
+x-y	-Infinity
+x*y	Infinity
+x/y	0
+
+Comparing: Infinity 7
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	Infinity
+x-y	Infinity
+x*y	Infinity
+x/y	Infinity
+
+Comparing: -Infinity -6
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-Infinity
+x-y	-Infinity
+x*y	Infinity
+x/y	Infinity
+
+Comparing: -6 -Infinity
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-Infinity
+x-y	Infinity
+x*y	Infinity
+x/y	0
+
+Comparing: -Infinity 7
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-Infinity
+x-y	-Infinity
+x*y	-Infinity
+x/y	-Infinity
+
+Comparing: 7 -Infinity
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-Infinity
+x-y	Infinity
+x*y	-Infinity
+x/y	0
+
+Comparing: -Infinity Infinity
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	Indeterminate
+x-y	-Infinity
+x*y	-Infinity
+x/y	Indeterminate
+
+Comparing: Infinity -Infinity
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	Indeterminate
+x-y	Infinity
+x*y	-Infinity
+x/y	Indeterminate
+
+Comparing: 20 -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	14
+x-y	26
+x*y	-120
+x/y	-3.33333
+
+Comparing: -6 20
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	14
+x-y	-26
+x*y	-120
+x/y	-0.3
+
+Comparing: 20 7
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	27
+x-y	13
+x*y	140
+x/y	2.85714
+
+Comparing: 7 20
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	27
+x-y	-13
+x*y	140
+x/y	0.35
+
+Comparing: 20 Infinity
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	Infinity
+x-y	-Infinity
+x*y	Infinity
+x/y	0
+
+Comparing: Infinity 20
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	Infinity
+x-y	Infinity
+x*y	Infinity
+x/y	Infinity
+
+Comparing: 20 -Infinity
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-Infinity
+x-y	Infinity
+x*y	-Infinity
+x/y	0
+
+Comparing: -Infinity 20
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-Infinity
+x-y	-Infinity
+x*y	-Infinity
+x/y	-Infinity
+
+Comparing: -20 -6
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-26
+x-y	-14
+x*y	120
+x/y	3.33333
+
+Comparing: -6 -20
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-26
+x-y	14
+x*y	120
+x/y	0.3
+
+Comparing: -20 7
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-13
+x-y	-27
+x*y	-140
+x/y	-2.85714
+
+Comparing: 7 -20
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-13
+x-y	27
+x*y	-140
+x/y	-0.35
+
+Comparing: -20 Infinity
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	Infinity
+x-y	-Infinity
+x*y	-Infinity
+x/y	0
+
+Comparing: Infinity -20
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	Infinity
+x-y	Infinity
+x*y	-Infinity
+x/y	-Infinity
+
+Comparing: -20 -Infinity
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-Infinity
+x-y	Infinity
+x*y	Infinity
+x/y	0
+
+Comparing: -Infinity -20
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-Infinity
+x-y	-Infinity
+x*y	Infinity
+x/y	Infinity
+
+Comparing: -6 -6
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	-12
+x-y	0
+x*y	36
+x/y	1
+
+Comparing: -6 -6
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	-12
+x-y	0
+x*y	36
+x/y	1
+
+Comparing: -6 7
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	1
+x-y	-13
+x*y	-42
+x/y	-0.857143
+
+Comparing: 7 -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	1
+x-y	13
+x*y	-42
+x/y	-1.16667
+
+Comparing: -6 Infinity
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	Infinity
+x-y	-Infinity
+x*y	-Infinity
+x/y	0
+
+Comparing: Infinity -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	Infinity
+x-y	Infinity
+x*y	-Infinity
+x/y	-Infinity
+
+Comparing: -6 -Infinity
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-Infinity
+x-y	Infinity
+x*y	Infinity
+x/y	0
+
+Comparing: -Infinity -6
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-Infinity
+x-y	-Infinity
+x*y	Infinity
+x/y	Infinity
+
+Comparing: -6 -6
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	-12
+x-y	0
+x*y	36
+x/y	1
+
+Comparing: -6 -6
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	-12
+x-y	0
+x*y	36
+x/y	1
+
+Comparing: -6 7
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	1
+x-y	-13
+x*y	-42
+x/y	-0.857143
+
+Comparing: 7 -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	1
+x-y	13
+x*y	-42
+x/y	-1.16667
+
+Comparing: -6 Infinity
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	Infinity
+x-y	-Infinity
+x*y	-Infinity
+x/y	0
+
+Comparing: Infinity -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	Infinity
+x-y	Infinity
+x*y	-Infinity
+x/y	-Infinity
+
+Comparing: -6 -Infinity
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-Infinity
+x-y	Infinity
+x*y	Infinity
+x/y	0
+
+Comparing: -Infinity -6
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-Infinity
+x-y	-Infinity
+x*y	Infinity
+x/y	Infinity
+
+Comparing: -6 -6
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	-12
+x-y	0
+x*y	36
+x/y	1
+
+Comparing: -6 -6
+x==y	1
+x!=y	0
+x<y	0
+x<=y	1
+x>y	0
+x>=y	1
+x+y	-12
+x-y	0
+x*y	36
+x/y	1
+
+Comparing: -6 7
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	1
+x-y	-13
+x*y	-42
+x/y	-0.857143
+
+Comparing: 7 -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	1
+x-y	13
+x*y	-42
+x/y	-1.16667
+
+Comparing: -6 Infinity
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	Infinity
+x-y	-Infinity
+x*y	-Infinity
+x/y	0
+
+Comparing: Infinity -6
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	Infinity
+x-y	Infinity
+x*y	-Infinity
+x/y	-Infinity
+
+Comparing: -6 -Infinity
+x==y	0
+x!=y	1
+x<y	0
+x<=y	0
+x>y	1
+x>=y	1
+x+y	-Infinity
+x-y	Infinity
+x*y	Infinity
+x/y	0
+
+Comparing: -Infinity -6
+x==y	0
+x!=y	1
+x<y	1
+x<=y	1
+x>y	0
+x>=y	0
+x+y	-Infinity
+x-y	-Infinity
+x*y	Infinity
+x/y	Infinity
+
+lround(infinity):      2147483647 Infinity
+lround(-infinity):    -2147483648 -Infinity
+lround(MAXDOUBLE):     2147483647 Infinity
+lround(-MAXDOUBLE):   -2147483648 -Infinity
+lround(LONG_MAX):      2147483647 2147483647
+lround(LONG_MIN):     -2147483648 -2147483648
+lround(LONG_MAX-1.5):  2147483646 2147483645.5
+lround(LONG_MIN+1.5): -2147483646 -2147483646.5

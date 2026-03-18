@@ -1,0 +1,48 @@
+/*! 
+ * \page lagrangianExecutable Executable ufl (Lagrangian Relaxation)
+
+\section lagrangianOverview Overview
+
+The \b ufl executable can solve sensor placement problems almost as
+quickly as the local search heuristic, and with provable bounds on solution
+quality. "ufl" stands for "uncapacitated facility location", and this code
+is a Sandia-modified version of the combination of lagrangian relaxation
+and the "Volume Algorithm" that is found in the open-source "COIN" repository 
+(that the PICO solver uses).
+
+The lagrangian relaxation algorithm is a promising technology for handling
+side constraints, but it does not do so yet (as of teva-spot-1.1.0).
+
+\section Usage
+
+\verbatim
+   ufl <input-file> [--gap=<fraction between 0 and 1>]
+\endverbatim
+
+\section Options
+
+The "gap" option tells the solver to stop when the solution is within a 
+certain percentage of optimal.  Let \b icost be the current best integer
+solution found and \b lb be the current lower bound.  The solver will 
+stop with <b> (icost - lb)/lb </b> is less that the gap.  For example,
+if the gap is 0.1, then the solver will stop when it has a solution that
+is within 10 percent of optimality.
+
+\section Description
+
+\section Example
+
+See the \b sp solver notes, and look for the <b> --solver=lagrangian </b> option.
+That invokes ufl.
+
+\section Notes
+
+Currently, we are using PICO without cutting methods, because they are not a stable
+feature of this solver right now.
+
+On large-scale tests, we have noted that PICO's performance is often
+limited by the performance of the public-domain LP solvers that it
+employs.  In some cases, we have noted that these solvers can be over
+100 times slower than the state-of-the-art CPLEX LP solver.
+
+*/

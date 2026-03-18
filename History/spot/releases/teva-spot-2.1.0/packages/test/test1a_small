@@ -1,0 +1,22 @@
+#!/bin/csh
+##
+## Test1 test script
+##
+
+setenv bindir `pwd`/../../bin
+setenv moddir `pwd`/../../etc/mod
+
+if (! -e smallb.tso) then
+   $bindir/tevasim --tsg test1b.tsg --tsi test1b.tsi --tso smallb.tso small.inp small.out.out
+endif
+
+if (! -e smallc.tso) then
+   $bindir/tevasim --tsg test1c.tsg --tsi test1c.tsi --tso smallc.tso small.inp small.out
+endif
+
+#  Generate a single impact file that includes ensembles from both .tso files
+if ((! -e small_td.impact) || (! -e small_pe.impact)) then
+   $bindir/tso2Impact --td --pe --minQuality 3000000 small smallb.tso smallc.tso bio.tai chem.tai 
+endif
+
+$bindir/sp --path=$bindir --path=$moddir --network=small --objective=td --ub=ns,5 --solver=lagrangian --disable-aggregation=all

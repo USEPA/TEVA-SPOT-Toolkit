@@ -1,0 +1,35 @@
+See "TODO"s in source files, mostly figure out what the tests should be.
+
+Many C++ tests to lookup, to replace ifdef's in code.
+
+Configure command line for MPI, MPE, paths like prefix.
+
+Building independently and also as part of acro.
+
+Build on platforms other than Linux.
+
+_MSC_VER - do we want to be able to build on msvc
+
+Our m4 macros are only found (consistently) if we put
+them in a file called acsite.m4 in the same directory
+as configure.ac.  I've tried all of these:
+
+autoreconf -Iconfig
+
+In configure.ac:
+AC_CONFIG_MACRO_DIR([config])
+AC_CONFIG_AUX_DIR([config])
+
+In Makefile.am:
+AMLOCAL_AMFLAGS=-I$(top_srcdir)/config
+
+where our macros are :  ac_cxx_*.m4 in subdirectory config.
+
+For each of the C++ compiler issues we check for, write
+up a brief description for developers.
+
+Write up each of the special config/config_*.h headers.
+
+How should the DOXYGEN ifdefs be handled?
+
+

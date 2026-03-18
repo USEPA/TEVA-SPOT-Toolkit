@@ -1,0 +1,71 @@
+To use with IPOPT:
+
+Obtain IPOPT and install the IPOPT library `libipopt.a'as described in
+the IPOPT instructions.  In order to use IPOPT for DFO, you do not
+need the AMPL Solver Interface or CUTEr.
+
+Once IPOPT has been compiled and installed, edit the Makefile here in
+the DFO directory so that the IPOPTLIB variable points to the
+libipopt.a that you installed from the IPOPT distrubtion.
+
+In addition, you might need to specify (in the variables ADDLIBS) any
+libraries that IPOPT requires, such as BLAS and LAPACK, unless you
+downloaded the source code for these during the installation of IPOPT
+and they have been included into the IPOPT library `libipopt.a.'
+
+Once that is done, run command "make libdfo_ipopt.a" to make
+the DFO library.
+
+Additional files that are required are:
+dasum.f, dasum.f, dgeqpf.f, dpocon.f, dpotrf.f, dsyrk.f, dtrsm.f 
+from LAPACK, http://www.netlib.org/lapack/, 
+and ranlux.f from
+http://www.camk.edu.pl/~tomek/htmls.refs/ranlux.f.html.
+The user can have LAPACK and BLAS routines in a separate library.
+In that case the only file needed is  ranlux.f. Otherwise
+these files can all be included as objects in 
+the APPL variable in the makefile.
+
+If using IPOPT the the BLAS routines are already included, so there
+is not need to point to them again.
+
+Once all the libraries are in place, run "make dfotest_ipopt"
+to create a test example. File dfotest.f contains examples
+of all user provided routines. The test set includes 8 problems
+briefly described in dfotest.f. They are Hock and Schittkowski
+problems with various choices of treating constraints as "easy" or
+"difficult" (see the manual for meaning). To run the first example
+type "dfotest_ipopt 1" and press enter, etc.
+-----------------------------------------------------------------
+
+To use with NPSOL:
+
+Obtain NPSOL and create a library. Change the makefile to point to that 
+library.
+
+
+Once that is done, run command "make libdfo_npsol.a" to make
+the DFO library. Run command "make libappl.a" to make a library
+of auxiliary routines. Change the makefile to point to these
+libraries (e.g. change line
+"DFO_IPOPT  = /u/katyas/Dfo/dfo_constr/libdfo_npsol.a"
+to "DFO_IPOPT  = ./libdfo_npsol.a" to point to the current directory).
+
+The files that are needed by libappl.a are:
+dasum.f, dasum.f, dgeqpf.f, dpocon.f, dpotrf.f, dsyrk.f, dtrsm.f 
+from LAPACK, http://www.netlib.org/lapack/, 
+and ranlux.f from
+http://www.camk.edu.pl/~tomek/htmls.refs/ranlux.f.html
+The user can have LAPACK routines in a separate library and
+modify the libappl.a library (or completely delete it, as long
+as ranlux.f is linked with thre rest of the code).
+
+The user also needs to point to the local BLAS library.
+
+Once all the libraries are in place, run "make dfotest_npsol"
+to create a test example. File dfotest.f contains examples
+of all user provided routines. The test set includes 8 problems
+briefly described in dfotest.f. They are Hock and Schittkowski
+problems with various choices of treating constraints as "easy" or
+"difficult" (see the manual for meaning). To run the first example
+type "dfotest_npsol 1" and press enter, etc.

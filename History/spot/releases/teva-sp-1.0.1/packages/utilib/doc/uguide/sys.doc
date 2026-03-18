@@ -1,0 +1,20 @@
+/*!
+ * \page sys
+
+\section sys System Support
+
+
+The \c utilib/src/sys directory contains definitions for a variety of
+support functions, including functions that are system-specific. These
+functions are defined in the following header files:
+  - _generic.h
+  - alloc.h
+  - errmsg.h
+  - general.h
+  - real.h
+  - seconds.h
+  - signalError.h
+  - stdlibmpi.h
+  - utilib_dll.h
+
+*/

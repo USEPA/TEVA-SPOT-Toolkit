@@ -1,0 +1,9 @@
+//There's no documentation for the SparseMatrix stuff.  Here's a repeat of
+//the definition, just to avoid searching around for it.  It would be nice
+//if we could find the real documentation -- CAP 3/24/98
+
+//
+// This has been supplanted by the SparseMatrix class, which is now located 
+// in the utilib/src/adt directory.
+// WEH 11/99
+//

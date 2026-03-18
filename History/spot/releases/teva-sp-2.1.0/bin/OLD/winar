@@ -1,0 +1,39 @@
+#!/bin/sh
+#
+# cclib
+# Wrapper around MS's lib.exe to make it act more like 'ar' 
+#
+
+usage()
+{
+    cat <<EOF
+Usage: cclib [OPTIONS]
+
+cclib is a wrapper around Microsoft's lib.exe.
+EOF
+    exit $1
+}
+
+opt="/nologo"
+
+tmp=`echo "$1" | sed 's/\/cygdrive\/c/c:/'`;
+tmp=`echo "$tmp" | sed 's/\(.*\)\/lib\(.*\)\.a/\1\/\2.lib/'`;
+tmp=`echo "$tmp" | sed 's/lib\(.*\)\.a/\1.lib/'`;
+shift
+
+while test $# -gt 0; do
+  file=`echo "$1" | sed 's/\/cygdrive\/c/c:/'`;
+
+  if [ -e $tmp ]; then
+     echo "lib $opt $tmp $file"
+     eval "lib $opt $tmp $file"
+  else
+     echo "lib $opt /out:$tmp $file"
+     eval "lib $opt /out:$tmp $file"
+  fi
+  shift
+done
+
+exit 0
+
+    

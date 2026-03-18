@@ -1,0 +1,246 @@
+/*  _________________________________________________________________________
+ *
+ *  UTILIB: A utility library for developing portable C++ codes.
+ *  Copyright (c) 2001, Sandia National Laboratories.
+ *  This software is distributed under the GNU Lesser General Public License.
+ *  For more information, see the README file in the top UTILIB directory.
+ *  _________________________________________________________________________
+ */
+
+/**
+ * \file math_basic.h
+ *
+ * Defines and constants for basic numerical operations.
+ */
+
+#ifndef utilib_math_basic_h
+#define utilib_math_basic_h
+
+#include <utilib/utilib_config.h>
+#if defined(__cplusplus)
+ #if defined(UTILIB_HAVE_STD)
+ #include <cmath>
+ #include <algorithm>
+ #else
+ #include <math.h>
+ #include <algo.h>
+ #endif
+#else
+ #include <math.h>
+#endif
+#include <utilib/_generic.h>
+#ifdef SOLARIS_CC
+#include <sunmath.h>
+#include <ieeefp.h>
+#endif
+
+/*
+ *
+ * DEFINE MATHEMATICAL CONSTANTS
+ *
+ */
+#if defined(__cplusplus) && defined(UTILIB_HAVE_STD)
+#include <climits>
+#include <cfloat>
+#elif defined(UTILIB_HAVE_LIMITS_H) && defined(UTILIB_HAVE_FLOAT_H)
+#include <limits.h> /* Defines: INT_MAX, LONG_MAX, LLONG_MAX, etc */
+#include <float.h>  /* Defines: FLT_MAX, DBL_MAX, LDBL_MAX, etc */
+#elif UTILIB_HAVE_VALUES_H
+#include <values.h> /* Obsolete: It defines MAXINT, MAXFLOAT, etc. */
+#else
+#error "configure should fail if these headers are absent"
+#endif
+
+#ifndef MAXINT
+#define MAXINT INT_MAX
+#endif
+
+#ifndef MAXFLOAT
+#define MAXFLOAT FLT_MAX
+#endif
+
+#ifndef MAXDOUBLE
+#define MAXDOUBLE DBL_MAX
+#endif
+
+#ifdef LDBL_MAX
+#undef  MAXLONGDOUBLE
+#define MAXLONGDOUBLE LDBL_MAX
+#endif
+
+
+#if 0
+#if defined(DOXYGEN)
+/* A definition for pi. */
+const long double M_PI = 3.1415926535897932384626433832795029L;
+/* A definition for e. */
+const long double M_E  = 2.71828
+#endif
+
+/* TODO: Why these special definitions of PI?  What do we want
+ * autoconf to test for?
+ * Do we really want to try to define MAXINT when it is not defined
+ * in a header file?
+ * What is the purpose of the DOXYGEN sections?  Why bother?
+ */
+#if defined(DARWIN)
+const double PI      = 3.1415926535897932384626433832795029L;
+
+#elif !defined(RS6K)
+const long double PI = 3.1415926535897932384626433832795029L;
+#endif
+
+#ifndef MAXINT
+#define MAXINT (int)(~((int)0) ^ (1 << (sizeof(int)*8-1)))
+#endif
+
+/**
+ * \def MAXINT
+ *
+ * The maximum integer value, which is system dependent.
+ */
+#if defined(DOXYGEN)
+#ifdef MAXINT
+#undef MAXINT
+#endif
+#define MAXINT
+#endif
+
+/**
+ * \def PI
+ *
+ * The value of pi, which may be defined by the system.
+ */
+#if defined(DOXYGEN)
+#ifdef PI
+#undef PI
+#endif
+#define PI
+#endif
+
+/**
+ * \def MAXFLOAT
+ *
+ * The maximum double value, which is system dependent.
+ */
+#if defined(DOXYGEN)
+#ifdef MAXFLOAT
+#undef MAXFLOAT
+#endif
+#define MAXFLOAT
+#endif
+
+/**
+ * \def MAXDOUBLE
+ *
+ * The maximum double value, which is system dependent.
+ */
+#if defined(DOXYGEN)
+#ifdef MAXDOUBLE
+#undef MAXDOUBLE
+#endif
+#define MAXDOUBLE
+#endif
+#endif
+
+
+#if defined(__cplusplus)
+namespace utilib {
+
+//#ifdef UTILIB_HAVE_NAMESPACES
+//using std::max;
+//using std::min;
+//using std::swap;
+//#endif
+
+/*
+ * 
+ * OPERATIONS ON SIMPLE VALUES
+ *
+ */
+
+
+/* Returns +1 if argument is positive, -1 if it is negative, and 0 otherwise. */
+template<class T>
+inline int sgn(const T& thing)
+{
+  if (thing > 0)
+    return 1;
+  if (thing < 0)
+    return -1;
+  return 0;
+}
+
+}
+#endif
+
+/*
+ *
+ * MISCELLANEOUS 
+ *
+ */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+/* Compute the number of lines in file filename. */
+int calc_filesize(char* filename);
+
+/**
+ * Return the integer value of the rounded value of x.  
+ * If the fractional part of x is less than 0.5, then x is
+ * rounded down.  Otherwise, x is rounded up.
+ */
+#ifndef UTILIB_HAVE_LROUND
+#ifndef DOXYGEN
+long int lround _((double x));
+#else
+long int lround(double x);
+#endif
+#endif
+
+/**
+ * A method for rounding a double to num_digits
+ * number of decimal digits after the decimal point.
+ */
+double d_round(double to_round, unsigned int num_digits);
+
+#if 0
+/* Setup the data structures for bufexp. */
+#ifndef DOXYGEN
+void setup_bufexp _((int tabsz, double xmin, double xmax));
+#else
+void setup_bufexp(int tabsz, double xmin, double xmax);
+#endif
+
+/* Compute the exponential function using fast buffered interpolation. */
+#ifndef DOXYGEN
+double bufexp _((double x));
+#else
+double bufexp(double x);
+#endif
+#endif
+
+#ifdef __cplusplus
+}
+#endif
+
+#if 0
+/**
+ * \def Exp(x)
+ *
+ * A macro masks the 'exp' function, possibly replacing it with bufexp to 
+ * accelerate the calculation of 'exp'.
+ *
+ * TODO: Do we want BUFFERED_EXP to be determined by a configure
+ *       command line option?
+ */
+#ifdef BUFFERED_EXP
+#define Exp(x)	bufexp(x)
+#else
+#define Exp(x)	exp(x)
+#endif
+#endif
+
+#endif

@@ -1,0 +1,46 @@
+CP := /bin/cp -p
+LN := ln -s
+
+###############################################################################
+CC := gcc
+DEPCC := gcc -MM
+
+CXX := g++
+DEPCXX := g++ -MM
+
+FF := g77
+DEPFF := g77 -MM
+
+###############################################################################
+
+ifeq ($(OptLevel),-O)
+    OPTFLAG = -O6
+else
+    OPTFLAG = $(OptLevel)
+endif
+
+compilerOptFlags := -O -O1 -O2 -O3 -O4 -O5 -O6
+
+###############################################################################
+
+SYSLD += 
+STATICSYSLD += -static 
+
+###############################################################################
+
+SHARED_LIBEXT := .dylib
+STATIC_LIBEXT := .a
+
+ifeq (${LibType},SHARED)
+  LD  := g++ -o
+  LIBLDFLAGS := -dynamiclib -undefined dynamic_lookup
+  LIBEXT := $(SHARED_LIBEXT)
+  CXXFLAGS += -fPIC
+else
+  LD  := libtool -static -s -o
+  LIBLDFLAGS :=
+  LIBEXT := $(STATIC_LIBEXT)
+  CXXFLAGS +=
+endif
+
+EFENCE := -lefence

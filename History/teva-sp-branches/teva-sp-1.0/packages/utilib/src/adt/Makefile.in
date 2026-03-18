@@ -1,0 +1,12 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+LIBRARY=libutilib
+
+
+SRCS =  CharString.cpp BitArray.cpp \
+	MixedIntVars.cpp lookupa.cpp \
+	hash_fn.cpp Ereal.cpp
+
+include ../MakeMacros
+

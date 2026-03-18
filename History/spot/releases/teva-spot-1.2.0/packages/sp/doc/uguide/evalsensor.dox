@@ -1,0 +1,265 @@
+/*! 
+ * \page evalsensorExecutable Executable evalsensor
+
+
+\section evalsensorOverview Overview
+
+The <b>evalsensor</b> executable is used to compute information about the the impact of contamination events for one (or more) sensor placements.
+
+
+\section evalsensorUsage Usage
+
+\verbatim
+   evalsensor [options...] <sensor-file> <impact-file1> [<impact-file2> ... ]
+\endverbatim
+
+
+\section evalsensorOptions Options
+
+\verbatim
+   --debug
+        For each set of sensor locations, output information about each event
+
+   --delay=<minutes>
+        Specifies the response delay used when evaluating sensor placements.
+
+   --gamma=<double>
+        Specifies the fraction of the tail distribution used to compute the VaR
+        and TCE performance measures. (The default value is 0.05.)
+
+   --format=(cout|xls|xml)
+        Controls the type of output that the evaluation will generate:
+          cout  Generates output that is easily read. (default)
+          xls   Generates output that is easily imported into a MS Excel
+                spreadsheet.
+          xml   Generates an XML-formated output that is used to communicate
+                with the TEVA GUI.  (Not currently supported.)
+
+   --event-probabilities=<filename>
+        Specifies a file with the probability of the different contamination
+        scenarios.  (Not currently supported.)
+
+   --nodemap=<filename>
+        Specifies a file with the node map information, for translating node
+        IDs into junction labels.
+
+   --costs=<filename>
+        Specifies a file with the cost information for each location id.
+
+   --sc-probabilities=<filename>
+        Specifies a file with the probability of detection for each sensor
+        category.
+
+   --scs=<filename>
+        Specifies a file with the sensor category information for each
+        location id.
+
+arguments:
+
+   <sensor-file>
+        A sensor placement file, which contains one or more sensor
+        placements that will be evaluated.
+
+   <impact-file>
+        An impact file, which contains the impact data concerning a
+        contamination event.  If one or more impact files are specified, then
+        evaluations are performed for each impact separately.
+\endverbatim
+
+
+\section evalsensorArguments Arguments:
+
+\verbatim
+   <sensor-file>
+        A sensor placement file, which contains one or more sensor
+        placements that will be evaluated.
+
+   <impact-file>
+        An impact file, which contains the impact data concerning a
+        contamination event.  If one or more impact files are specified, then
+        evaluations are performed for each impact separately.
+\endverbatim
+
+
+\section Description
+
+The <b>evalsensor</b> executable takes sensor placements in a \ref
+sensorPlacementFile and evaluates them using data from an \ref impactFile
+(or a list of impact files).  This executable measures the performance of
+each sensor placement with respect to the set of possible contamination
+locations.  This analysis assumes that probabilities have been assigned
+to these contamination locations.  The following measures are supported:
+<ul>
+
+<li> <b>min</b> - The minimum impact over all contamination events.
+If we make the 
+assumption that a sensor protects the node at which it is placed, then this
+measure will generally be zero.
+
+<li> <b>mean</b> - The mean (or average) impact over all contamination events.
+
+<li> <b>lower quartile</b> - 25% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>median</b> - 50% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>upper quartile</b> - 75% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>VaR</b> - The value at risk (VaR) uses a user-defined quantile: alpha.
+100*alpha% of contamination events,
+weighted by their likelihood, have an impact value less than this quantile.
+
+<li> <b>TCE</b> - The tailed-conditioned expectation (TCE) is the mean value
+of the impacts that are greater than or equal to VaR.
+
+<li> <b>worst</b> - The value of the worst impact.
+
+</ul>
+
+
+\section Example
+
+The following example illustrates the use of <b>evalsensor</b> after 
+running the <b>test1</b> test in teva-sp/packages/sp/test.
+
+\verbatim
+../../../bin/evalsensor test1.sensors test1_ec.impact
+------------------------------------------------------------------------------
+Sensor placement id:        41
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            19 28 54 63 75
+Sensor junctions:
+
+Impact File:                test1_ec.impact
+Number of events          : 236
+Min impact:                 0
+Mean impact:                8446.76
+Lower quartile impact:      0
+Median impact:              6949
+Upper quartile impact:      12530
+Value at Risk (VaR) (  5%): 25960
+TCE                 (  5%): 33323.3
+Max impact:                 42994.8
+------------------------------------------------------------------------------
+
+jberry@S868904 ~/release/TEVA/teva-sp/packages/sp/test
+$ ../../../bin/evalsensor --format=xls test1.sensors test1_ec.impact
+Sensor ID       Num Sensors     Cost    ImpactFile      Num Events     Min
+Mean    Lower Quartile  Median  Upper Quartile  VaR     TCE     Max
+41      5       0       test1_ec.impact 236     0       8446.76 0       6949
+12530   25960   33323.3 42994.8
+41      41      41      41
+test1_ec.impact test1_ec.impact test1_ec.impact test1_ec.impact
+236     236     236     236
+Event ID       Witness Location Index  Witness Location ID     Impact
+
+1       -1              1650
+2       -1              0
+3       54              37675
+4       54              17470
+\endverbatim
+
+\section Example2
+
+Suppose now that sensors can fail, and there is is some small number of
+different classes of sensors (grouped by false negative probability).
+The test.imperfectsc file located in the test directory defines such a set
+of classes:  
+
+\verbatim
+$ more test1.imperfectsc
+1 0.25
+2 0.50
+3 0.75
+4 1.0
+\endverbatim
+
+Sensors of class "1" give false negative readings 25% of the time, sensors
+of class "2" give them 50% of the time, etc.  
+
+Once failure classes have been defined, the nodes of the network are assigned
+to classes.  This is done with another file (a "junction class" or jc file).
+In the test directory, the test1.imperfectsc file maps nodes to classes:
+
+\verbatim
+$ head -20 test1.imperfectjc
+1 1
+2 1
+3 1
+4 1
+5 1
+6 1
+7 1
+8 1
+9 1
+10 1
+11 1
+12 1
+13 1
+14 1
+15 1
+16 1
+17 1
+18 1
+19 1
+20 1
+....
+....
+\endverbatim
+
+Given the node classes, we may run evalsensor again to determine the
+expected impact of a sensor placement, given that sensors may fail.  Using
+the solution found in the previous example:
+
+\verbatim
+$ ../../../bin/evalsensor --sc-probabilities=test1.imperfectsc --scs=test1.impe
+rfectjc test1.sensors test1_ec.impact
+------------------------------------------------------------------------------
+Sensor placement id:        41
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            19 28 54 63 75
+Sensor junctions:
+
+Impact File:                test1_ec.impact
+Number of events          : 236
+Min impact:                 0
+Mean impact:                17099.5
+Lower quartile impact:      3940
+Median impact:              14952.3
+Upper quartile impact:      26486.8
+Value at Risk (VaR) (  5%): 47554.6
+TCE                 (  5%): 54891.4
+Max impact:                 75426.7
+------------------------------------------------------------------------------
+\endverbatim
+
+Note that the mean impact of this "extent of contamination" changes 
+dramatically if sensors are allowed to fail.  The original solution,
+8446.76 pipe feet, was misleading if sensors fail according to the 
+probabilities we have assigned.  Now, the expected impact is 17,099.5
+pipe feet -- more than twice the "perfect sensor" impact.
+
+The "sp" executable documentation describes how to find solutions that
+take sensor imperfections into account.
+
+
+\section Notes
+
+This executable needs to be extended to generate the distribution 
+of impact values for every contamination event.  However, we have not agreed
+on the format for this information.
+
+This executable will not work properly if sensor placements in 
+a \ref sensorPlacementFile have the same ID.  In particular, only the last 
+sensor placement with a given ID will be evaluated.
+
+Cost computations are not currently supported.
+
+This executable appears to run unreasonably slow on even moderatly large
+data sets.
+
+*/

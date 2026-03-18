@@ -1,0 +1,54 @@
+/AUTHORS/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpCholeskyBase.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpCholeskyDense.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpCholeskyTaucs.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpCholeskyUfl.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpCholeskyWssmp.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpCholeskyWssmpKKT.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpDualRowDantzig.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpDualRowPivot.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpDualRowSteepest.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpDummyMatrix.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpDynamicExampleMatrix.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpDynamicMatrix.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpEventHandler.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpFactorization.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpGubDynamicMatrix.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpGubMatrix.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpHelperFunctions.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpInterior.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpLinearObjective.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpMatrixBase.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpMessage.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpModel.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpNetworkBasis.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpNetworkMatrix.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpNonLinearCost.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpObjective.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpPackedMatrix.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpPlusMinusOneMatrix.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpPredictorCorrector.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpPresolve.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpPrimalColumnDantzig.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpPrimalColumnPivot.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpPrimalColumnSteepest.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpQuadraticObjective.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpSimplex.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpSimplexDual.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpSimplexNonlinear.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpSimplexOther.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpSimplexPrimal.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/ClpSolve.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/Clp_1.01.01.tar.gz/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/Clp_1.01.02.tar.gz/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/Clp_C_Interface.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/INSTALL/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/IdiSolve.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/Idiot.cpp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/Makefile/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/Makefile.Clp/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+/README/1.1.1.1/Thu May 11 21:21:21 2006//Tteva_sp_02_01
+D/Docs////
+D/Samples////
+D/Test////
+D/include////

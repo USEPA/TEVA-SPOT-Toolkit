@@ -1,0 +1,39 @@
+#-----------------------------------------------------#
+# Target ARCHitecture dependent definitions - LINUX   #
+#-----------------------------------------------------#
+
+AR		= winar
+ARFLAGS		= 
+RANLIB		= echo
+ARCLEAN		= echo
+
+CC              = wincc
+CWARNINGS       = -I/Program\ Files/Microsoft\ Visual\ Studio\ .Net\ 2003/Vc7/include /EHs /D_USE_MATH_DEFINES -I/Program\ Files/Microsoft\ Visual\ Studio\ .NET\ 2003/Vc7/PlatformSDK/Include
+CC_SHARED	= 
+ 
+CCC             = wincc
+C++             = $(CCC)
+C++WARNINGS     = -I/Program\ Files/Microsoft\ Visual\ Studio\ .Net\ 2003/Vc7/include /EHs /D_USE_MATH_DEFINES
+C++_SHARED	= 
+ 
+F77		= 
+FFLAGS		= 
+F_SHARED	=
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= 
+LDFLAGS		=
+OPTIMIZATION	= -O #/O2
+
+ARCH_LIB_PATH	=
+ARCH_LIBS	= 
+ARCH_INCLUDES	= -I.
+ARCH_FLAGS	= -DWINDOWS -DANSI_HDRS -DANSI_NAMESPACES -DNO_TEMPLATE_TEMPLATE_PARAMETERS
+XTRAFLAGS	= 
+PROFILE_FLAG	= 
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = install_library

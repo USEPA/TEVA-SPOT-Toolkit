@@ -1,0 +1,38 @@
+#----------------------------------------------------#
+# Target ARCHitecture dependent definitions - CPLANT #
+#----------------------------------------------------#
+
+AR		= ar
+ARFLAGS		= ruv
+RANLIB		= ranlib
+ARCLEAN		= $(RM)
+
+CC              = /home/wehart/bin/cplant_gcc3
+CWARNINGS       = $(C++WARNINGS)
+CC_SHARED	=
+ 
+CCC             = /home/wehart/bin/cplant_g++3
+C++             = $(CCC)
+C++WARNINGS     = #-tlocal -fast
+C++_SHARED	=
+ 
+F77		= f77
+FFLAGS		= #-fast -O4 -native -libmil #-u
+F_SHARED	=
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= 
+LDFLAGS		=
+OPTIMIZATION	= -O
+
+ARCH_LIB_PATH	=
+ARCH_LIBS	= 
+ARCH_INCLUDES	= -I. -I/usr/include/X11
+ARCH_FLAGS	= -DUNIX -DCPLANT -DMULTITASK -DANSI_NAMESPACES
+XTRAFLAGS	= 
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard

@@ -1,0 +1,4 @@
+
+The 'interface' library provides a global interface to IO control routines.
+This includes a macro definition for cout/cin/cerr as well as routines
+to synchronize IO among parallel processes.

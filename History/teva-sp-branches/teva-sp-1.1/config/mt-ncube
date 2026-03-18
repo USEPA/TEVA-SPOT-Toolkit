@@ -1,0 +1,38 @@
+#-----------------------------------------------------#
+# Target ARCHitecture dependent definitions - nCUBE   #
+#-----------------------------------------------------#
+
+AR		= nar
+ARFLAGS		= ruv
+RANLIB		= /usr/bin/true 
+ARCLEAN		= $(RM)
+
+CC		= ngcc
+CWARNINGS	= 
+CC_SHARED	=
+
+CCC		= ng++
+C++		= $(CCC)
+C++WARNINGS	= -Wall -Wstrict-prototypes -Wmissing-prototypes -Winline
+C++_SHARED	=
+
+F77		= nf77
+FFLAGS		= $(ARCH_FLAGS)
+F_SHARED	=
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= 
+LDFLAGS		=
+OPTIMIZATION	= -O
+
+ARCH_LIB_PATH	=
+ARCH_LIBS	= -ll -lnpara -lm
+ARCH_INCLUDES	= -I.
+ARCH_FLAGS	= -DnCUBE2
+XTRAFLAGS	= 
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH	=
+LIBRARY_TARGET  = library_standard

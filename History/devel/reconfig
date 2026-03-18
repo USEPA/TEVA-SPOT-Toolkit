@@ -1,0 +1,45 @@
+#! /usr/bin/env python
+#
+# A script to reconfigure externals for configuration files
+#
+
+import ConfigParser
+import glob
+import os
+import sys
+import commands
+
+def create(name,type):
+    #
+    if not os.path.exists(name+'_'+type):
+        print commands.getoutput('svn mkdir '+name+'_'+type)
+    #
+    externals = []
+    for section in config.sections():
+        for option in config.options(section):
+            if option in 'release':
+                externals.append(section+' '+config.get(section,option))
+            elif option == 'root':
+                externals.append(section+' '+config.get(section,option)+'/'+type)
+    if len(externals) > 0:
+        os.chdir(name+'_'+type)
+        OUTPUT = open('Externals','w')
+        print >>OUTPUT, '\n'.join(externals)
+        OUTPUT.close()
+        commands.getoutput('svn add Externals')
+        commands.getoutput('svn propset -F Externals svn:externals .')
+        commands.getoutput('svn commit -m "Updating externals"')
+        os.chdir('..')
+
+for file in glob.glob("../vpy/*.ini"):
+    print "Processing "+file
+    config = ConfigParser.ConfigParser()
+    config.read(file)
+    #
+    name = os.path.splitext(os.path.basename(file))[0]
+    create(name,'trunk')
+    create(name,'stable')
+
+        
+        
+    

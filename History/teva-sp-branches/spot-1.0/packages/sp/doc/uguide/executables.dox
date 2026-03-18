@@ -1,0 +1,30 @@
+/*! 
+ * \page executables
+
+
+\section executables Executables
+
+/*
+\latexonly
+\newpage
+\endlatexonly
+
+\subsection spExec sp
+
+
+\subsection evalsensorExec evalsensor
+
+\subsubsection Usage
+\verbatim
+evalsensor [--delay=<minutes>] [--format=(cout|xml|xls)] [--probabilities=<filename>] <sensor-file> <impact-file1> [<impact-file2> ... ]
+\endverbatim
+
+
+\subsection tso2ImpactExec tso2Impact
+
+
+\subsection setupIPDataExec setupIPData
+*/
+
+
+*/

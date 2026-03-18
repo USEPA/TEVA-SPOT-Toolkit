@@ -1,0 +1,22 @@
+teva-spot
+  William Hart - contributor & PM
+  Jean-Paul Watson - grasp heuristic
+  Cynthia Phillips - integer programming optimizers
+  Lee Ann Fisk - teva-cat and configuration system
+  Jon Berry - contributor
+
+packages/tevaUtils
+  An Argonne National Laboratory package developed by Tom Taxon
+
+packages/sim
+  An Argonne National Laboratory package developed by Tom Taxon,
+  that includes the EPA's EPANET software
+
+packages/acro-pico
+  A Sandia National Laboratories optimization package
+
+packages/gmp
+  The GNU multi-precision package
+
+packages/fast
+  A nightly testing framework develop by Sandia National Laboratories

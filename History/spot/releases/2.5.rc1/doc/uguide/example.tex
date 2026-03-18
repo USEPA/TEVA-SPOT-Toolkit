@@ -1,0 +1,151 @@
+This section provides an introduction to the process of sensor placement, the use of SPOT command-\/line tools, and the installation of the SPOT executables.
+
+\section{Approaches to Sensor Placement}\label{example_gStarted1}
+
+Sensor placement strategies can be broadly characterized by the technical approach and the type of computational model used. For a review of sensor placement methods, see Hart and Murray, JWRPM November 2010. The following categories reflect important differences in proposed sensor placement strategies:
+\begin{itemize}
+
+\item {\bfseries Expert} {\bfseries Opinion:} Although expertise with water distribution systems is always needed to design an effective CWS, some approaches are solely guided by expert judgment. For example, Berry et al. \cite{BerHarPhiUbeWal05} and Trachman \cite{Tra06} consider sensor placements developed by experts with significant knowledge of water distribution systems. These experts did not use computational models to carefully analyze network dynamics. Instead, they used their experience to identify locations whose water quality is representative of water throughout the network.
+
+\item {\bfseries Ranking} {\bfseries Methods:} A related approach is to use preference information to rank network locations 
+\cite{BahSamGraAmsPic03,Chastain04}. In this approach, a user provides preference values for the properties of a ''desirable'' sensor location, such as proximity to critical facilities. These preferences can then be used to rank the desirability of sensor locations throughout the network. Further, spatial information can be integrated to ensure good coverage of the network.
+
+\item {\bfseries Optimization:} Sensor placement can be automated with optimization methods that computationally search for a sensor configuration that minimizes contamination risks. Optimization methods use a computational model to estimate the performance of a sensor configuration. For example, a model might compute the expected impact of an ensemble of contamination incidents, given sensors placed at strategic locations.
+
+Optimization methods can be further distinguished by the type of computational model that they use. Early sensor placement research focused on models that used simplified network models derived from contaminant transport simulations. For example, hydraulic simulations can be used to model stable network flows 
+\cite{BerFleHarPhiWat05}, or to generate an {\itshape averaged\/} water network flow model \cite{OstSal04}.
+
+More recently, researchers have used models that directly rely on contaminant transport simulation results. Simulation tools, like EPANET \cite{EPANET}, perform extended-\/period simulation of the hydraulic and water quality behavior within pressurized pipe networks. These models can evaluate the expected flow in water distribution systems, and they can model the transport of contaminants and related chemical interactions. Thus, the CWS design process can directly minimize contamination risks by considering simulations of an ensemble of contamination incidents, which reflect the impact of contamination at different locations, times of the day, etc.
+
+\end{itemize}
+
+SPOT development has focused on optimization methods, and in particular on methods that use contaminant transport simulation. Contaminant transport simulation models can directly model contamination risks, and consequently optimization methods using these models have proven effective at minimizing risk. Comparisons with expert opinion and ranking methods suggest that these approaches are not as effective in large, complex networks \cite{Ost07,BerHarPhiUbeWal05}. Further, optimization methods using simpler models can fail to capture important transient dynamics (see Berry et al. 
+\cite{BerHarPhi05} for a comparison).
+
+A key issue for the simulation-\/based optimization methods is that they require the simulation of a potentially large number of contamination incidents. Consequently, it is very expensive to apply generic optimization methods like evolutionary algorithms 
+\cite{OstSal04}. However, Berry et al. 
+\cite{BerHarPhiUbeWat06} have shown that these simulations can be performed in an off-\/line preprocessing step that is done in advance of the optimization process. Thus, the time needed for simulation does not necessarily impact the time spent performing sensor placement.
+
+\section{The Main Steps in Using SPOT}\label{example_gStarted3}
+
+The following example illustrates the main steps required to (1)
+simulate contamination incidents, (2) compute contamination impacts,
+(3) perform sensor placement, and (4) evaluate a sensor placement. This
+example places sensors in EPANET Example 3 (Net3), a small distribution
+system with 97 junctions.
+
+The data files used in this example are available with the SPOT software package (C:$\backslash$spot$\backslash$examples$\backslash$simple directory).  Installation instruction are included in \doxyref{Section 2.3}{p.}{example_gStarted5}. In general, a user will need to use a variety of data sources to develop a sensor placement model. Data requirements for TEVA-SPOT are described in detail in the \doxyref{Appendix}{p.}{dataRequire}.  File formats are described in \doxyref{Section 6}{p.}{fileFormats}. 
+%The file C:$\backslash$spot$\backslash$doc$\backslash$SPOT\_\-DataRequirements.doc discussess the type of data used in TEVA-\/SPOT in greater detail.
+
+\subsection{Simulating Contamination Incidents}\label{example_gStartedTEVASIM}
+
+Simulation of contamination incidents is performed with the {\ttfamily tevasim} command, which iteratively calls EPANET to simulation an ensemble of contamination incidents. The {\ttfamily tevasim} command has the following inputs and outputs: 
+\begin{itemize}
+\item {\bfseries Inputs:} 
+\begin{itemize}
+\item TSG File: defines an ensemble of contamination scenarios 
+\item INP File: the EPANET input file for the network 
+\end{itemize}
+\item {\bfseries Outputs:} 
+\begin{itemize}
+\item ERD File: a binary file that stores the contamination results for all incidents (ERD database files include a erd, index.erd, hyd.erd, and qual.erd file) 
+\item OUT File: a plain text log file 
+\end{itemize}
+\end{itemize}For example, the file C:$\backslash$spot$\backslash$examples$\backslash$simple$\backslash$Net3.tsg defines an ensemble of contamination scenarios for Net3. Contamination incidents are simulated for all network junctions, one for each hour of the day, and each contamination incident models an injection that continues for 24 hours. The {\ttfamily tevasim} command performs these contaminant transport simulations, using the following command line: 
+\lstinputlisting[firstline=9,lastline=9]{examples/simple1.sh}% anchor=tevasim
+
+
+\subsection{Computing Contamination Impacts}\label{example_gStartedTSO2IMPACT}
+
+TSO and ERD files contain raw data about the extent of a contamination throughout a network. This data needs to be post-\/processed to compute relevant impact statistics. The {\ttfamily tso2Impact} command processes a TSO and ERD files and generates one or more IMPACT files. An IMPACT file is a plain text file that summarizes the consequence of each contamination incident in a manner that facilitates optimization. The {\ttfamily tso2Impact} command has the following inputs and outputs: 
+\begin{itemize}
+\item {\bfseries Inputs:} 
+\begin{itemize}
+\item ERD or TSO File: a binary file that stores the contamination result data generated by {\ttfamily tevasim} 
+\end{itemize}
+\item {\bfseries Outputs:} 
+\begin{itemize}
+\item IMPACT File(s): plain text files that summarize the observed impact at each location where a contamination incident could be observed by a potential sensor. 
+\item NODEMAP File(s): plain text files that map sensor placement ids to the network junction labels (defined by EPANET). 
+\end{itemize}
+\end{itemize}The {\ttfamily tso2Impact} command generates IMPACT files with the following command line: 
+\lstinputlisting[firstline=17,lastline=17]{examples/simple1.sh}% anchor=tso2Impact
+
+ This command generates IMPACT files for each of the five objectives specified: mass consumed (mc), volume consumed (vc), time to detection (td), number of failed detections (nfd) and extent of contamination (ec). For each impact file (e.g. {\ttfamily Net3\_\-mc.impact}), a corresponding id file is generated (e.g. {\ttfamily Net3\_\-mc.impact.id}).
+
+The ERD file format replaced the TSO and SDX index file format, created by previous versions of {\ttfamily tevasim}, to extend {\ttfamily tevasim} capability for multi-specie simulation using EPANET-MSX.  While {\ttfamily tevasim} produces only ERD files (even for single specie simulation), {\ttfamily tso2Impact} accepts both ERD and TSO file formats.
+
+\subsection{Performing Sensor Placement}\label{example_gStartedSP}
+
+An IMPACT file can be used to define a sensor placement optimization problem. The standard problem supported by SPOT is to minimize the expected impact over an ensemble of incidents while limiting the number of potential sensors. By default, sensors can be placed at any junction in the network. The {\ttfamily sp} command coordinates the application of optimization solvers for sensor placement. The {\ttfamily sp} command has a rich interface, but the simplest use of it requires the following inputs and outputs: 
+\begin{itemize}
+\item {\bfseries Inputs:} 
+\begin{itemize}
+\item IMPACT File(s): plain text files that summarize the observed impact at each location 
+\item NODEMAP File(s): plain text files that map sensor placement ids to the network junction labels 
+\end{itemize}
+\item {\bfseries Outputs:} 
+\begin{itemize}
+\item SENSORS File: a plain text file that summarizes the sensor locations identified by the optimizer 
+\end{itemize}
+\end{itemize}For example, the command 
+\lstinputlisting[firstline=22,lastline=23]{examples/simple1.sh}% anchor=sp
+generates the file {\ttfamily Net3.sensors}, and prints a summary of the impacts for this sensor placement.
+
+\subsection{Evaluating a Sensor Placement}\label{example_gStartedEVALSENSOR}
+
+The final output provided by the {\ttfamily sp} command is actually generated by the {\ttfamily evalsensor} command, and this command can be directly used to evaluate a sensor placement for a wide variety of different objectives. The {\ttfamily evalsensor} command requires the following inputs: 
+\begin{itemize}
+\item {\bfseries Inputs:} 
+\begin{itemize}
+\item 
+\item IMPACT File(s): plain text files that summarize the observed impact at each location 
+\item NODEMAP File(s): plain text files that map sensor placement ids to the network junction labels 
+\item SENSORS File: a plain text file that defines a sensor placement 
+\end{itemize}
+\end{itemize}For example, the command
+\lstinputlisting[firstline=27,lastline=28]{examples/simple1.sh}% anchor=evalsensor
+will summarize the solution in the {\ttfamily Net3.sensors} file for the {\ttfamily ec}, {\ttfamily mc} and {\ttfamily nfd} impact measures. No files are generated by {\ttfamily evalsensors}.
+
+\section{Installation and Requirements for Using SPOT}\label{example_gStarted5}
+
+Instructions for installing SPOT in Unix are included in the \doxyref{Appendix}{p.}{unixInstall}.
+
+To install SPOT on MS Windows platforms, an installer executable can be downloaded from \begin{verbatim}
+   https://software.sandia.gov/trac/spot/downloader
+\end{verbatim}
+ Note that the first time this page is accessed, the user must register. When run, this installer places the SPOT software in the directory
+\begin{verbatim}
+   C:\tevaspot
+\end{verbatim}
+ The installer places executables in the directory
+\begin{verbatim}
+   C:\tevaspot\bin
+\end{verbatim}
+ This directory should be added to the system PATH environment variable to allow SPOT commands to be run within any DOS shell.
+
+Some of the SPOT commands use the Python scripting language. Python is not commonly installed in MS Windows machines, but an installer script can be downloaded from
+\begin{verbatim}
+   http://www.python.org/download/
+\end{verbatim}
+ The system path needs to be modified to include the Python executable. A nice video describing how to edit the system path is available at:
+\begin{verbatim}
+   http://showmedo.com/videos/video?name=960000&fromSeriesID=96
+\end{verbatim}
+
+
+No other utilities need to be installed to run the SPOT commands. EPANET is linked into the {\ttfamily tevasim} executable. Detailed information about the SPOT commands is provided on the SPOT wiki: \begin{verb}
+   https://software.sandia.gov/trac/spot/wiki/Tools
+\end{verb}
+
+
+Note that all SPOT commands need to be run from the DOS command shell. This can be launched from the \char`\"{}Accessories/Command Prompt\char`\"{} menu. Numerous online tutorials can provide information about DOS commands. For example, see \begin{verb} http://en.wikipedia.org/wiki/List_of_DOS_commands \end{verb} or \begin{verb} http://www.computerhope.com/msdos.htm \end{verb}
+
+
+The plain text input files used by SPOT can be edited using standard text editors. For example, at a DOS prompt you can type \begin{verb}
+  notepad Net3.tsg
+\end{verb}
+ to open up the {\ttfamily Net3.tsg} file with the MS Windows Notepad application. The plain text output files can be viewed in a similar manner. The binary files generated by SPOT cannot be viewed in this manner. Generally, output files should not be modified manually since many are used as input to other programs.
+
+\section{Reporting Bugs and Feature Requests}\label{example_gStarted6}
+The TEVA-\/SPOT development team uses Trac tickets to communicate requests for features and bug fixes. The TEVA-\/SPOT Trac site can can be accessed at: \begin{verb} https://software.sandia.gov/trac/spot \end{verb}. External users can insert a ticket, which will be moderated by the developers. Note that this is the only mechanism for ensuring that bug fixes will be made a high priority by the development team. 

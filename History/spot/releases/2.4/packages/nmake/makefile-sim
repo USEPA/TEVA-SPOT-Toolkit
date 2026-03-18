@@ -1,0 +1,348 @@
+##
+## nmake file - to build in compiler console window for
+##    microsoft compiler (cl) or compilers (like intel's icl)
+##    which try to be mostly compatible (but better)
+##
+## build epanet codes
+##
+## it expects to find a writeable spot source directory at TOP
+##
+## "nmake all" builds static libraries and executables
+## 
+## To build shared libraries:
+##
+##  nmake /F makefile-sim dlls JDK_ROOT=C:\Java\jdk1.6.0
+##
+## TODO create a make check that runs some executables
+
+TOP=..\..
+
+DEBUGGING_SYMBOLS=/Z7
+
+PACKAGES=$(TOP)\packages
+TPL=$(TOP)\tpl
+
+!if $(BITS)==64
+LIBSUBDIR=win64
+!else
+LIBSUBDIR=win32
+!endif
+
+   
+ANLDIR=$(PACKAGES)\tevaUtils\anl
+ANLUTILS_DIR=$(ANLDIR)\ANLUtils
+ANLUTILS_DLL=$(ANLDIR)\libs\$(LIBSUBDIR)\ANLUtils.dll
+ANLUTILS_LIB_DIR=$(ANLDIR)\libs\$(LIBSUBDIR)
+ANLUTILS_LIB=$(ANLUTILS_LIB_DIR)\ANLUtils.lib
+ANLUTILS_INCLUDE=/I $(ANLUTILS_DIR)\include /I $(ANLUTILS_DIR)\src /I $(ANLUTILS_DIR)\include
+
+## TODO how many of these winflags do we actually need
+WINFLAGS=-D_WIN32 -DWIN32 -D_WINDOWS -DWINDOWS
+## _USRDLL and LIBEPANET_JNI_EXPORTS are not found in our sources
+SHAREDFLAGS=-D_USRDLL -DLIBEPANET_JNI_EXPORTS -DDLL
+DONTWARN=/wd4996 /wd4518 /wd4502 /wd4430 /wd4530
+CFLAGS = $(CFLAGS) $(WINFLAGS) $(DONTWARN) -DANSI -DANSI_NAMESPACES $(DEBUGFLAG)
+
+!IFDEF USE_SHARED_FLAGS
+CFLAGS = $(CFLAGS) $(SHAREDFLAGS)
+!ENDIF
+
+##
+## UTILIB LIBRARY - BUILD IT IF NOT ALREADY CREATED
+##
+##
+UTILIB_DIR=$(TPL)\acro\packages\utilib
+UTILIB_LIB_DIR=$(UTILIB_DIR)\mvs\nmake
+UTILIB_LIB=$(UTILIB_LIB_DIR)\static\libutilib.lib
+UTILIB_INCLUDE= \
+  /I $(UTILIB_LIB_DIR) \
+  /I $(UTILIB_DIR)\src
+
+all: $(UTILIB_LIB) \
+     headers \
+     static\libtsoutil.lib \
+     static\libepanet.lib  \
+     static\libtevautil.lib \
+     static\epanet.exe \
+     static\tevasim.exe \
+     static\tso2text.exe \
+     static\tsodiff.exe \
+     static\tsoinfo.exe
+
+dll: dlls
+
+dlls: shared \
+     headers \
+     shared\libtsoutil.dll \
+     shared\libepanet.dll  \
+     shared\libAnalysisModule.dll \
+     shared\libepanet_jni.dll \
+     shared\libTSO.dll 
+
+$(UTILIB_LIB):
+   cd $(UTILIB_LIB_DIR)
+   if not exist static\libutilib.lib $(MAKE) DEBUGFLAG="$(DEBUGFLAG)" static\libutilib.lib
+   cd $(MAKEDIR)
+
+
+##
+## Create a teva_config.h - the configuration file from autotools
+##
+##
+headers:
+    copy teva_config.txt teva_config.h
+
+##
+## Create directories to keep static and shared files separate
+##
+##
+static:
+    @if not exist static mkdir static
+
+shared:
+    @if not exist shared mkdir shared
+
+##
+## TSO_UTIL LIBRARY
+##
+##
+TSO_UTIL_LIB_LOC = $(PACKAGES)\tevaUtils\tso\src
+TSO_UTIL_LIB_C_SRC = $(TSO_UTIL_LIB_LOC)\tso.c
+TSO_UTIL_LIB_C_OBJ = $(TSO_UTIL_LIB_C_SRC:.c=.obj)
+TSO_UTIL_LIB_INCLUDE = /I $(TSO_UTIL_LIB_LOC)
+TSO_UTIL_LIB_FLAGS = -D_FILE_OFFSET_BITS=64
+TSO_UTIL_FLAGS = -DDLL
+
+$(TSO_UTIL_LIB_C_OBJ): $(TSO_UTIL_LIB_C_SRC)
+    $(CC) $(CFLAGS) $(TSO_UTIL_LIB_FLAGS) $(TSO_UTIL_LIB_INCLUDE) /Fo$@ /c $*.c
+
+static\libtsoutil.lib: static $(TSO_UTIL_LIB_C_OBJ)
+    lib /out:static\libtsoutil.lib $(TSO_UTIL_LIB_C_OBJ)
+
+shared\libtsoutil.dll: shared $(TSO_UTIL_LIB_C_OBJ)
+    link $(LINK_FLAGS) /dll /IMPLIB:shared/libtsoutil.lib /out:shared\libtsoutil.dll $(TSO_UTIL_LIB_C_OBJ)
+
+##
+## EPANET LIBRARY
+##
+##
+EPANETLIB_LOC = $(PACKAGES)\sim\TEVAepanet\src
+EPANETLIB_C_SRC = \
+    $(EPANETLIB_LOC)\epanet.c \
+    $(EPANETLIB_LOC)\hash.c \
+    $(EPANETLIB_LOC)\hydraul.c \
+    $(EPANETLIB_LOC)\inpfile.c \
+    $(EPANETLIB_LOC)\input1.c \
+    $(EPANETLIB_LOC)\input2.c \
+    $(EPANETLIB_LOC)\input3.c \
+    $(EPANETLIB_LOC)\mempool.c \
+    $(EPANETLIB_LOC)\output.c \
+    $(EPANETLIB_LOC)\quality.c \
+    $(EPANETLIB_LOC)\report.c \
+    $(EPANETLIB_LOC)\rules.c \
+    $(EPANETLIB_LOC)\smatrix.c 
+
+EPANETLIB_C_OBJ = $(EPANETLIB_C_SRC:.c=.obj)
+EPANETLIB_INCLUDE = /I . /I $(EPANETLIB_LOC)
+EPANETLIB_FLAGS =
+
+{$(EPANETLIB_LOC)}.c.{$(EPANETLIB_LOC)}.obj:
+    $(CC) $(CFLAGS) $(EPANETLIB_FLAGS) $(EPANETLIB_INCLUDE) /Fo$@ /c $*.c
+
+static\libepanet.lib: static $(EPANETLIB_C_OBJ)
+    lib /out:static\libepanet.lib $(EPANETLIB_C_OBJ)
+
+shared\libepanet.dll: shared $(EPANETLIB_C_OBJ)
+    link $(LINK_FLAGS) /dll /IMPLIB:shared/libepanet.lib /out:shared\libepanet.dll $(EPANETLIB_C_OBJ)
+
+##
+## TEVAUTIL LIBRARY
+##
+##
+TEVAUTIL_C_SRC = $(TSO_UTIL_LIB_LOC)\enutil.c
+TEVAUTIL_C_OBJ = $(TEVAUTIL_C_SRC:.c=.obj)
+TEVAUTIL_INCLUDE = /I . /I $(TSO_UTIL_LIB_LOC) /I $(EPANETLIB_LOC)
+TEVAUTIL_FLAGS =
+
+$(TEVAUTIL_C_OBJ): $(TEVAUTIL_C_SRC)
+    $(CC) $(CFLAGS) $(TEVAUTIL_FLAGS) $(TEVAUTIL_INCLUDE) /Fo$@ /c $*.c
+
+static\libtevautil.lib: static $(TEVAUTIL_C_OBJ) static\libepanet.lib static\libtsoutil.lib
+    lib /out:static\libtevautil.lib $(TEVAUTIL_C_OBJ) static\libepanet.lib static\libtsoutil.lib
+
+##
+## ANALYSIS MODULE LIBRARY  (SHARED ONLY)
+##
+##
+
+ANALYSIS_LOC = $(ANLDIR)\src
+ANALYSIS_C_SRC = \
+  $(ANALYSIS_LOC)\namedData.c \
+  $(ANALYSIS_LOC)\AggregationServerJNI.c  \
+  $(ANALYSIS_LOC)\IntAnalysisServerJNI.c 
+
+ANALYSIS_C_OBJ = $(ANALYSIS_C_SRC:.c=.obj)
+ANALYSIS_INCLUDE =  $(ANLUTILS_INCLUDE) -I $(ANLDIR)\include /I "$(JDK_ROOT)\include" /I "$(JDK_ROOT)\include\win32"
+ANALYSIS_FLAGS = 
+
+{$(ANALYSIS_LOC)}.c.{$(ANALYSIS_LOC)}.obj:
+    $(CC) $(CFLAGS) $(ANALYSIS_FLAGS) $(ANALYSIS_INCLUDE) /Fo$@ /c $*.c
+
+shared\libAnalysisModule.dll: shared $(ANALYSIS_C_OBJ)
+   link $(LINK_FLAGS) /dll /out:shared\libAnalysisModule.dll $(ANALYSIS_C_OBJ) $(ANLUTILS_LIB)
+
+##
+## TSO MODULE LIBRARY  (SHARED ONLY)
+##
+##
+TSO_LOC = $(PACKAGES)\tevaUtils\tso_jni
+TSO_C_SRC = $(TSO_LOC)\tso_jni.c
+TSO_C_OBJ = $(TSO_C_SRC:.c=.obj)
+TSO_INCLUDE =  /I $(TSO_LOC) /I $(PACKAGES)\tevaUtils\tso  $(TSO_UTIL_LIB_INCLUDE) /I "$(JDK_ROOT)\include" /I "$(JDK_ROOT)\include\win32" $(ANLUTILS_INCLUDE)
+TSO_FLAGS = 
+
+{$(TSO_LOC)}.c.{$(TSO_LOC)}.obj:
+    $(CC) $(CFLAGS) $(TSO_FLAGS) $(TSO_INCLUDE) /Fo$@ /c $*.c
+
+shared\libTSO.dll: shared $(TSO_C_OBJ)
+    link $(LINK_FLAGS) /dll /out:shared\libTSO.dll $(TSO_C_OBJ) $(ANLUTILS_LIB) shared\libtsoutil.lib
+
+##
+## EPANET_JNI MODULE LIBRARY  (SHARED ONLY)
+##
+##
+EPANET_JNI_LOC = $(PACKAGES)\sim\TEVAEpanetJNI
+EPANET_JNI_C_SRC = \
+    $(EPANET_JNI_LOC)\EPANETWaterModel.c \
+    $(EPANET_JNI_LOC)\EPANETJava.c
+
+EPANET_JNI_C_OBJ = $(EPANET_JNI_C_SRC:.c=.obj)
+EPANET_JNI_INCLUDE =  /I $(EPANET_JNI_LOC) /I $(PACKAGES)\sim\TEVAepanet\src /I "$(JDK_ROOT)\include" /I "$(JDK_ROOT)\include\win32" $(ANLUTILS_INCLUDE)
+EPANET_JNI_FLAGS = 
+
+{$(EPANET_JNI_LOC)}.c.{$(EPANET_JNI_LOC)}.obj:
+    $(CC) $(CFLAGS) $(EPANET_JNI_FLAGS) $(EPANET_JNI_INCLUDE) /Fo$@ /c $*.c
+
+shared\libepanet_jni.dll: shared $(EPANET_JNI_C_OBJ)
+    link $(LINK_FLAGS) /dll /out:shared\libepanet_jni.dll $(EPANET_JNI_C_OBJ)  /LIBPATH:$(ANLUTILS_LIB_DIR) ANLUtils.lib shared\libepanet.lib
+
+##
+## EPANET EXECUTABLE
+##
+##
+EPANET_C_SRC = $(EPANETLIB_LOC)\epanet.c
+EPANET_C_OBJ = .\epanet.obj
+EPANET_INCLUDE = /I . /I $(EPANETLIB_INCLUDE)
+EPANET_FLAGS = -DCLE
+
+$(EPANET_C_OBJ): $(EPANET_C_SRC)
+    $(CC) $(CFLAGS) $(EPANET_FLAGS) $(EPANETLIB_INCLUDE) /Fo$@ /c $**
+
+static\epanet.exe:  $(EPANET_C_OBJ) static\libepanet.lib
+     $(CC) $(LINKDBG) /Fe$@ $**
+     del $(EPANET_C_OBJ)
+
+##
+## TEVASIM EXECUTABLE
+##
+##
+TEVASIM_LOC = $(PACKAGES)\sim\tevasim
+TEVASIM_CPP_SRC = $(TEVASIM_LOC)\teva.cpp 
+TEVASIM_CPP_OBJ = $(TEVASIM_CPP_SRC:.cpp=.obj)
+TEVASIM_C_SRC = $(TEVASIM_LOC)\run_teva.c
+TEVASIM_C_OBJ = $(TEVASIM_C_SRC:.c=.obj)
+TEVASIM_OBJ = $(TEVASIM_C_OBJ) $(TEVASIM_CPP_OBJ)
+TEVASIM_INCLUDE = /I . /I $(TEVASIM_LOC) /I $(TSO_UTIL_LIB_LOC) /I $(EPANETLIB_LOC) $(UTILIB_INCLUDE)
+TEVASIM_FLAGS =
+
+{$(TEVASIM_LOC)}.c.{$(TEVASIM_LOC)}.obj:
+    $(CC) $(CFLAGS) $(TEVASIM_FLAGS) $(TEVASIM_INCLUDE) /Fo$@ /c $*.c
+
+{$(TEVASIM_LOC)}.cpp.{$(TEVASIM_LOC)}.obj:
+    $(CPP) $(CFLAGS) $(TEVASIM_FLAGS) $(TEVASIM_INCLUDE) /Fo$@ /c $*.cpp
+
+static\tevasim.exe:  $(TEVASIM_OBJ) static\libtsoutil.lib static\libtevautil.lib static\libepanet.lib $(UTILIB_LIB)
+   $(CC) $(DEBUGGING_SYMBOLS) $(LINKDBG) /Fe$@  $**
+
+##
+## TSO2TEXT EXECUTABLE
+##
+##
+TSO2TEXT_LOC = $(TSO_UTIL_LIB_LOC)
+TSO2TEXT_C_SRC = $(TSO2TEXT_LOC)\tso2text.c
+TSO2TEXT_C_OBJ = $(TSO2TEXT_LOC)\tso2text.obj
+TSO2TEXT_INCLUDE = /I . /I $(TSO2TEXT_LOC)
+TSO2TEXT_FLAGS =
+
+
+{$(TSO2TEXT_LOC)}.c.{$(TSO2TEXT_LOC)}.obj:
+    $(CC) $(CFLAGS) $(TSO2TEXT_FLAGS) $(TSO2TEXT_INCLUDE) /Fo$@ /c $*.c
+
+static\tso2text.exe:  $(TSO2TEXT_C_OBJ) static\libtsoutil.lib
+   $(CC) $(LINKDBG) /Fe$@ $** 
+
+##
+## TSODIFF EXECUTABLE
+##
+##
+TSODIFF_LOC = $(TSO_UTIL_LIB_LOC)
+TSODIFF_C_SRC = $(TSODIFF_LOC)\tsodiff.c
+TSODIFF_C_OBJ = $(TSODIFF_LOC)\tsodiff.obj
+TSODIFF_INCLUDE = /I . /I $(TSODIFF_LOC)
+TSODIFF_FLAGS =
+
+{$(TSODIFF_LOC)}.c.{$(TSODIFF_LOC)}.obj:
+    $(CC) $(CFLAGS) $(TSODIFF_FLAGS) $(TSODIFF_INCLUDE) /Fo$@ /c $*.c
+
+static\tsodiff.exe:  $(TSODIFF_C_OBJ) static\libtsoutil.lib
+   $(CC) $(LINKDBG) /Fe$@ $** 
+
+##
+## TSOINFO EXECUTABLE
+##
+##
+TSOINFO_LOC = $(TSO_UTIL_LIB_LOC)
+TSOINFO_C_SRC = $(TSOINFO_LOC)\tso_info.c
+TSOINFO_C_OBJ = $(TSOINFO_LOC)\tso_info.obj
+TSOINFO_INCLUDE = /I . /I $(TSOINFO_LOC)
+TSOINFO_FLAGS =
+
+{$(TSOINFO_LOC)}.c.{$(TSOINFO_LOC)}.obj:
+    $(CC) $(CFLAGS) $(TSOINFO_FLAGS) $(TSOINFO_INCLUDE) /Fo$@ /c $*.c
+
+static\tsoinfo.exe:  $(TSOINFO_C_OBJ) static\libtsoutil.lib
+   $(CC) $(LINKDBG) /Fe$@ $** 
+
+OBJ_FILES = $(TSO_UTIL_LIB_C_OBJ) $(EPANETLIB_C_OBJ) $(TEVAUTIL_C_OBJ) $(ANALYSIS_C_OBJ) $(TSO_C_OBJ) $(EPANET_JNI_C_OBJ) $(EPANET_C_OBJ) $(TEVASIM_C_OBJ) $(TEVASIM_CPP_OBJ) $(TSO2TEXT_C_OBJ) $(TSODIFF_C_OBJ) $(TSOINFO_C_OBJ)
+
+help:
+   @echo "nmake all" will build the static libraries and executables
+   @echo "nmake dlls " will build the shared versions
+   @echo "nmake clean-objs" will delete the object files only
+   @echo "nmake clean" will delete all generated files
+   @echo "nmake check" will run and check the executables (not implemented yet)
+   @echo "nmake /?" lists all nmake options
+
+clean-objs:
+        @-del /Q $(OBJ_FILES)
+
+clean:
+	cd $(UTILIB_LIB_DIR)
+	$(MAKE) clean
+	cd $(MAKEDIR)
+		@-del /Q teva_config.h
+        @-del /Q $(OBJ_FILES)
+        @-del /Q static/tsoinfo.*
+        @-del /Q static\libtsoutil.*
+        @-del /Q static\libepanet.*
+        @-del /Q static\libtevautil.*
+        @-del /Q static\epanet.*
+        @-del /Q static\tevasim.*
+        @-del /Q static\tso2text.*
+        @-del /Q static\tsodiff.*
+        @-del /Q static\tsoinfo.*
+        @-del /Q shared\libtsoutil.*
+        @-del /Q shared\libepanet.*
+        @-del /Q shared\libAnalysisModule.*
+        @-del /Q shared\libepanet_jni.*
+        @-del /Q shared\libTSO.*

@@ -1,0 +1,26 @@
+\section{Overview}\label{scenarioAggrExecutable_scenarioAggrOverview}
+The {\bfseries scenarioAggr} executable takes an IMPACT file and produces an aggregated impact file.\section{Usage}\label{scenarioAggrExecutable_scenarioAggrUsage}
+\begin{verb}
+   scenarioAggr --numEvents=<num_incidents> <impact file>
+\end{verb}
+\section{Options}\label{scenarioAggrExecutable_scenarioAggrOptions}
+\begin{verb}
+    --numEvents=<number>
+       The number of incidents that should be aggregated.
+\end{verb}
+\section{Description}\label{scenarioAggrExecutable_scenarioAggrDescription}
+The {\bfseries scenarioAggr} executable reads an IMPACT file, finds similar incidents, combines them, and writes out another IMPACT file. The convention is to prepend the string \char`\"{}aggr\char`\"{} to the output.
+
+The following files are generated during the execution of {\bfseries scenarioAggr}, assuming that the input was named \char`\"{}network.impact\char`\"{}: 
+\begin{itemize}
+\item aggrnetwork.impact -\/ the new \doxyref{Impact File}{p.}{formats_impactFile}
+
+
+\item aggrnetwork.impact.prob -\/ the probabilities of the aggregated incidents. These are non-\/uniform, so any solver must recognize incident probabilities.
+
+
+\end{itemize}\section{Notes}\label{scenarioAggrExecutable_scenarioAggrNotes}
+
+\begin{itemize}
+\item Not all solvers in SPOT can perform optimization with aggregated IMPACT files. In particular, the heuristic GRASP solver does not currently support aggregation because it does not use incident probabilities. The Lagrangian and PICO solvers support incident aggregation. However, initial results suggest that although the number of incidents is reduced significantly, the number of impacts may not be, and solvers may not run much faster. 
+\end{itemize}

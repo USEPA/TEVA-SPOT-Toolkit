@@ -1,0 +1,48 @@
+{\small
+\begin{verbatim}
+template <class ProblemT>
+class serialLipshitzianNode : virtual public pico::branchSub
+{
+public:
+
+  /// The type of the branching class
+  typedef serialLipshitzian<ProblemT> branching_t;
+
+  /// Return a pointer to the global branching object
+  branching_t* global() const;
+
+  /// Return a pointer to the base class of the global branching object
+  pico::branching* bGlobal() const;
+
+  /// Link the debugging in the subproblem to the debugging level
+  /// set within the global branching object.
+  REFER_DEBUG(global());
+
+  /// Initialize a subproblem using a branching object
+  void initialize(branching_t* master);
+
+  /// Initialize a subproblem as a child of a parent subproblem.
+  void initialize(serialLipshitzianNode<ProblemT>* parent,int whichChild);
+
+  /// Initialize this subproblem to be the root of the branching tree
+  void setRootComputation();
+
+  /// Compute the lower bound on this subproblem's value.
+  void boundComputation(double* controlParam);
+
+  /// Determine how many children will be generated and how they will be
+  /// generated (e.g. the branching variable).
+  int splitComputation();
+
+  /// Create a child subproblem of the current subproblem
+  branchSub* makeChild(int whichChild);
+
+  /// Returns true if this subproblem represents a feasible solution
+  bool candidateSolution();
+
+  /// Updates the incumbent solution.
+  void updateIncumbent();
+
+};
+\end{verbatim}
+}

@@ -1,0 +1,10 @@
+#------------------------------------------------------------------------#
+#       These PACKAGE Macros for target=DARWIN  at site=Emory on krunchy #
+#------------------------------------------------------------------------#
+
+MPI_DIR=/usr/local
+MPI_INCLUDES=-I$(MPI_DIR)/include
+MPI_LIBS=-llammpi++ -llammpio -llamf77mpi -lmpi -llam
+MPI_LDFLAGS=-L$(MPI_DIR)/lib
+
+# BLAS and LAPACK are provided by Darwin's vecLib framework: defines are in mt-darwin-*

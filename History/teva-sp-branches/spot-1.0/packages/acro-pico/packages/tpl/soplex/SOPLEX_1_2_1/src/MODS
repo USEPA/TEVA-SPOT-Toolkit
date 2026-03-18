@@ -1,0 +1,14 @@
+
+. rename vector.h -> spxvector.h to avoid compiler confusions
+. rename vector.cpp -> spxvector.cpp to avoid compiler confusions
+. const argument in SPxLP::lhs
+. const argument in SPxLP::rhs
+. const argument in SPxLP::obj
+. const argument in SPxLP::maxObj
+. const argument in SPxLP::lower
+. const argument in SPxLP::upper
+
+. commented out 'infinity' asserts (necessary????)  (look for TRM)
+
+. added a variety of compilation targets (including cygwin!)
+. augmented osf1.compaq target to integrate templates into the library itself

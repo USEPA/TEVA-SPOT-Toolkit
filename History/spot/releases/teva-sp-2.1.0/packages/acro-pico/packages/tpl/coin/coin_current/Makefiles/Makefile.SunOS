@@ -1,0 +1,172 @@
+
+# Updated to look for Sun Studio, then Sun (Forte) Workshop, then GCC. I
+# haven't yet looked to see if Studio deserves/requires different option
+# settings vs. Workshop. -- lh, 06.02.03 --
+
+# The first order of business is to attempt to figure out what programming
+# environment we're using, and what the appropriate command names are.
+
+pathsearch = $(firstword $(wildcard $(addsuffix /$(1), \
+	       $(subst :, ,$(PATH)))))
+
+# To hardwire your programming environment, uncomment one of these lines.
+# SUNWspro is Sun Studio (or its predecessor, Sun/Forte Workshop.) GCC is the
+# GNU Compiler Collection.
+
+# SunOS_PROGENV := SUNWspro
+# SunOS_PROGENV := GCC
+
+# If the user hasn't specified the programming environment above, try to
+# figure it out. First up, check for Sun Studio, then Sun/Forte Workshop.
+# If one of them is present, use it.
+
+ifndef SunOS_PROGENV
+  testcmd := $(call pathsearch,sunstudio)
+  ifneq ($(testcmd),)
+    testout := $(shell $(testcmd) -V)
+    ifneq ($(findstring Studio,$(testout)),)
+      SunOS_PROGENV := SUNWspro
+#      $(info Found $(testcmd))
+    endif
+  else
+    testcmd := $(call pathsearch,workshop)
+    ifneq ($(testcmd),)
+      testout := $(shell $(testcmd) -V)
+      ifneq ($(findstring WorkShop,$(testout)),)
+	SunOS_PROGENV := SUNWspro
+#	$(info Found $(testcmd))
+      endif
+    endif
+  endif
+endif
+
+# If neither Studio or Workshop are present, assume the GCC is available
+# (after all, we're running Gnu make).
+
+ifndef SunOS_PROGENV
+  SunOS_PROGENV := GCC
+endif
+
+export SunOS_PROGENV
+
+# For Studio/Workshop, "cc" is correct for C compilation, "CC" for C++
+# compilation.  For GCC, check for presence of "gcc", fall back to "cc" (likely
+# obsolete).
+
+ifeq ($(SunOS_PROGENV),SUNWspro)
+  CC := cc
+  CXX := CC
+  FF := f90
+  DEPCXX := $(CXX) -xM1
+  DEPCC := $(CC) -xM1
+else
+  testcmd := $(call pathsearch,gcc)
+  ifneq ($(testcmd),)
+    CC := gcc
+  else
+    CC := cc
+  endif
+  CXX := g++
+  FF := g77
+  DEPCXX := $(CXX) -MM
+  DEPCC := $(CC) -MM
+  STDCPP_DIR = $(subst /bin/$(CXX),/lib,$(call pathsearch,$(CXX)))
+  SYSLD += -Wl,-R,$(STDCPP_DIR) -lstdc++ -lnsl -lsocket
+endif
+
+CP := /usr/bin/cp -p
+LN := ln -s
+
+###############################################################################
+
+# Sort out optimisation and debug symbol table info. These are not mutually
+# exclusive, so the easiest approach is to filter out debugging (always -g),
+# then work with optimisation. It's not clear that -g belongs in OPTFLAG,
+# but this is consistent with other Makefile.<ostype> files.
+
+dbgflg := $(strip $(filter -g, $(OptLevel)))
+optflg := $(strip $(filter-out -g, $(OptLevel)))
+
+OPTFLAG += $(dbgflg)
+
+ifeq ($(SunOS_PROGENV),SUNWspro)
+  ifeq ($(optflg),-O)
+      OPTFLAG += -xO4
+  else
+      OPTFLAG += $(optflg)
+  endif
+  compilerOptFlags := -O -xO1 -xO2 -xO3 -xO4 -xO5
+else
+  ifeq ($(optflg),-O)
+      OPTFLAG += -O6
+  else
+      OPTFLAG += $(optflg)
+  endif
+  compilerOptFlags := -O -O1 -O2 -O3 -O4 -O5 -O6
+endif
+
+# Now, what to do? If we have debug and no optimisation, set ZEROFAULT to
+# make sure COIN does a thorough job of initialising variables and arrays.
+
+ifeq ($(OptLevel),-g)
+  CXXFLAGS += -DZEROFAULT
+endif
+
+# If we have optimisation and no debugging, add NDEBUG
+
+ifeq ($(optflg),$(strip $(OptLevel)))
+  CXXFLAGS += -DNDEBUG
+endif
+
+# And if the user has specified both debugging and optimisation, well, assume
+# they understand the implications and can adjust other makefiles to suit
+# themselves.
+
+###############################################################################
+# Set up library and linking info. Some makefiles do not manage to define
+# LibType, so assign a default (shared) here. Note that creating a static
+# build requires changing LibType in multiple makefiles. The conditionals
+# here should be cleaned up to properly separate settings for shared and
+# static builds, but in the meantime no harm is done.
+
+SHARED_LIBEXT := .so
+STATIC_LIBEXT := .a
+LibType ?= SHARED
+
+ifeq ($(SunOS_PROGENV),SUNWspro)
+
+    SHLINKPREFIX := -R
+    SYSLD += 
+    STATICSYSLD += -Bstatic
+    ifeq (${LibType},SHARED)
+        LD  := $(CXX) -o
+        LIBLDFLAGS := -G
+        LIBEXT := $(SHARED_LIBEXT)
+        CXXFLAGS += -KPIC
+    else
+        LD  := $(CXX) -o
+        LIBLDFLAGS := -xar 
+        LIBEXT := $(STATIC_LIBEXT)
+        CXXFLAGS +=
+    endif
+
+else
+
+    SHLINKPREFIX := -Wl,-R,
+    SYSLD += 
+    STATICSYSLD += -static
+    ifeq (${LibType},SHARED)
+        LD  := g++ -o
+        LIBLDFLAGS := -shared
+        LIBEXT := $(SHARED_LIBEXT)
+        CXXFLAGS += -fPIC
+    else
+        LD  := ar -q
+        LIBLDFLAGS :=
+        LIBEXT := $(STATIC_LIBEXT)
+        CXXFLAGS +=
+    endif
+
+endif
+
+EFENCE := -lefence

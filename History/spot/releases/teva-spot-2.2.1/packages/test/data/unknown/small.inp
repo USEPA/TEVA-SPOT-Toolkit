@@ -1,0 +1,122 @@
+
+[TITLE]
+Project: test for network morphing
+Scenario: 4 nodes
+Date: 08/05/04 
+
+[JUNCTIONS]
+;ID              	Elev        	Demand      	Pattern         
+ 1               	5    		10			;
+ 2               	5    		0			;
+[RESERVOIRS]
+;ID              	Head        	Pattern         
+
+[TANKS]
+;ID              	Elevation   	InitLevel   	MinLevel    	MaxLevel    	Diameter    	MinVol      	VolCurve
+ S               	10    		100		0		100		50		0		;
+ T               	0    		0		0		100		50		0		;
+
+[PIPES]
+;ID              	Node1           	Node2           	Length      	Diameter    	Roughness   	MinorLoss   	Status
+ P-0	          	S               	1               	2000.0        	10.0         	110.0       	0.0         	Open  	;
+ P-1	          	1               	2               	3000.0        	6.0         	110.0       	0.0         	Open  	;
+ P-2	          	1               	2               	3000.0        	8.0         	110.0       	0.0         	Open  	;
+ P-3	          	2               	T               	2000.0        	10.0         	110.0       	0.0         	Open  	;
+
+[PUMPS]
+;ID              	Node1           	Node2           	Parameters
+
+[VALVES]
+;ID              	Node1           	Node2           	Diameter    	Type	Setting     	MinorLoss   
+
+[TAGS]
+
+[STATUS]
+;ID              	Status/Setting
+
+[PATTERNS]
+;ID              	Multipliers
+
+[CURVES]
+;ID              	X-Value     	Y-Value
+
+[CONTROLS]
+
+
+[RULES]
+
+
+[ENERGY]
+ Global Efficiency  	75
+ Global Price       	0
+ Demand Charge      	0
+
+[EMITTERS]
+;Junction        	Coefficient
+
+[QUALITY]
+;Node            	InitQual
+
+[SOURCES]
+;Node            	Type        	Quality     	Pattern 
+S            CONCEN        5.1000000000e-02  
+
+[REACTIONS]
+;Type     	Pipe/Tank       	Coefficient
+
+
+[MIXING]
+;Tank            	Model
+
+[TIMES]
+ Duration           	96
+ Hydraulic Timestep 	1:00
+ Quality Timestep   	0:05
+ Pattern Timestep   	1:00
+ Pattern Start      	0:00
+ Report Timestep    	0:05
+ Report Start       	0:00
+ Start ClockTime    	12 am
+ Statistic          	None
+
+[REPORT]
+ Status             	Yes
+ Summary            	Yes
+ Page               	0
+ Links                  All
+ Nodes                  All
+ Quality                Yes
+
+[OPTIONS]
+ Units              	GPM
+ Headloss           	H-W
+ Specific Gravity   	0.998
+ Viscosity          	0.10803737e-4
+ Trials             	40
+ Accuracy           	0.001
+ Unbalanced         	Continue 10
+ Pattern            	1
+ Demand Multiplier  	1.0
+ Emitter Exponent   	0.5
+ Quality            	Chemical mg/L
+ Diffusivity        	1
+ Tolerance          	0.01
+
+[COORDINATES]
+;Node            	X-Coord         	Y-Coord
+ S                      0                       0
+ 1                      0                       0
+ 2                      0                       0
+ T                      0                       0
+
+
+[LABELS]
+;X-Coord           Y-Coord          Label & Anchor Node
+
+[BACKDROP]
+ DIMENSIONS     	403822.54       	1435331.13      	427962.10       	1481463.23      
+ UNITS          	None
+ FILE           	
+ OFFSET         	0.00            	0.00            
+
+[END]

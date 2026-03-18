@@ -1,0 +1,118 @@
+
+#### package, host, target, and site dependent Makefile fragments come in here.
+
+#-------------------------------------------------------------------------------
+#
+# SRC Makefile 
+#
+#-------------------------------------------------------------------------------
+
+##
+## Customizations here
+##
+SRCDIRS= ranlib adt math sys io $(SWIGDIR) doe
+PACKAGE= utilib
+
+default: libraries
+
+##
+## Makefile Macros
+##
+install:
+	$(MAKE) global_header
+	$(MAKE) $(INSTALL_LIBRARIES) $(INSTALL_SHARED_LIBRARIES)
+
+libraries: install_headers
+	@(if [ ! -d $(LIBDIR) ]; then \
+	   mkdir -p $(LIBDIR); \
+	fi)
+	@(for DIRS in $(SRCDIRS); do  \
+	  cd $${DIRS};\
+          $(MAKE) library;\
+	  if [ $$? != 0 ]; then exit 1; fi; \
+	  cd ..;\
+	done)
+ 
+install_libraries: install_headers
+	@(if [ ! -d $(LIBDIR) ]; then \
+	   mkdir -p $(LIBDIR); \
+	fi)
+	@(for DIRS in $(SRCDIRS); do  \
+	  cd $${DIRS}; \
+	  $(MAKE) install_library; \
+	  if [ $$? != 0 ]; then exit 1; fi; \
+	  cd ..; \
+	done)
+
+shared_libraries: install_headers
+	@(if [ ! -d $(LIBDIR)-shared ]; then \
+	   mkdir -p $(LIBDIR)-shared; \
+	fi)
+	@(for DIRS in $(SRCDIRS); do  \
+	  cd $${DIRS};\
+          $(MAKE) shared_library;\
+	  if [ $$? != 0 ]; then exit 1; fi; \
+	  cd ..;\
+	done)
+ 
+install_shared_libraries: install_headers
+	@(if [ ! -d $(LIBDIR)-shared ]; then \
+	   mkdir -p $(LIBDIR)-shared; \
+	fi)
+	@(for DIRS in $(SRCDIRS); do  \
+	  cd $${DIRS}; \
+	  $(MAKE) install_shared_library; \
+	  if [ $$? != 0 ]; then exit 1; fi; \
+	  cd ..; \
+	done)
+
+clean:
+	@(for DIRS in $(SRCDIRS); do  \
+	  cd $${DIRS}; $(MAKE) clean; cd ..; \
+	done)
+	@(for FILE in `find . -name 'SunWS_cache' -print` ; do\
+		$(RM) -rf $${FILE};\
+	done) #2> /dev/null
+
+distclean:
+	@(for DIRS in $(SRCDIRS); do  \
+	  cd $${DIRS}; $(MAKE) distclean; cd ..; \
+	done)
+	$(RM) Makefile config.status config Makefile-*
+
+clean_generic:
+	- $(RM) *.o core *.i Templates.DB tempinc ptrepository tmp *~
+
+distclean_generic:	clean_generic
+	-$(RM) config.status Makefile config Makefile-*
+
+install_headers:
+	@if [ ! -f $(INCDIR)/$(PACKAGE)/.update_flag ]; then \
+	    $(MAKE) update_includes; \
+	    touch $(INCDIR)/$(PACKAGE)/.update_flag; \
+	fi
+
+update_includes:
+	@if [ ! -d $(INCDIR)/$(PACKAGE) ]; then \
+	   mkdir -p $(INCDIR)/$(PACKAGE); \
+	fi
+	@$(RM) $(INCDIR)/$(PACKAGE)/*[Hh]
+	@if [ -r utilib.h ]; then\
+	   $(ECHO) "Linking file utilib.h";\
+	   $(LN) `pwd`/utilib.h $(INCDIR)/$(PACKAGE)/utilib.h;\
+	fi
+	@(for FILE in `find $(SRCDIRS) -name '*.[hH]' -print` ; do\
+	       fname=`$(ECHO) "$${FILE}" | sed 's#\(.*\)\/\([a-zA-Z0-9]*\)$ #\2#'`; \
+	       if [ ! -f $(INCDIR)/$(PACKAGE)/$${fname} ] ; then			\
+	          $(ECHO) "Linking file $${FILE}";			\
+	          $(LN) `pwd`/$${FILE} $(INCDIR)/$(PACKAGE)/$${fname} ;		\
+	       fi;							\
+	done) #2> /dev/null
+
+global_header:
+	@$(BINDIR)/makehdr $(PACKAGE) $(SRCDIRS)
+
+
+executables:
+	@(cd doe; $(MAKE) executables)
+

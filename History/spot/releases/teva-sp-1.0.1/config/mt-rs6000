@@ -1,0 +1,38 @@
+#----------------------------------------------------#
+# Target ARCHitecture dependent definitions - RS6000 #
+#----------------------------------------------------#
+
+AR		= ar
+ARFLAGS		= ruv
+RANLIB		= ranlib
+ARCLEAN		= $(RM)
+
+CC		= xlc
+CWARNINGS	= -Ae
+CC_SHARED	=
+
+CCC		= xlC
+C++		= $(CCC)
+C++WARNINGS	= #+p +a1
+C++_SHARED	=
+
+F77		= f77
+FFLAGS		= -O #-u -libmil
+F_SHARED	=
+
+INCLUDES	= $(ARCH_INCLUDES)
+LIB_PATH	= $(ARCH_LIB_PATH)
+LIBS		= $(ARCH_LIBS)
+LDSTATIC	= 
+LDFLAGS		=
+OPTIMIZATION	= -O
+
+ARCH_LIB_PATH	=
+ARCH_LIBS	= -ll
+ARCH_INCLUDES	= -I. -I/usr/include/X11R5
+ARCH_FLAGS	= -DUNIX -DRS6K -DMULTITASK
+XTRA_FLAGS	=
+
+DEFINES		= $(ARCH_DEFINES)
+TARGET_ARCH     =
+LIBRARY_TARGET  = library_standard

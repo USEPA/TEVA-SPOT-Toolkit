@@ -1,0 +1,52 @@
+/* System Headers */
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <math.h>
+#include <float.h>
+#include <time.h>
+
+/* MS/Epanet header */
+//#ifdef WIN32
+//#ifdef MSEPANET  /* Multi-species or Normal Epanet header */
+//#include "epanet2ms.h"
+//#else
+//#include "epanet2.h"
+//#endif
+//#endif
+
+//#ifdef __linux__
+
+#ifdef MSEPANET  /* Multi-species or Normal Epanet header */
+#include "toolkitms.h"
+#else
+#include "toolkit.h"
+#endif
+
+//#endif
+
+/* TEVAUtils headers */
+#include "tevautil.h"
+#include "enutil.h"
+
+#define TSMAJORVERSION  1
+#define TSMINORVERSION  2
+
+/* Global Conversion macros */
+#define TEVAFILEOPEN(x) if ((x) == NULL) { TEVASimError(1,"Opening files");}
+#define MEMCHECK(x) if ((x) == NULL) { TEVASimError(1,"Allocating memory"); }
+#define MIN(x,y) (((x)<=(y)) ? (x) : (y))     /* minimum of x and y    */
+#define MAX(x,y) (((x)>=(y)) ? (x) : (y))     /* maximum of x and y    */
+#define MOD(x,y) ((x)%(y))                    /* x modulus y           */
+
+/* Function Prototypes */
+#ifdef __cplusplus
+extern "C" {
+#endif
+void TEVASimError(int exitCode,const char *errmsg, ...);
+char  *TEVAclocktime(char*, long);
+#ifdef __cplusplus
+};
+#endif
+

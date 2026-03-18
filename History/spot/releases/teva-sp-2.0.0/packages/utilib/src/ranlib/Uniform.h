@@ -1,0 +1,123 @@
+/*  _________________________________________________________________________
+ *
+ *  UTILIB: A utility library for developing portable C++ codes.
+ *  Copyright (c) 2001, Sandia National Laboratories.
+ *  This software is distributed under the GNU Lesser General Public License.
+ *  For more information, see the README file in the top UTILIB directory.
+ *  _________________________________________________________________________
+ */
+
+/**
+ * \file Uniform.h
+ *
+ * Defines the utilib::Uniform class
+ */
+
+#ifndef utilib_Uniform_h
+#define utilib_Uniform_h
+
+#include <utilib/utilib_config.h>
+#ifdef UTILIB_HAVE_STD
+#include <cmath>
+#else
+#include <math.h>
+#endif
+
+#include <utilib/exception_mngr.h>
+#include <utilib/RandomVariable.h>
+
+namespace utilib {
+
+#if defined(SGI)
+using std::floor;
+#endif
+
+/**
+ * A class that generates uniformly distributed random variables.
+ * Adapted from GNU code by Dirk Grunwald.
+ */
+class Uniform: public SimpleRandomVariable<double>
+{
+public:
+
+  /// Constructor
+  Uniform() : pLow(0.0), pHigh(1.0), delta(1.0) {}
+
+  /// Templated constructor
+  template <class RNGT>
+  Uniform(RNGT* gen, double low=0.0, double high=1.0)
+	: SimpleRandomVariable<double>()
+	{
+	generator(gen);
+    	pLow = (low < high) ? low : high;
+    	pHigh = (low < high) ? high : low;
+    	delta = pHigh - pLow;
+	}
+
+  /// Returns the lower limit of the r.v.
+  double low()
+	{ return pLow; }
+
+  /// Sets the lower limit of the r.v.
+  double low(double x)
+	{
+  	double tmp = pLow;
+  	pLow = x;
+  	delta = pHigh - pLow;
+  	return tmp;
+	}
+
+  /// Returns the upper limit of the r.v.
+  double high()
+	{ return pHigh; }
+
+  /// Sets the upper limit of the r.v.
+  double high(double x)
+	{
+  	double tmp = pHigh;
+  	pHigh = x;
+  	delta = pHigh - pLow;
+  	return tmp;
+	}
+
+  ///
+  virtual double operator()();
+
+protected:
+
+  /// The lower limit of the r.v.
+  double pLow;
+
+  /// The upper limit of the r.v.
+  double pHigh;
+
+  /// The difference between \c pHigh and \c pLow.
+  double delta;
+
+};
+
+
+inline double Uniform::operator()()
+{
+if (!pGenerator)
+   EXCEPTION_MNGR(runtime_error, "Uniform::operator() : Attempting to use a NULL RNG.")
+
+double temp = (double) (pHigh-pLow)*(pGenerator.asDouble()) + pLow;
+return(temp);
+}
+
+
+
+/// Discretize a value in [0.0,1.0] into {low, ..., high}
+inline int Discretize(double urand, int low, int high) 
+{
+int ans = (int)floor(low + (high-low+1) * urand);
+if (ans > high)
+   ans = high;		// This handles the case when urand == 1.0
+return ans;
+}
+
+
+} // namespace utilib
+
+#endif

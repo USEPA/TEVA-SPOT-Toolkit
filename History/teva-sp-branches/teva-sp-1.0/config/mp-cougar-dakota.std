@@ -1,0 +1,34 @@
+#-----------------------------------------------------------------------#
+#       These PACKAGE Macros for target=COUGAR at site=DAKOTA.STD	#
+#-----------------------------------------------------------------------#
+
+CPLEX_DIR=/Net/proj/opt/packages/CPLEX.6.0/SOLARIS
+CPLEX_INCLUDES=-I$(CPLEX_DIR)
+CPLEX_LIBS=-lcplex
+CPLEX_LDFLAGS=-L$(CPLEX_DIR)
+
+MPI_DIR=
+MPI_INCLUDES=
+MPI_LIBS= 
+MPI_LDFLAGS=
+
+MPE_DIR=
+MPE_INCLUDES=
+MPE_LIBS=
+MPE_LDFLAGS=
+
+XPRESS_DIR=/Net/proj/opt/packages/express
+XPRESS_INCLUDES=-I$(XPRESS_DIR)/include
+XPRESS_LIBS=-lxmsl -lxosl -lmp-opt
+XPRESS_LDFLAGS=-L$(XPRESS_DIR)/lib
+
+SOPLEX_DIR=/Net/proj/opt/packages/SOPLEX
+SOPLEX_INCLUDES=-I$(SOPLEX_DIR)/include
+SOPLEX_LIBS=-lsoplex
+SOPLEX_LDFLAGS=-L$(SOPLEX_DIR)/lib
+
+RW_DIR=
+RW_INCLUDES=
+RW_LIBS=
+RW_LDFLAGS=
+

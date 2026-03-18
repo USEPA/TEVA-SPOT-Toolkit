@@ -1,0 +1,45 @@
+{\small
+\begin{verbatim}
+int main(int argc, char* argv[])
+{
+try {
+  /// Reset the UTILIB global timing information
+  InitializeTiming();
+  /// Create the test function
+  FunctionClass problem;
+  /// If we're using MPI, then initialize the MPI data structures
+#if defined(USING_MPI)
+  uMPI::init(&argc,&argv,MPI_COMM_WORLD);
+  int nprocessors = uMPI::size;
+  if (parallel_exec_test<parallelBranching>(argc,argv,nprocessors)) {
+     /// Do parallel optimization if we're using more than one processor
+     CommonIO::begin();
+     CommonIO::setIOFlush(1);
+     parallelLipshitzian<FunctionClass> optimizer;
+     if (optimizer.setup(argc,argv,problem)) {
+        optimizer.Lipshitz_constant = 400.0;
+        optimizer.reset();
+        optimizer.solve();
+        }
+     CommonIO::end();
+     }
+  else {
+#endif
+     /// Do serial optimization
+     serialLipshitzian<FunctionClass> optimizer;
+     if (optimizer.setup(argc,argv,problem)) {
+        optimizer.Lipshitz_constant = 400.0;
+        optimizer.reset();
+        optimizer.solve();
+        }
+#ifdef USING_MPI
+     }
+  uMPI::done();
+#endif
+  }
+/// Use a standard block of catch routines, which catches all STL exception types explicitly
+STD_CATCH(;)
+return 0;
+}
+\end{verbatim}
+}

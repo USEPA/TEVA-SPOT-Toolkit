@@ -1,0 +1,54 @@
+Instructions to build libraries or example codes from COIN:
+
+First get the code:
+  - cd ~   (or some other directory of your choice -- for the rest of this
+	    file it is assumed that COIN is installed in your home directory)
+  - cvs checkout COIN  (see http://www.coin-or.org/faqs.html#cvsUsage)
+    or 
+    download and unpack the tarball file.
+
+You should now have a subset of the following directories (depending on what
+you have downloaded)
+  - ~/COIN 
+  - ~/COIN/Makefiles - various global and system dependent Makefiles
+  - ~/COIN/Coin - a library containing a set of core classes, functions.
+  - ~/COIN/Vol - the Volume Algorithm
+  - ~/COIN/Clp - the Coin LP solver
+  - ~/COIN/Osi - the Open Solver Interface
+  - ~/COIN/Cgl - the Cut Generation Library
+  - ~/COIN/Sbb - the Simple Branch and Bound solver (frozen Halloween 2004)
+  - ~/COIN/Cbc - the Coin Branch and Cut solver (was Sbb)
+  - ~/COIN/Bcp - the Branch-Cut-Price framework
+  - ~/COIN/Examples/* - Sample programs
+  - ~/COIN/Mps - *.mps files
+  - ~/COIN/Ots - the Open Tabu Search framework
+  - ~/COIN/Dfo - the Derivative Free Optimization
+  - ~/COIN/Ipopt - Interior Point Non-linear optimizer
+  - ~/COIN/Alps - a framework for implementing parallel tree search algorithms.
+
+To build any component (library or example code), see the INSTALL file
+in that directory (except for Ipopt, where the INSTALL file is in
+~/COIN/Ipopt/doc)
+
+After installing any of the libraries two more directory will be created: 
+  - ~/COIN/include - the header files of the installed libraries
+  - ~/COIN/lib     - the installed libraries
+
+IMPORTANT NOTES: 
+================
+
+1) One of the most important files is ~/COIN/Makefiles/Makefile.location.
+   This file contains definitions for which libraries you want to build and
+   the location of libraries that might be needed (e.g., zlib to read
+   compressed MPS files). Please look at this file before starting to install
+   anything.
+
+2) Also, take a look at the ~/COIN/Makefiles/Makefile.<your_system_type>
+   file. This specifies what compiler to use and what compiler flags.
+
+3) Most components require GNU make rather than BSD make.  On some
+   systems (e.g., Linux), GNU make is the default.  On other systems,
+   it may be called gmake, or it may be called make but not appear in
+   the default path, or it may not be installed at all.  If you need
+   to install GNU make from source, source is available at
+   http://www.gnu.org/software/make.

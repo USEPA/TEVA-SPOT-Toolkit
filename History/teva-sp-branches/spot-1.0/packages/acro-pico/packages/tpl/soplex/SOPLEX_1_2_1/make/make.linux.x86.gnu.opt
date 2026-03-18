@@ -1,0 +1,6 @@
+#--- $Id: make.linux.x86.gnu.opt,v 1.1 2002/06/25 21:07:09 DEVspx Exp $
+CXX	=	g++
+CPPFLAGS=	-Isrc -DNDEBUG
+CXXFLAGS=	-O3 -march=pentiumpro -fno-exceptions -funroll-loops
+LDFLAGS	=	-lm -static
+ARFLAGS	=	crs

@@ -1,0 +1,34 @@
+
+Templates are hard-coded using the template instantiation mechanisms contained
+in templates/Makefile.temps.  Creating a new template class is a bit tricky.
+The target 'base_templates' syntactically processes template header and source
+files to create *.Ct and *.Ht files that can be used to instantiate templates.
+These files are assumed to be massaged to make the template type names more
+distintinguishable, as well as to include some ifdefs that are needed to
+instantiate a template.  The basic routine used here is 'gentemp', which has the
+syntax:
+
+    gentemp <sourcefile> <headerfile> <class1> ... <classn> -types <type1> ... <typen>
+
+where the class list are the template instantiations, which are assumed to
+use the same type names throughout the file.
+ 
+Constructing a template instances is substantially easier (though not quite
+easy).  The basic routine is 'instemp':
+
+    instemp <sourcefile> <headerfile> <type1> ... <typen> 
+		-headers <header1> ... <headern>
+		-classes <class1> ... <classn>
+
+The types are the actual types that match the type list used for gentemp.  The
+headers are the files that are included to define the types used during the
+instantiation (possibly even other template types).  The class list is the
+template_instantiated classnames.  This is generated manually to allow
+pointers to be turned into appropriate class names.  Again, the order of these
+class names must match the order of the classes listed for gentemp.
+
+
+The file templates/Makefile.temps defines the base_templates and 
+template_instances targets.  It also defines template_objs and 
+TEMP_LIBS, which do not need to be updated if a new template instantion is 
+created.

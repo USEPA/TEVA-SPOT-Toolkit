@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# Argument is a file name.  Figure out how many days old the file
+# is, and echo that number.
+#
+# If the file name is not found, echo "-1" to flag an error.
+#
+
+if [ ! -f $1 ] ; then
+  echo "-1"
+  exit
+fi
+
+#
+# get "seconds since epoch" of file's modification time
+#
+lsout=$(ls -l --time-style=+%s $1)
+lsinfo=${lsout% *}
+lsdate=${lsinfo##* }
+
+#
+# get "seconds since epoch" right now
+#
+nowdate=$(date +%s)
+
+#
+# age of file in days
+#
+
+declare -i secondsPerDay=86400
+declare -i s1=$lsdate
+declare -i s2=$nowdate
+
+declare -i age=$(( ($s2 - $s1) / $secondsPerDay ))
+
+echo $age

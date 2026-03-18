@@ -1,0 +1,6 @@
+The 'reconfig' script sets up configuration directories that 
+have externals to subversion repositories that are referenced in a
+Coopr configuration.
+
+NOTE: these configurations should not be manually edited, and these
+directories are used strictly for development.

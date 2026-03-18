@@ -1,0 +1,15 @@
+OBJECTS = epanet.o hash.o hydraul.o inpfile.o input1.o input2.o input3.o mempool.o output.o quality.o report.o rules.o smatrix.o
+
+libepanet.a: $(OBJECTS)
+	ar cr $@ $(OBJECTS)
+	ranlib $@
+
+.c.o:
+	gcc -c -O6 $<
+
+install:
+	cp libepanet.a ../../lib/.
+	cp toolkit.h ../../include/.
+
+clean:
+	rm -f *.o libepanet.a

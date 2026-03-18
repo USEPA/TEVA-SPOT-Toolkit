@@ -1,0 +1,65 @@
+
+NumArray is a subclass of SimpleArray that provides
+definitions for an array data type for numerical data types.  NumArray
+is a This code extends the vector class developed by Brian Bartell, UC
+San Diego.  The constructor semantics are the same as those for BasicArray.
+
+
+void plus  (const NumArray<T>&, const NumArray<T>&);
+void minus (const NumArray<T>&, const NumArray<T>&);
+void times (const NumArray<T>&, const NumArray<T>&);
+void divide(const NumArray<T>&, const NumArray<T>&);
+
+  Apply the operator element-wise to the two arrays and put the result into
+  ArrayData.
+
+void plus  (const NumArray<T>&, const T& );
+void minus (const NumArray<T>&, const T& );
+void times (const NumArray<T>&, const T& );
+void divide(const NumArray<T>&, const T& );
+
+  Apply the operator element-wise to array and the value and put the result into
+  ArrayData.
+
+NumArray<T> operator-    ();
+
+  Negate the sign of the elements in ArrayData.
+ 
+NumArray<T>& operator+=  (const T& );
+NumArray<T>& operator-=  (const T& );
+NumArray<T>& operator*=  (const T& );
+NumArray<T>& operator/=  (const T& );
+ 
+  Apply the operator element-wise to ArrayData using the value.
+
+NumArray<T>& operator+= (const NumArray<T>&);
+NumArray<T>& operator-= (const NumArray<T>&);
+NumArray<T>& operator*= (const NumArray<T>&);
+NumArray<T>& operator/= (const NumArray<T>&);
+ 
+  Apply the operator element-wise to ArrayData using the array.
+
+NumArray<T> operator+ (const NumArray<T>& a1, const NumArray<T>& a2)
+NumArray<T> operator- (const NumArray<T>& a1, const NumArray<T>& a2)
+NumArray<T> operator* (const NumArray<T>& a1, const NumArray<T>& a2)
+NumArray<T> operator/ (const NumArray<T>& a1, const NumArray<T>& a2)
+
+  Construct an array and apply the operator element-wise to the two arrays,
+  putting the result into the new array.
+
+NumArray<T> operator+ (const NumArray<T>& a1, const T& val)
+NumArray<T> operator- (const NumArray<T>& a1, const T& val)
+NumArray<T> operator* (const NumArray<T>& a1, const T& val)
+NumArray<T> operator/ (const NumArray<T>& a1, const T& val)
+
+  Construct an array and apply the operator element-wise to array and 
+  the value, putting the result into the new array.
+
+NumArray<T> operator+ (const T& val, const NumArray<T>& a1)
+NumArray<T> operator- (const T& val, const NumArray<T>& a1)
+NumArray<T> operator* (const T& val, const NumArray<T>& a1)
+NumArray<T> operator/ (const T& val, const NumArray<T>& a1)
+
+  Construct an array and apply the operator element-wise to array and 
+  the value, putting the result into the new array.
+

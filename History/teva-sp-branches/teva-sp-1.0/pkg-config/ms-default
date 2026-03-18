@@ -1,0 +1,16 @@
+#-----------------------------------------------------------------------#
+#       These SITE Macros for a STANDARD configuration are used 	#
+#	everywhere.				                        #
+#									#
+#	This is the configuration that I use for development, so I make	#
+#	assumptions that the make environment is less brain-dead.	#
+#	In particular, I use VPATH and the += option			#
+#-----------------------------------------------------------------------#
+
+BINDIR= $(ROOT_DIR)/bin
+LIBDIR= $(ROOT_DIR)/lib
+INCDIR= $(ROOT_DIR)/include
+DOCDIR= $(ROOT_DIR)/doc
+
+INCLUDES= -I$(INCDIR) -I$(INCDIR)/coin -I$(INCDIR)/appspack
+SUBDIRS=

@@ -1,0 +1,10 @@
+#!/bin/sh 
+
+\rm -f .coverage */.coverage */*/.coverage
+cd ..
+../tpl/acro-pico/python/bin/python ../bin/nosetests --with-nosexunit --core-target=test/xunit --where=test $*
+
+cd test/studies
+./runstudy -f tso.study.xml
+./runstudy -f impact.study.xml
+./runstudy -f opt.study.xml

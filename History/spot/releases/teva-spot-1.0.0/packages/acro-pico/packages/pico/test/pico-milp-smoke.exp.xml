@@ -1,0 +1,30 @@
+<experimental-study name="pico-milp">
+  <tags>
+    <tag>smoke</tag>
+    <tag>pico</tag>
+  </tags>
+
+  <experiment>
+    <factors>
+      <factor name="test" filename="milp_smoke_problems"/>
+      <factor name="lptype">
+        <level>lpType=clp</level>
+        <!-- <level>lpType=soplex</level>
+        <level>lpType=glpk</level> -->
+      </factor>
+      <factor name="misc">
+        <level>maxCPUMinutes=30 usingCuts=false</level>
+        <level>maxCPUMinutes=60</level>
+      </factor>
+    </factors>
+    <controls>
+       <executable type="runexp_driver">./exp.pico.pl</executable>
+    </controls>
+  </experiment>
+
+  <analyze>
+    <test name="FinalValue" type="validate">
+      <options>_measurement='Value' _tolerance=_opttol</options>
+    </test>
+  </analyze>
+</experimental-study>
