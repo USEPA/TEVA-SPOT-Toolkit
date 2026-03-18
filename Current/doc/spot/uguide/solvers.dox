@@ -1,0 +1,1120 @@
+/*! 
+ * \page solvers Sensor Placement Solvers
+
+
+The SPOT sensor placement solvers are launched with the \ref spExecutable
+"sp" command.  The \c sp command reads in one or more IMPACT files,
+and computes a sensor placement.  Command-line options for \c sp can
+specify any of a set of performance or cost goals as the objective to
+be optimized, as well as constraints on performance and cost goals.
+
+The \c sp command currently interfaces with 
+three different sensor placement optimizers:
+<ul>
+
+<li> <b>MIP solvers</b> - Several different MIP solvers can be used
+by the \c sp command: the commercial CPLEX solver and the open-source
+PICO solver.  These optimizers use the MIP formulations to find globally
+optimal solutions.  However, this may be a computationally expensive
+process (especially for large problems), and the size of the MIP
+formulation can become prohibitively large in some cases.
+
+Two different MIP solvers can be used: the public-domain PICO solver and the commercial PICO solver.  PICO is included in distributions of SPOT.
+
+<li> <b>GRASP Heuristic</b> - The GRASP heuristic performs sensor
+placement optimization without explicitly creating a MIP formulation.
+Thus, this solver uses much less memory, and it usually runs very quickly.
+Although the GRASP heuristic does not guarantee that a globally optimal
+solution is found, it has proven effective at finding optimal solutions
+to a variety of large-scale applications.
+
+Two different implementations of the GRASP solvers can be used: an ATT commercial solver (att_grasp) and an open-source implementation of this solver (snl_grasp).
+
+<li> <b>GRASP Heuristic</b> - The GRASP heuristic performs sensor
+<li> <b>Lagrangian Heuristic</b> - The Lagrangian heuristic uses the
+structure of the p-median MIP formulation (eSP) to find
+near-optimal solutions while computing a lower bound on the best
+possible solution.  
+</ul>
+
+The following sections provide examples that illustrate the use of the
+\c sp command.  A complete description of \c sp is available in the
+Appendix.  Note that this appendix includes a summary of the limitations of 
+different solvers.
+
+The \c sp command has many different options. The following examples
+show how different sensor placement optimization problems can be solved
+with \c sp.
+Note that these examples can be run in the
+\c C:\\spot\\examples\\simple directory.  The user needs to generate IMPACT files 
+for these examples with the following commands:
+\verbatim
+    tevasim --tsg Net3.tsg --tso Net3.tso Net3.inp Net3.out
+    tso2Impact --mc --vc --td --nfd --ec Net3 Net3.tso
+\endverbatim
+
+
+\section solvers2 A Simple Example
+
+The following simple example illustrates the way that SPOT has been most commonly used.  In this example, SPOT minimizes the extent of contamination (ec)
+while limiting the number of sensors (ns) to no more than 5.   This 
+problem formulation (eSP) can be efficiently solved with all solvers
+for modest-size distribution networks, and heuristics can effectively 
+perform sensor placement on very large networks. 
+
+We begin by using the PICO solver to solve this problem, with the following command line:
+\verbatim
+sp --network=Net3 --objective=ec --ub=ns,5 --solver=pico
+\endverbatim
+This specifies that network \c Net3 is analyzed.  The objective is to minimize \c ec, the extent of contamination, and an upper-bound of 5 is placed on 
+\c ns, the number of sensors.  The solver selected is \c pico, the PICO MIP solver.
+
+This execution of the \c  sp command uses the \c Net3_ec.impact file and 
+creates the following files: \c Net3.log, a logfile for the optimization solver,
+and Net3.sensors, a file with the sensor placement locations.  Also, \c sp
+generates the following output:
+
+\verbatim
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+Running PICO...
+PICO --debug=1 --lpType=clp   --tableInitFrac=0.05 --RRTrialsPerCall=8
+	--RRDepthThreshold=-1 --usingCuts=true  Net3.mod
+	C:\spot\examples\simple\Net3.dat
+... PICO done
+------------------------------------------------------------------------------
+Sensor placement id:        22971
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            19 28 54 63 75
+Sensor junctions:           119 141 193 207 239
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                8478.9674
+Lower quartile impact:      0.0000
+Median impact:              6949.0000
+Upper quartile impact:      12530.0000
+Value at Risk (VaR) (  5%): 25960.0000
+TCE                 (  5%): 33323.2833
+Max impact:                 42994.8000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+54      29124.8004
+19      18687.7292
+63      11471.6750
+75      9951.8699
+28      8478.9674
+Done with sp
+\endverbatim
+
+The initial information up to the statment "... PICO done" is simply output
+about what solver is run and information from the solver output.  The 
+next information beginning with "Sensor placement id:" is generated
+by \ref evalsensorExecutable "evalsensor".  This is a summary that describes
+the sensor placement and the performance of this sensor placement with
+respect to the impact measure that was minimized.  This includes the following
+data:
+<ul>
+<li> <b>Sensor placement id</b> - an integer ID used to distinguish this
+        sensor placement
+<li> <b>Number of sensors</b> - the number of sensors in the sensor placement
+<li> <b>Total cost:</b> - the cost of the sensor placement, which may be nonzero if cost data is provided
+<li> <b>Sensor node IDs</b> - the internal node indexes used by \c sp
+<li> <b>Sensor junctions</b> - the EPANET junction labels for the sensor locations
+</ul>
+The performance of the sensor placement is summarized for each IMPACT file 
+used with \c sp.  The impact statistics included are:
+<ul>
+
+<li> <b>min</b> - The minimum impact over all contamination events.
+If we make the 
+assumption that a sensor protects the node at which it is placed, then this
+measure will generally be zero.
+
+<li> <b>mean</b> - The mean (or average) impact over all contamination events.
+
+<li> <b>lower quartile</b> - 25% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>median</b> - 50% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>upper quartile</b> - 75% of contamination events,
+weighted by their likelihood, have an impact value less than this quartile.
+
+<li> <b>VaR</b> - The value at risk (VaR) uses a user-defined percentile.  Given
+\f$ 0.0 < \beta < 1.0\f$, VaR is the minimum value for which \f$100*(1-\beta)\f$% of contamination events have a smaller impact.
+
+<li> <b>TCE</b> - The tailed-conditioned expectation (TCE) is the mean value
+of the impacts that are greater than or equal to VaR.
+
+<li> <b>worst</b> - The value of the worst impact.
+
+</ul>
+
+Finally, a greedy sensor placement is described by \c evalsensor, which takes
+the five sensor placements and places them one-at-a-time, minimizing
+the mean impact as each sensor is placed.  This gives a sense of the relative
+priorities for these sensors.
+
+The \c evalsensor command can evaluate a sensor placement for a wide variety
+ of different objectives.  For example, the command
+\verbatim
+    evalsensor --nodemap=Net3.nodemap Net3.sensors Net3_ec.impact \
+               Net3_mc.impact Net3_nfd.impact
+\endverbatim
+will summarize the solution in the \c Net3.sensors file for the \c ec, \c mc and
+ \c nfd impact measures.
+
+The following example shows how to solve this same problem with the GRASP heuristic.  This solver finds the same (optimal) solution as the MIP solver, though much more quickly.
+
+\verbatim
+sp --network=Net3 --objective=ec --ub=ns,5 --solver=snl_grasp
+
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+Note: witness aggregation disabled for grasp
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+Number of sensors=5
+Objective=ec
+Statistic=mean
+Impact file=C:\spot\examples\simple\Net3_ec.impact
+Delay=0
+Running iterated descent heuristic for *perfect* sensor model
+Iterated descent completed
+------------------------------------------------------------------------------
+Sensor placement id:        23009
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            19 28 54 63 75
+Sensor junctions:           119 141 193 207 239
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                8478.9674
+Lower quartile impact:      0.0000
+Median impact:              6949.0000
+Upper quartile impact:      12530.0000
+Value at Risk (VaR) (  5%): 25960.0000
+TCE                 (  5%): 33323.2833
+Max impact:                 42994.8000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+54      29124.8004
+19      18687.7292
+63      11471.6750
+75      9951.8699
+28      8478.9674
+Done with sp
+\endverbatim
+
+Finally, the following example shows how to solve this problem with the Lagrangian heuristic.  This solver does not find as good a solution as the
+GRASP heuristic.
+
+\verbatim
+sp --network=Net3 --objective=ec --ub=ns,5 --solver=lagrangian
+
+
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+aggregateImpacts Net3.config 10000
+Setting up Lagrangian data files...
+Running UFL solver ...
+ufl Net3_ec_agg.lag  6 0
+------------------------------------------------------------------------------
+Sensor placement id:        27730
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            15 17 19 21 66
+Sensor junctions:           111 115 119 121 211
+
+Impact File:                C:\spot\examples\simple\Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                12306.8229
+Lower quartile impact:      0.0000
+Median impact:              10410.0000
+Upper quartile impact:      18100.0000
+Value at Risk (VaR) (  5%): 41526.9000
+TCE                 (  5%): 45057.9000
+Max impact:                 49880.8000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+19      32174.3110
+66      17854.3458
+15      13583.0559
+21      12929.5602
+17      12306.8229
+Done with sp
+\endverbatim
+
+
+
+
+\section solvers2a Computing a Bound on the Best Sensor Placement Value
+
+The following example shows how a lower bound can be computed on the best possible sensor placement.  That is, any sensor placement would have an expected
+impact greater than this value.  A bound is computed with the following
+syntax:
+
+\verbatim
+sp --network=Net3 --objective=ec --ub=ns,5 --solver=pico --compute-bound
+
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+Running PICO...
+PICO --debug=1 --lpType=clp   --onlyRootLP=true Net3.mod
+	C:\spot\examples\simple\Net3.dat
+... PICO done
+Computing a lower bound
+Objective lower bound: 8478.96737288
+Done with sp
+\endverbatim
+
+
+\section solvers2b Minimizing the Number of Sensors
+
+We can "invert" the sensor placement problem by minimizing the number
+of sensors subject to a constraint on the extent of contamination.
+Note that the following example finds a solution with a single sensor
+that meets our goal of 40000 mean extent of contamination.
+
+\verbatim
+sp --network=Net3 --objective=ns --ub=ec,40000 --solver=pico
+
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+WARNING: Location aggregation does not work with side constraints
+WARNING: Turning off location aggregation
+Running PICO...
+PICO --debug=1 --lpType=clp   --RRTrialsPerCall=8 --RRDepthThreshold=-1 --usingCuts=true --absTolerance=.99999  Net3.mod C:\spot\examples\simple\Net3.dat
+... PICO done
+------------------------------------------------------------------------------
+Sensor placement id:        27738
+Number of sensors:          1
+Total cost:                 0
+Sensor node IDs:            37
+Sensor junctions:           161
+
+Impact File:                C:\spot\examples\simple\Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                26901.9572
+Lower quartile impact:      3940.0000
+Median impact:              22450.0000
+Upper quartile impact:      38855.0000
+Value at Risk (VaR) (  5%): 71377.8000
+TCE                 (  5%): 81046.0667
+Max impact:                 103746.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+37      26901.9572
+Done with sp
+\endverbatim
+
+
+\section solvers2c Fixing Sensor Placement Locations
+
+Properties of the sensor locations can be specified with the
+\c --sensor-locations option.  This options specifies a \ref locationsFile
+that can control whether sensor locations are feasible or infeasible, and
+fixed or unfixed.  For example, suppose the file \c locations contains
+\verbatim
+infeasible 193 119 141 207 239
+fixed 161
+\endverbatim
+The following example shows how these restrictions impact the solution.  Compared to the 
+first example above, we have a less-optimal solution, since we cannot use the sensor locations above and 
+we are required to include junction \c 161.
+
+\verbatim
+sp --network=Net3 --objective=ec --ub=ns,5 --solver=pico 
+        --sensor-locations=locations
+
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+Running PICO...
+PICO --debug=1 --lpType=clp   --tableInitFrac=0.05 --RRTrialsPerCall=8
+	--RRDepthThreshold=-1 --usingCuts=true  Net3.mod
+	C:\spot\examples\simple\Net3.dat
+... PICO done
+------------------------------------------------------------------------------
+Sensor placement id:        22996
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            17 33 37 50 66
+Sensor junctions:           115 151 161 185 211
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                9338.7119
+Lower quartile impact:      0.0000
+Median impact:              7640.0000
+Upper quartile impact:      14120.0000
+Value at Risk (VaR) (  5%): 27335.0000
+TCE                 (  5%): 32282.3000
+Max impact:                 45300.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+37      26901.9572
+66      18192.6581
+33      13958.3119
+17      11281.2907
+50      9338.7119
+Done with sp
+\endverbatim
+
+
+\section solvers4 Robust Optimization of Sensor Locations
+
+The following example demonstrates the optimization of sensor placements
+using the TCE measure.  TCE is the mean value of the worst incidents in
+the ensemble being evaluated.  Given a confidence level \f$1-\beta\f$,
+TCE is the expectation of the worst impacts with probability \f$\beta\f$.
+Compared with our first example, we see that this finds a better solution
+in terms of TCE, although the mean performance is slightly worse.
+
+\verbatim
+sp --network=Net3 --objective=ec_tce --ub=ns,5 --solver=snl_grasp
+
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+Note: witness aggregation disabled for grasp
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+Number of sensors=5
+Objective=ec
+Statistic=tce
+Impact file=C:\spot\examples\simple\Net3_ec.impact
+Delay=0
+Running iterated descent heuristic for *perfect* sensor model
+Iterated descent completed
+------------------------------------------------------------------------------
+Sensor placement id:        23005
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            17 19 24 65 88
+Sensor junctions:           115 119 127 209 267
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                10266.1110
+Lower quartile impact:      0.0000
+Median impact:              10400.0000
+Upper quartile impact:      16930.0000
+Value at Risk (VaR) (  5%): 24199.0000
+TCE                 (  5%): 26376.2167
+Max impact:                 28564.8000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+88      30803.8140
+19      19369.7636
+65      12568.0822
+17      11130.4161
+24      10266.1110
+Done with sp
+\endverbatim
+
+Note that the greedy ordering of sensors is less useful in this case.  Although we optimized to minimize TCE, the greedy ordering uses the mean value to
+select each sensor location.
+
+
+\section solvers7 Multi-Criteria Analysis
+
+We now illustrate how \c sp supports multi-objective analysis through
+an iterative process.  SPOT does not have a general "pareto search"
+optimizer.  Instead, users can specify constraints with \c sp that ensure
+that previously optimized objectives are "close" to their previous values.
+In this way, the user can explicitly search for trade-offs between
+one-or-more performance objectives.
+
+The examples above consider the extent-of-contamination objective.
+We can assess how well the sensor placements generated above minimize
+other objectives like the expected mass of contaminant consumed using
+\c evalsensor.  Consider the solution generated by the previous example
+(which minimized \c ec_tce), which we have copied into the file \c
+Net3_ec.sensors.
+
+\verbatim
+evalsensor --nodemap=Net3.nodemap Net3_ec.sensors Net3_mc.impact
+------------------------------------------------------------------------------
+Sensor placement id:        23112
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            17 19 24 65 88
+Sensor junctions:           115 119 127 209 267
+
+Impact File:                Net3_mc.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                70895.2854
+Lower quartile impact:      503.9170
+Median impact:              83150.7000
+Upper quartile impact:      144002.0000
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144546.8333
+Max impact:                 144693.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+65      71599.4274
+88      71256.6780
+24      71042.6323
+17      70952.7213
+19      70895.2854
+\endverbatim
+
+The mean mass consumed is 70895, which is far from the optimal value of 21782 (which we computed separately).  
+We revisit the robust optimization example in the previous section; we keep
+"extent of contamination - tce" as our primary objective, but we now impose a 
+"side constraint" that precludes any solution that admits an average 
+mass consumed of worse than 30,000 units.  We do this as follows:
+
+\verbatim
+sp --network=Net3 --objective=ec_tce --ub=mc_mean,30000 --ub=ns,5 --solver=snl_grasp
+
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+read_impact_files:  C:\spot\examples\simple\Net3_mc.impact
+Note: witness aggregation disabled for grasp
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+WARNING: Location aggregation does not work with side constraints
+WARNING: Turning off location aggregation
+Number of sensors=5
+Objective=ec
+Statistic=tce
+Impact file=C:\spot\examples\simple\Net3_ec.impact
+Delay=0
+Running iterated descent heuristic for *perfect* sensor model
+Iterated descent completed
+------------------------------------------------------------------------------
+Sensor placement id:        23143
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            4 15 29 68 81
+Sensor junctions:           35 111 143 215 253
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                14315.5322
+Lower quartile impact:      1379.0000
+Median impact:              10810.0000
+Upper quartile impact:      21809.8000
+Value at Risk (VaR) (  5%): 37915.8000
+TCE                 (  5%): 48340.3667
+Max impact:                 71329.0000
+
+Impact File:                Net3_mc.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                29501.3226
+Lower quartile impact:      139.0200
+Median impact:              1766.1000
+Upper quartile impact:      16476.3000
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144276.3333
+Max impact:                 144335.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+4       33437.5797
+15      22324.5746
+29      17100.4814
+68      14912.0110
+81      14315.5322
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+81      55207.4343
+29      37684.3130
+4       32849.0896
+68      29738.0747
+15      29501.3226
+Done with sp
+\endverbatim
+
+Note that the primary objective, minimizing the TCE of the 
+"extent of contamination" measure, has gotten worse:  it is now 48340
+rather than 26376.  However, our side constraint has
+been honored, and the mean mass consumed value is now 29501 rather than
+70895.
+
+
+\section solvers9 Sensor Placements without Penalties
+
+A fundamental issue for sensor placement is how to handle the fact that
+a limited budget of sensors will not be able to cover all possible 
+incidents.  SPOT addresses this issue by providing impact measures that
+integrate an impact 'penalty' for incidents that are not detected by a
+CWS design.  Thus, in the previous examples there was an implicit trade-off 
+between impact reduction and reduction in the number of contamination
+incidents that are detected.
+
+SPOT also includes impact measures that do not contain these penalties,
+which allows a user to more directly assess the performance of a CWS
+design in the context where detections have occured.  For example,
+the time-to-detection measure (td) includes a penalty for undetected
+incidents, but the detected-time-to-detection measure (dtd) has no
+penalty (or, more precisely, a zero penalty).
+
+For example, consider the simple example above, which minimizes the
+extent of contamination.  We apply \c evalsensors to the final solution
+to evaluate the \b ec, \b dec and \b nfd impact measures:
+
+\verbatim
+evalsensor --nodemap=Net3.nodemap Net3_orig.sensors Net3_ec.impact    
+	Net3_dec.impact Net3_nfd.impact
+
+------------------------------------------------------------------------------
+Sensor placement id:        3789
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            19 28 54 63 75
+Sensor junctions:           119 141 193 207 239
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                8478.9674
+Lower quartile impact:      0.0000
+Median impact:              6949.0000
+Upper quartile impact:      12530.0000
+Value at Risk (VaR) (  5%): 25960.0000
+TCE                 (  5%): 33323.2833
+Max impact:                 42994.8000
+
+Impact File:                Net3_dec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                8184.5182
+Lower quartile impact:      0.0000
+Median impact:              6949.0000
+Upper quartile impact:      12530.0000
+Value at Risk (VaR) (  5%): 25960.0000
+TCE                 (  5%): 33323.2833
+Max impact:                 42994.8000
+
+Impact File:                Net3_nfd.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                0.2500
+Lower quartile impact:      0.0000
+Median impact:              0.0000
+Upper quartile impact:      0.0000
+Value at Risk (VaR) (  5%): 1.0000
+TCE                 (  5%): 1.0000
+Max impact:                 1.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_ec.impact
+------------------------------------------------------------------------------
+54      29124.8004
+19      18687.7292
+63      11471.6750
+75      9951.8699
+28      8478.9674
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_dec.impact
+------------------------------------------------------------------------------
+19      4845.7771
+28      3613.4678
+54      10489.1614
+63      7097.6114
+75      8184.5182
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_nfd.impact
+------------------------------------------------------------------------------
+75      0.2712
+28      0.2500
+19      0.2500
+54      0.2500
+63      0.2500
+\endverbatim
+
+In this example, the final sensor placement fails to detect 25% of
+the incidents.  It is noteworthy that this does not impact the mean
+performance very much, since the impact penalty has led to a final solution
+that fails to detect few incidents with high penalties.
+
+Note that minimizing <b>dtd</b> does not really make sense.  With zero
+sensors, you detect no incidents, which means that the final impact
+measurement is zero!  Thus, minimizing <b>dtd</b> requires the additional
+constraint on the number of failed detections (nfd) as well as a limit on 
+the number of sensors (or total sensor costs).
+
+Only the 'pico' SPOT solver currently supports optimization with 'detected' 
+impact measures.  For example:
+
+\verbatim
+sp --network=Net3 --objective=dec --ub=ns,5 --ub=nfd,0.25 --solver=pico
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+WARNING: Location aggregation does not work with side constraints
+WARNING: Turning off location aggregation
+Running PICO...
+PICO --debug=1 --lpType=clp   --RRTrialsPerCall=8 
+	--RRDepthThreshold=-1 --feasibilityPump=false --usingCuts=true  
+	Net3.mod C:\spot\examples\simple\Net3.dat
+... PICO done
+------------------------------------------------------------------------------
+Sensor placement id:        23466
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            19 28 54 63 75
+Sensor junctions:           119 141 193 207 239
+
+Impact File:                Net3_dec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                8184.5182
+Lower quartile impact:      0.0000
+Median impact:              6949.0000
+Upper quartile impact:      12530.0000
+Value at Risk (VaR) (  5%): 25960.0000
+TCE                 (  5%): 33323.2833
+Max impact:                 42994.8000
+
+Impact File:                Net3_nfd.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                0.2500
+Lower quartile impact:      0.0000
+Median impact:              0.0000
+Upper quartile impact:      0.0000
+Value at Risk (VaR) (  5%): 1.0000
+TCE                 (  5%): 1.0000
+Max impact:                 1.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_dec.impact
+------------------------------------------------------------------------------
+19      4845.7771
+28      3613.4678
+54      10489.1614
+63      7097.6114
+75      8184.5182
+------------------------------------------------------------------------------
+Greedy ordering of sensors: Net3_nfd.impact
+------------------------------------------------------------------------------
+75      0.2712
+28      0.2500
+19      0.2500
+54      0.2500
+63      0.2500
+Done with sp
+\endverbatim
+
+
+
+\section solvers5 Limited-Memory Sensor Placement Techniques
+
+Controlling memory usage is a critical issue for solving large sensor
+placement formulations.  This is a particular challenge for MIP methods,
+but both the GRASP and Lagrangian heuristics can have difficultly solving
+very large problems on standard workstations.  A variety of mechanisms
+have been integrated into \c sp to reduce the problem representation
+size while preserving the structure of the sensor placement problem.
+
+The \ref scenarioAggrExecutable "scenarioAggr" method described in
+the previous section is one possible strategy.  This tool compresses
+the impact file while preserving the fundamental structure of the
+impact file and it is appropriate when optimizing for mean
+performance objectives.  Similarly, the \ref filter_impactsExecutable
+"filter_impacts" script can limit the sensor placement to only consider
+contamination incidents that are "sufficiently bad" in the worst-case.
+Another strategy is to limit the number of sensor placements, using
+the \c --sensor-locations option described above, since eliminating feasible
+locations reduces the problem representation used by the \c sp solvers.
+
+Two other strategies are also supported by \c sp.  First, the GRASP
+heuristic has several options for controlling how memory is managed.
+The \c --grasp-representation option can be used to control how the
+local search steps are performed.  By default, a dense matrix is
+precomputed to perform local search steps quickly, but a sparse matrix
+can be used to perform local search with less memory.  Also,
+the GRASP heuristic can be configured to use the local disk to store this
+matrix. It should be
+noted that the Lagrangian heuristic requires less memory than the GRASP
+heuristic, and thus similar techniques have not been developed for it.
+
+Second, the <i>witness aggregation</i> technique can be used to limit
+the size of the sensor placement formulation.  This term refers to the
+variables in the MIP formulation that "witness" a contamination event.
+By default, variables that witness contamination events with the same
+impact are aggregated, and this typically reduces the MIP constraint
+matrix by a significant amount.  Further reductions can be performed
+with more aggressive aggregations.
+
+To illustrate the use of witness aggregation, we generated impact
+files with the \c C:\\spot\\etc\\tsg\\hourly.tsg TSG file.  The following
+table illustrates the use of the two witness aggregation options when
+optimizing the mean extent of contamination: \c --aggregation-percent
+and \c --aggregation-ratio (used with the \c --distinguish-detection
+option, which helps this aggregation option).  The second line of data
+in this table is the default aggregation, which has about half as many
+non-zero values in the MIP constraint matrix.  Both the percent and ratio
+aggregation strategies effectively reduce the problem size while finding
+near-optimal solutions.
+
+<center>
+<table>
+<tr>
+<td bgcolor="lightgray">Aggr Type</td><td bgcolor="lightgray">Aggr Value</td><td bgcolor="lightgray">Binary Vars</td><td bgcolor="lightgray">MIP Nonzeros</td><td bgcolor="lightgray">Solution Value</td>
+</tr>
+<tr>
+<td>None</td><td>NA</td><td>97</td><td align="right">220736</td><td align="right">8525</td>
+</tr>
+<tr>
+<td>Percent</td><td>0.0</td><td>97</td><td align="right">119607</td><td align="right">8525</td>
+</tr>
+<tr>
+<td>Percent</td><td>0.125</td><td>97</td><td align="right">49576</td><td align="right">9513</td>
+</tr>
+<tr>
+<td>Ratio</td><td>0.125</td><td>97</td><td align="right">12437</td><td align="right">10991</td>
+</tr>
+</table>
+</center>
+
+
+\section solvers6 Evaluating a Sensor Placement 
+
+The \ref evalsensorExecutable "evalsensor" executable takes sensor placements in a \ref
+sensorPlacementFile and evaluates them using data from an \ref impactFile
+(or a list of impact files).  This executable measures the performance of
+each sensor placement with respect to the set of possible contamination
+locations.  This analysis assumes that probabilities have been assigned
+to these contamination locations, and if no probabilities are given then uniform
+probabilies are used by \c evalsensor.
+
+The following example illustrates the use of \c evalsensor after 
+running the first sensor placement optimization example.
+
+\verbatim
+evalsensor --nodemap=Net3.nodemap Net3_orig.sensors Net3_ec.impact 
+	Net3_mc.impact
+------------------------------------------------------------------------------
+Sensor placement id:        5511
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            19 28 54 63 75
+Sensor junctions:           119 141 193 207 239
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                8478.9674
+Lower quartile impact:      0.0000
+Median impact:              6949.0000
+Upper quartile impact:      12530.0000
+Value at Risk (VaR) (  5%): 25960.0000
+TCE                 (  5%): 33323.2833
+Max impact:                 42994.8000
+
+Impact File:                Net3_mc.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                43636.7076
+Lower quartile impact:      220.0020
+Median impact:              1909.9500
+Upper quartile impact:      105031.0000
+Value at Risk (VaR) (  5%): 144271.0000
+TCE                 (  5%): 144345.0000
+Max impact:                 144477.0000
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+54      29124.8004
+19      18687.7292
+63      11471.6750
+75      9951.8699
+28      8478.9674
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+75      59403.2616
+28      44478.4678
+63      43854.6979
+54      43659.7307
+19      43636.7076
+\endverbatim
+
+The \c evalsensors command can also evaluate a sensor placement in the case
+where sensors can fail, and there is some small number of
+different classes of sensors (grouped by false negative probability).
+Consider the \c Net3.imperfectsc file, which defines different categories of
+sensor failures:
+\verbatim
+1 0.25
+2 0.50
+3 0.75
+4 1.0
+\endverbatim
+Sensors of class "1" give false negative readings 25% of the time, sensors
+of class "2" give them 50% of the time, etc.  
+
+Once failure classes have been defined, the junctions of the network are assigned
+to classes.  This is done with another file (a "junction class" or jc file), like
+\c Net3.imperfectjc.
+\verbatim
+1 1
+2 1
+3 1
+4 1
+5 1
+6 1
+7 1
+8 1
+9 1
+10 1
+11 1
+12 1
+13 1
+14 1
+15 1
+16 1
+17 1
+18 1
+19 1
+20 1
+....
+....
+\endverbatim
+Given the junction classes, we can run \c evalsensor to determine the
+expected impact of a sensor placement, given that sensors may fail.  Again,
+using the solution from the original example:
+\verbatim
+evalsensor --nodemap=Net3.nodemap --sc-probabilities=Net3.imperfectsc 
+	--scs=Net3.imperfectjc Net3_orig.sensors Net3_ec.impact
+
+------------------------------------------------------------------------------
+Sensor placement id:        5511
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            19 28 54 63 75
+Sensor junctions:           119 141 193 207 239
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                17161.8656
+Lower quartile impact:      3940.0000
+Median impact:              15307.2500
+Upper quartile impact:      26537.2156
+Value at Risk (VaR) (  5%): 47637.7773
+TCE                 (  5%): 54977.0644
+Max impact:                 75509.9043
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+54      36553.6321
+63      25655.0376
+28      21209.3084
+75      18810.1629
+19      17161.8656
+\endverbatim
+
+Note that the mean impact of this "extent of contamination" changes 
+dramatically if sensors are allowed to fail.  The original solution,
+8478 pipe feet, was misleading if sensors fail according to the 
+probabilities we have assigned.  With sensor failures, the expected impact is 17161
+pipe feet -- more than twice the "perfect sensor" impact.
+
+
+\section solvers3 Sensor Placement with Imperfect Sensors
+
+The GRASP heuristics in SPOT can optimize sensor placements that take into
+account sensor failures.  For example, we can perform sensor placement
+optimization with imperfect sensors using the \c Net3.imperfectsc and
+\c Net3.imperfectjc files defined in the previous section.
+
+\verbatim
+sp --network=Net3 --objective=ec --ub=ns,5 --imperfect-scfile=Net3.imperfectsc 
+	--imperfect-jcfile=Net3.imperfectjc --solver=snl_grasp
+
+read_impact_files:  C:\spot\examples\simple\Net3_ec.impact
+Note: witness aggregation disabled for grasp
+
+Number of Nodes                :  97
+Number of Contamination Impacts: 9458
+
+Number of sensors=5
+Objective=ec
+Statistic=mean
+Impact file=C:\spot\examples\simple\Net3_ec.impact
+Delay=0
+Running iterated descent heuristic for *imperfect* sensor model
+Iterated descent completed
+------------------------------------------------------------------------------
+Sensor placement id:        9285
+Number of sensors:          5
+Total cost:                 0
+Sensor node IDs:            33 63 75 83 87
+Sensor junctions:           151 207 239 257 265
+
+Impact File:                Net3_ec.impact
+Number of events:           236
+Min impact:                 0.0000
+Mean impact:                13414.2479
+Lower quartile impact:      3610.0000
+Median impact:              11690.0000
+Upper quartile impact:      20096.0000
+Value at Risk (VaR) (  5%): 36467.5500
+TCE                 (  5%): 44420.1990
+Max impact:                 63324.0500
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+Greedy ordering of sensors
+------------------------------------------------------------------------------
+87      27984.5508
+63      22080.0939
+83      16853.0790
+75      14955.9915
+33      13414.2479
+Done with sp
+\endverbatim
+
+After this optimization, the mean impact is 13414 pipe feet rather than
+the 17161 pipe feet value for the solution optimized with perfect sensors.
+Thus, it is clear that the GRASP heuristic makes different choices if
+the sensors are imperfect.
+
+
+
+\section solversSummary Summary of Solver Features
+
+The following table highlights the capabilities
+of the SPOT optimizers.  The previous examples illustrate SPOT's capabilities,
+but the advanced features in SPOT are not available for all optimizers.
+
+\htmlonly
+<center>
+\endhtmlonly
+<table>
+<tr>
+<td bgcolor="lightgray" align="left"><b>Solver Feature</b></td>
+<td bgcolor="lightgray" align="center"><b>MIP</b></td>
+<td bgcolor="lightgray" align="center"><b>GRASP</b></td>
+<td bgcolor="lightgray" align="center"><b>Lagrangian</b></td>
+</tr>
+<tr>
+<td>Minimize mean impact</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+</tr>
+<tr>
+<td>Minimize worst impact</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+</tr>
+<tr>
+<td>Minimized number of sensors</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+<td bgcolor="pink" align="center">NO</td>
+</tr>
+<tr>
+<td>Robust objectives</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+</tr>
+<tr>
+<td>Side-constraints</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+</tr>
+<tr>
+<td>Fixed/Invalid locations</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+</tr>
+<tr>
+<td>Witness aggregation</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+</tr>
+<tr>
+<td>Incident probabilities</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+</tr>
+<tr>
+<td>Incident aggregation</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+</tr>
+<tr>
+<td>Sparse data management</td>
+<td bgcolor="pink" align="center">NO</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+</tr>
+<tr>
+<td>Imperfect sensor model</td>
+<td bgcolor="pink" align="center">NO</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+</tr>
+<tr>
+<td>Computes lower bound</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+<td bgcolor="pink" align="center">NO</td>
+<td bgcolor="lightgreen" align="center">YES</td>
+</tr>
+</table>
+\htmlonly
+</center>
+\endhtmlonly
+*/

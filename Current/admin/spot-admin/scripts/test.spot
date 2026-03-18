@@ -1,0 +1,22 @@
+#! /usr/bin/env python
+
+import os
+import sys
+import glob
+import pyutilib.subprocess
+
+if os.environ.get('PATH',None) is None:
+    os.environ['PATH'] = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname( os.path.abspath(__file__)))))
+else:
+    os.environ['PATH'] = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname( os.path.abspath(__file__)))))+os.sep+'python'+os.sep+'bin'+os.pathsep+os.environ['PATH']
+
+currdir = os.path.dirname(os.path.dirname( os.path.dirname( os.path.dirname( os.path.abspath(__file__)))))+os.sep
+
+print ""
+print "*****************************"
+print " Executing test.spot"
+print "*****************************"
+
+os.chdir( currdir+'packages'+os.sep+'test' )
+pyutilib.subprocess.run('./runtests', tee=True)
+
