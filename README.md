@@ -1,3 +1,6 @@
+DEPRECATED - This repository is no longer being maintained and is available for reuse. 
+
+
 TEVA-SPOT Toolkit 
 ========================
 
@@ -22,7 +25,7 @@ a MS Windows DOS shell or any standard Unix shell (e.g. the Bash shell).
 TEVA-SPOT was developed between 2005 and 2011. The repository is no longer under active 
 development.  Version 2.5.2 is the final release. Related projects include:
 
-* [Water Security Toolkit (WST)](https://github.com/dbhart/wst-water-security-toolkit) (WST was developed between 2011 and 2018, the repository is no longer under active development)
+* [Water Security Toolkit (WST)](https://github.com/USEPA/Water-Security-Toolkit) (WST was developed between 2011 and 2018, the repository is no longer under active development)
 * [Water Network Tool for Resilience (WNTR)](https://github.com/USEPA/WNTR)
 * [Chama - Sensor Placement Optimization](https://github.com/sandialabs/chama)
 
